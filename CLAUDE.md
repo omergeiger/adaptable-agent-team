@@ -32,7 +32,7 @@ These apply to agents running inside loop cycles (enforced via the cycle prompt 
 
 - Write only inside `projects/<active_project>/`. Never modify framework files (`loop.py`, `core/`, `.claude/`, `config.yaml`).
 - Never run `git push` - the loop owns git sync.
-- Never remove or rewrite the `## Human Overrides` section of consensus.md; preserve it verbatim.
+- Never write `human_directives.md` - it is human-owned and read-only to agents. consensus.md is agent-owned; humans steer only via human_directives.md.
 
 ## Adapt Skill
 
