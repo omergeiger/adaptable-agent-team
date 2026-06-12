@@ -1,0 +1,13 @@
+active_project: example
+
+loop_interval_seconds: 30
+single_cycle: true
+git_sync: false
+
+squad:
+  - orchestrator
+  - worker
+
+cycle_timeout_seconds: 1800
+verbosity: false
+max_cycle_logs: 50
