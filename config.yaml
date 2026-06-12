@@ -5,8 +5,9 @@ single_cycle: true
 git_sync: false
 
 squad:
-  - orchestrator
   - worker
+
+model: claude-sonnet-4-6
 
 cycle_timeout_seconds: 1800
 verbosity: false

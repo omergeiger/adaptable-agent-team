@@ -133,7 +133,7 @@ Active project: `{active}`. This is Cycle #{cycle_num}. Act decisively.
 # ---------------------------------------------------------------------------
 
 def run_cycle(
-    prompt: str, claude_bin: str, timeout_seconds: int, verbose: bool
+    prompt: str, claude_bin: str, timeout_seconds: int, verbose: bool, model: str | None = None
 ) -> tuple[int, str, list[str], bool]:
     """
     Run one `claude -p` invocation.
@@ -142,6 +142,8 @@ def run_cycle(
     """
     cmd = [claude_bin, "-p", prompt, "--permission-mode", "bypassPermissions"]
     cmd += ["--output-format", "stream-json" if verbose else "json"]
+    if model:
+        cmd += ["--model", model]
 
     proc = subprocess.Popen(
         cmd,
@@ -196,8 +198,6 @@ def extract_output_json(raw: str, verbose: bool) -> dict:
 
 
 def is_rate_limited(raw: str, exit_code: int) -> bool:
-    if exit_code == 429:
-        return True
     lower = raw.lower()
     return any(p in lower for p in RATE_LIMIT_PATTERNS)
 
@@ -275,17 +275,12 @@ def main() -> None:
 
     while True:
         cycle_count += 1
-        ts = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
         cycle_dir = logs_dir / f"cycle-{cycle_count:04d}-{ts}"
         cycle_dir.mkdir(parents=True, exist_ok=True)
 
         log.info(f"=== Cycle #{cycle_count} START ===")
         save_state(state_file, cycle_count, "running")
-
-        # Rotate loop.log if grown large
-        log_file = logs_dir / "loop.log"
-        if log_file.exists() and log_file.stat().st_size > LOG_ROTATE_BYTES:
-            log_file.rename(log_file.with_suffix(".log.old"))
 
         # Back up consensus
         con.backup(project_dir)
@@ -305,10 +300,11 @@ def main() -> None:
         # Run the cycle
         timeout = config.get("cycle_timeout_seconds", 1800)
         verbose = config.get("verbosity", False)
+        model = config.get("model") or None
         start_time = time.time()
 
         exit_code, raw_output, transcript_lines, timed_out = run_cycle(
-            prompt, claude_bin, timeout, verbose
+            prompt, claude_bin, timeout, verbose, model
         )
         duration = time.time() - start_time
 
@@ -389,11 +385,14 @@ def main() -> None:
             )
 
             if is_rate_limited(raw_output, exit_code):
+                log.warning(f"Cycle #{cycle_count}: rate limit detected.")
+                save_state(state_file, cycle_count, "rate_limited")
+                if config.get("single_cycle", False):
+                    log.warning("Single-cycle mode - exiting instead of sleeping.")
+                    sys.exit(1)
                 log.warning(
-                    f"Cycle #{cycle_count}: rate limit detected. "
                     f"Waiting {RATE_LIMIT_WAIT_SECONDS}s ({RATE_LIMIT_WAIT_SECONDS // 3600}h)..."
                 )
-                save_state(state_file, cycle_count, "rate_limited")
                 time.sleep(RATE_LIMIT_WAIT_SECONDS)
                 error_count = 0
             elif error_count >= MAX_CONSECUTIVE_ERRORS:
