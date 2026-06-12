@@ -1,5 +1,5 @@
 .idea/
-.claude/
+.claude/settings.local.json
 *.local.env
 __pycache__/
 *.pyc

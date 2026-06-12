@@ -26,6 +26,18 @@ For any discussion that requires more than a few lines - design decisions, plann
 - Never commit secrets or API keys.
 - Never modify `.gitignore` in a way that exposes previously ignored files.
 
+## Loop Agent Guardrails
+
+These apply to agents running inside loop cycles (enforced via the cycle prompt built from PROMPT.md):
+
+- Write only inside `projects/<active_project>/`. Never modify framework files (`loop.py`, `core/`, `.claude/`, `config.yaml`).
+- Never run `git push` - the loop owns git sync.
+- Never remove or rewrite the `## Human Overrides` section of consensus.md; preserve it verbatim.
+
+## Adapt Skill
+
+`.claude/skills/adapt/` is a human-run setup wizard for customizing the framework to a new domain before launching the loop. Agents and the loop never invoke it; the loop only detects an unadapted project and exits, directing the user to run /adapt interactively.
+
 ## Project Structure
 
 See `PLAN.md` for the full structure and build order.
