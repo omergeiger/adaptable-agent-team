@@ -1,3 +1,8 @@
+---
+name: adapt
+description: Human-run setup wizard for adapting the framework to a new domain. Only the human user invokes this interactively before launching the loop; loop agents must never invoke it.
+---
+
 # /adapt - AgentTeam Setup Wizard
 
 **Run this skill interactively before launching the loop on a new domain.**

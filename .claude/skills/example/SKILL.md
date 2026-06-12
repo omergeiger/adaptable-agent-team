@@ -1,3 +1,8 @@
+---
+name: example
+description: Skill template and reference - shows the pattern for writing AgentTeam skills.
+---
+
 # /example - Skill Template
 
 This file shows the pattern for writing AgentTeam skills.

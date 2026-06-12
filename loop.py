@@ -100,8 +100,9 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 ## Runtime Guardrails (required)
 
 - Write only inside `projects/{active}/`. Never modify framework files (`loop.py`, `core/`, `.claude/`, `config.yaml`).
-- Never run `git push` — the loop owns git sync.
-- Never write `human_directives.md` — it is human-owned and read-only to agents.
+- Never run `git push` - the loop owns git sync.
+- Never write `human_directives.md` - it is human-owned and read-only to agents.
+- Never invoke the /adapt skill - it is human-run only.
 
 ---
 
