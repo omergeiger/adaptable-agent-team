@@ -36,7 +36,7 @@ Before this cycle ends, you **must** update `projects/<active_project>/consensus
 
 ```
 ## Last Updated
-<ISO timestamp>
+<copy the injected cycle time exactly - do not invent a timestamp>
 
 ## Current Phase
 <phase name>

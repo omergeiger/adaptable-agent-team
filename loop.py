@@ -93,6 +93,7 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
     active = config["active_project"]
     squad = config.get("squad", [])
     roster = "\n".join(f"- {s}" for s in squad) if squad else "(none configured)"
+    cycle_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     guardrails = f"""
 ---
@@ -124,7 +125,7 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 
 ---
 
-Active project: `{active}`. This is Cycle #{cycle_num}. Act decisively.
+Active project: `{active}`. This is Cycle #{cycle_num}. Cycle time: `{cycle_time}` (use this exact value for `## Last Updated` in consensus.md). Act decisively.
 """
     return base + guardrails
 
