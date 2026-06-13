@@ -24,7 +24,7 @@ Run `/adapt` when:
 
 This wizard interviews you about your domain and generates:
 1. A new project folder at `projects/<your-project-name>/` with `docs/`, `logs/`, and `memory/` subfolders
-2. Customized worker agent files in `.claude/agents/` - one per worker role (replaces the generic placeholders). The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into PROMPT.md.
+2. Customized worker agent files in `.claude/agents/` - one per worker role (replaces the generic placeholders). The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into PROMPT.md. After generating, every agent file NOT in the new squad is deleted (the generic `worker.md`/`orchestrator.md` placeholders and any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
 3. A tailored `PROMPT.md` embedding the orchestrator persona and domain-specific rules
 4. Domain skill files at `.claude/skills/<name>/SKILL.md` - one per convention, template, or rubric that must not drift across cycles. Agents load these during loop cycles.
 5. A starter `consensus.md` for the new project (ready to run - no sentinel marker)
@@ -139,6 +139,8 @@ You are the <role> for this agent team. <2-3 sentences describing responsibiliti
 
 <how this agent should structure its output report>
 ```
+
+**Cleanup (required):** after writing the new agent files, delete every other `.claude/agents/*.md` whose `name` is not in the new squad - including the generic `worker.md` and `orchestrator.md` placeholders and any agent files left over from a previous domain. The cycle session discovers all agent files and could delegate to a stale one. List the deletions to the user as part of the overwrite confirmation.
 
 ### `.claude/skills/<name>/SKILL.md` for each convention from question 7
 
