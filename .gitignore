@@ -11,3 +11,6 @@ projects/*/logs/
 projects/*/memory/
 # Example project docs are a smoke-test fixture, not a deliverable; real projects track docs/
 projects/example/docs/
+
+# Human/agent communication scratchpad - not source
+comments.txt
