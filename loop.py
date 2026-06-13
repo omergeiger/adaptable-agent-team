@@ -143,7 +143,11 @@ def run_cycle(
     transcript_lines is populated only when verbose=True.
     """
     cmd = [claude_bin, "-p", prompt, "--permission-mode", "bypassPermissions"]
-    cmd += ["--output-format", "stream-json" if verbose else "json"]
+    if verbose:
+        # The CLI requires --verbose for stream-json in print mode
+        cmd += ["--output-format", "stream-json", "--verbose"]
+    else:
+        cmd += ["--output-format", "json"]
     if model:
         cmd += ["--model", model]
 
