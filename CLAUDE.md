@@ -11,13 +11,15 @@ AgentTeam is a generic multi-agent loop framework for Claude Code. It extracts t
 
 ## Communication Convention
 
-For any discussion that requires more than a few lines - design decisions, planning, feedback, open questions - use `comments.txt` in the project root.
+Two working files under `.dev-docs/`, kept distinct:
 
-**Protocol:**
+**`discussions.md` - discussion thread.** For any exchange that needs more than a few lines: design decisions, planning, feedback, open questions.
 - Each turn is appended to the file, preceded by `---` and a `[Name]` marker.
 - Do not truncate or rewrite prior turns. Append only.
 - Read from the last `[User]` marker when picking up a thread.
 - Keep responses to ~50 lines per turn in the file.
+
+**`todos.md` - action items only.** No discussion - only concrete, actionable tasks. Two sections: a flat numbered **Pending items** list where each item carries an inline priority (P1 must do next / P2 important / P3 nice to have, same scheme as agent-team priorities), and a short **Next** queue that names the immediate actions by referencing pending items by number. Compact aggressively: delete items once done and renumber Pending from 1. Decisions and rationale belong in `discussions.md`, not here.
 
 ## Safety Guardrails
 
@@ -40,4 +42,4 @@ These apply to agents running inside loop cycles (enforced via the cycle prompt 
 
 ## Project Structure
 
-See `PLAN.md` for the full structure and build order.
+See `README.md` for the full structure and core concepts.

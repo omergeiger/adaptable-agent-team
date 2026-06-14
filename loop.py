@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """AgentTeam loop - drives headless Claude Code cycles against a project."""
 
+import argparse
 import json
 import logging
 import os
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -15,17 +17,41 @@ from pathlib import Path
 import yaml
 
 from core import consensus as con
+from core import git_sync
 
 REPO_ROOT = Path(__file__).parent.resolve()
 RATE_LIMIT_WAIT_SECONDS = 3600
 MAX_CONSECUTIVE_ERRORS = 5
 LOG_ROTATE_BYTES = 10 * 1024 * 1024  # 10 MB
 
+_stop_event = threading.Event()
+
+
+def _signal_handler(sig, frame):
+    _stop_event.set()
+
+
 RATE_LIMIT_PATTERNS = [
     "rate limit", "ratelimit", "429", "too many requests",
     "usage limit", "billing", "insufficient credits",
     "overloaded", "resource_exhausted", "quota",
 ]
+
+
+# ---------------------------------------------------------------------------
+# CLI args
+# ---------------------------------------------------------------------------
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="AgentTeam loop runner")
+    p.add_argument(
+        "--cycles", type=int, default=None, metavar="N",
+        help="Stop after N successful cycles (default: run indefinitely).",
+    )
+    args = p.parse_args()
+    if args.cycles is not None and args.cycles < 1:
+        p.error("--cycles must be a positive integer")
+    return args
 
 
 # ---------------------------------------------------------------------------
@@ -157,6 +183,10 @@ def run_cycle(
         stderr=subprocess.STDOUT,
         cwd=str(REPO_ROOT),
         text=True,
+        # Own session so a terminal Ctrl-C (SIGINT to the loop's process group)
+        # does not reach the child; the cycle finishes and the loop exits
+        # gracefully at the next stop-event check.
+        start_new_session=True,
     )
 
     timed_out = False
@@ -249,6 +279,10 @@ def save_state(state_file: Path, cycle_count: int, status: str) -> None:
 # ---------------------------------------------------------------------------
 
 def main() -> None:
+    args = parse_args()
+    signal.signal(signal.SIGTERM, _signal_handler)
+    signal.signal(signal.SIGINT, _signal_handler)
+
     config = load_config()
     active = config["active_project"]
     project_dir = REPO_ROOT / "projects" / active
@@ -278,6 +312,7 @@ def main() -> None:
 
     cycle_count = load_cycle_count(state_file)
     error_count = 0
+    remaining_cycles = args.cycles  # None = run indefinitely
 
     while True:
         cycle_count += 1
@@ -287,6 +322,9 @@ def main() -> None:
 
         log.info(f"=== Cycle #{cycle_count} START ===")
         save_state(state_file, cycle_count, "running")
+
+        if config.get("git_sync", True):
+            git_sync.pre_cycle(cycle_count, REPO_ROOT, log)
 
         # Back up consensus
         con.backup(project_dir)
@@ -390,6 +428,16 @@ def main() -> None:
                 f"(errors: {error_count}/{MAX_CONSECUTIVE_ERRORS})"
             )
 
+            # Circuit breaker applies to every failure cause, including a
+            # persistent rate-limit/billing condition (checked before the wait
+            # so it can't be masked by the rate-limit branch resetting state).
+            if error_count >= MAX_CONSECUTIVE_ERRORS:
+                log.error(
+                    f"Circuit breaker tripped: {MAX_CONSECUTIVE_ERRORS} consecutive failures. Exiting."
+                )
+                save_state(state_file, cycle_count, "circuit_broken")
+                sys.exit(1)
+
             if is_rate_limited(raw_output, exit_code):
                 log.warning(f"Cycle #{cycle_count}: rate limit detected.")
                 save_state(state_file, cycle_count, "rate_limited")
@@ -399,14 +447,14 @@ def main() -> None:
                 log.warning(
                     f"Waiting {RATE_LIMIT_WAIT_SECONDS}s ({RATE_LIMIT_WAIT_SECONDS // 3600}h)..."
                 )
-                time.sleep(RATE_LIMIT_WAIT_SECONDS)
-                error_count = 0
-            elif error_count >= MAX_CONSECUTIVE_ERRORS:
-                log.error(
-                    f"Circuit breaker tripped: {MAX_CONSECUTIVE_ERRORS} consecutive failures. Exiting."
-                )
-                save_state(state_file, cycle_count, "circuit_broken")
-                sys.exit(1)
+                if _stop_event.wait(timeout=RATE_LIMIT_WAIT_SECONDS):
+                    log.info("Stop signal received during rate-limit wait - exiting cleanly.")
+                    save_state(state_file, cycle_count, "stopped")
+                    break
+                # Backoff already served; start the next cycle now rather than
+                # also sleeping the normal inter-cycle interval. error_count is
+                # left intact so consecutive rate-limits still trip the breaker.
+                continue
         else:
             error_count = 0
             con.snapshot(project_dir, cycle_count)
@@ -414,6 +462,15 @@ def main() -> None:
                 f"Cycle #{cycle_count}: OK [{validation_outcome}] "
                 f"(cost: {cost}, duration: {duration:.1f}s)"
             )
+            if config.get("git_sync", True):
+                git_sync.post_cycle(cycle_count, REPO_ROOT, log)
+
+            if remaining_cycles is not None:
+                remaining_cycles -= 1
+                if remaining_cycles <= 0:
+                    log.info(f"Cycle #{cycle_count}: --cycles limit reached - exiting.")
+                    save_state(state_file, cycle_count, "idle")
+                    break
 
         # Prune old cycle log folders
         prune_cycle_logs(logs_dir, config.get("max_cycle_logs", 50))
@@ -428,7 +485,10 @@ def main() -> None:
 
         interval = config.get("loop_interval_seconds", 30)
         log.info(f"Sleeping {interval}s before next cycle...")
-        time.sleep(interval)
+        if _stop_event.wait(timeout=interval):
+            log.info("Stop signal received - exiting cleanly.")
+            save_state(state_file, cycle_count, "stopped")
+            break
 
 
 if __name__ == "__main__":

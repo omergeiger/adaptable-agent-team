@@ -9,8 +9,10 @@ __pycache__/
 # Runtime artifacts - regenerable every loop run
 projects/*/logs/
 projects/*/memory/
-# Example project docs are a smoke-test fixture, not a deliverable; real projects track docs/
-projects/example/docs/
 
-# Human/agent communication scratchpad - not source
-comments.txt
+# Dev scratchpads - not framework source
+.dev-docs/
+
+# Tool-generated artifacts - not framework source
+INSTINCT-PATTERNS.md
+.claude/scheduled_tasks.lock
