@@ -16,8 +16,8 @@ from pathlib import Path
 
 import yaml
 
-from core import consensus as con
-from core import git_sync
+from src import consensus as con
+from src import git_sync
 
 REPO_ROOT = Path(__file__).parent.resolve()
 RATE_LIMIT_WAIT_SECONDS = 3600
@@ -115,7 +115,7 @@ def find_claude_bin() -> str:
 # ---------------------------------------------------------------------------
 
 def build_prompt(cycle_num: int, config: dict, consensus_content: str, directives_content: str) -> str:
-    base = (REPO_ROOT / "PROMPT.md").read_text(encoding="utf-8")
+    base = (REPO_ROOT / "src" / "resources" / "PROMPT.md").read_text(encoding="utf-8")
     active = config["active_project"]
     squad = config.get("squad", [])
     roster = "\n".join(f"- {s}" for s in squad) if squad else "(none configured)"
@@ -126,7 +126,7 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 
 ## Runtime Guardrails (required)
 
-- Write only inside `projects/{active}/`. Never modify framework files (`loop.py`, `core/`, `.claude/`, `config.yaml`).
+- Write only inside `projects/{active}/`. Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`).
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents.
 - Never invoke the /adapt skill - it is human-run only.

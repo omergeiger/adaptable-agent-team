@@ -11,7 +11,7 @@ projects/*/logs/
 projects/*/memory/
 
 # Dev scratchpads - not framework source
-.dev-docs/
+#.dev-docs/
 
 # Tool-generated artifacts - not framework source
 INSTINCT-PATTERNS.md

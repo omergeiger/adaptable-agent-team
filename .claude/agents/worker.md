@@ -12,7 +12,7 @@ Execute the assigned task completely and report your output clearly. The orchest
 
 ## Rules
 
-- Write only inside `projects/<active_project>/`. Never modify framework files (loop.py, core/, .claude/, config.yaml).
+- Write only inside `projects/<active_project>/`. Never modify framework files (loop.py, config.yaml, src/, .claude/).
 - Do not update `consensus.md` — that is exclusively the orchestrator's responsibility.
 - Do not run `git push`.
 - If you cannot complete the task, report exactly what blocked you so the orchestrator can capture it as a blocker.

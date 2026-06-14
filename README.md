@@ -16,7 +16,7 @@ The patterns are extracted and generalized from the [Auto-Company](https://githu
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
    ```
-2. **Adapt the framework to your domain.** Run the `/adapt` skill interactively in a Claude Code session at the repo root. It interviews you (domain, purpose, roles, phases, cadence) and generates the worker agent files, a tailored `PROMPT.md`, the domain skills, and a starter `projects/<name>/consensus.md` + `human_directives.md`. See `example_cases.md` for ten worked adaptation cases.
+2. **Adapt the framework to your domain.** Run the `/adapt` skill interactively in a Claude Code session at the repo root. It interviews you (domain, purpose, roles, phases, cadence) and generates the worker agent files, a tailored `PROMPT.md`, the domain skills, and a starter `projects/<name>/consensus.md` + `human_directives.md`. See `.dev-docs/example_cases.md` for ten worked adaptation cases.
 3. **Configure** `config.yaml` - set `active_project`, the `squad` roster, cadence, and toggles (see below).
 4. **Run the loop:**
    ```bash
@@ -31,9 +31,9 @@ The patterns are extracted and generalized from the [Auto-Company](https://githu
 AgentTeam/
 ├── README.md
 ├── CLAUDE.md                  # Directives for Claude Code sessions
-├── config.yaml                # Top-level config (active project, toggles)
 ├── loop.py                    # Main loop entrypoint
-├── example_cases.md           # Worked adaptation cases (end-to-end test recipes)
+├── config.yaml                # Top-level config (active project, toggles)
+├── requirements.txt
 ├── .claude/
 │   ├── agents/                # Agent persona definitions (worker placeholders)
 │   │   ├── orchestrator.md
@@ -43,9 +43,15 @@ AgentTeam/
 │       │   └── SKILL.md
 │       └── example/           # Placeholder skill template
 │           └── SKILL.md
-├── core/                      # Python loop machinery
+├── src/                       # Python loop machinery + resources
 │   ├── consensus.py           # Reads/writes/validates the consensus.md relay baton
-│   └── git_sync.py            # Pre/post loop git commit+push
+│   ├── git_sync.py            # Pre/post loop git commit+push
+│   └── resources/
+│       └── PROMPT.md          # Cycle prompt template (orchestrator persona)
+├── .dev-docs/                 # Dev docs and scratchpads
+│   ├── example_cases.md       # Worked adaptation cases (end-to-end test recipes)
+│   ├── todos.md
+│   └── discussions.md
 └── projects/                  # All project workspaces (one folder per project)
     └── <project-name>/
         ├── consensus.md        # Relay baton for this project's loop (agent-owned)
@@ -96,7 +102,7 @@ Each iteration:
 7. Post-iteration: `git add . && git commit && git push` (if git_sync enabled)
 
 ### Consensus Validation & Recovery
-- `core/consensus.py` validates that every required `## ` section heading exists in consensus.md (exact heading text, case-sensitive, any order) - a loop-level integrity check that catches an agent mangling or truncating the relay baton.
+- `src/consensus.py` validates that every required `## ` section heading exists in consensus.md (exact heading text, case-sensitive, any order) - a loop-level integrity check that catches an agent mangling or truncating the relay baton.
 - Required sections: `## Last Updated`, `## Current Phase`, `## What We Did This Cycle`, `## Key Decisions`, `## Next Action`, `## Team State`, `## Open Questions`.
 - human_directives.md is not validated by the loop (human-owned, free-form).
 - On validation failure the loop restores `consensus.md.bak`, logs the rejected version, and increments the consecutive-error counter. The circuit breaker exits the loop after five consecutive failures.
@@ -107,7 +113,7 @@ Each iteration:
 - `verbosity` flag in config.yaml: when verbose, the loop uses `--output-format stream-json` and persists the full transcript - including the orchestrator's Task-tool delegations to workers, which captures the per-agent prompts. The direction is maximum visibility into the loop from logs alone.
 
 ### Runtime Guardrails (enforced via prompt + loop)
-- The cycle prompt instructs agents: write only inside `projects/<active>/`, never modify framework files (loop.py, core/, .claude/, config.yaml), never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents).
+- The cycle prompt instructs agents: write only inside `projects/<active>/`, never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`), never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents).
 - The CLI runs from the repo root (required so the session discovers `.claude/agents/`), so these restrictions are prompt-level, backed by the loop's backup/restore of critical files.
 
 ### Consensus.md Relay Baton
@@ -125,7 +131,7 @@ Each iteration:
 ### Dynamic Squad Assembly
 - **Orchestrator-driven.** Not all agents run every iteration. The loop does not select the subset; it injects the full configured `squad` roster (config.yaml) into the cycle prompt, and the orchestrator chooses the relevant subset to delegate to via the Task tool (PROMPT.md). The loop stays domain-agnostic - the LLM judges task/phase relevance, not hardcoded phase->agent rules in core code.
 - `config.yaml > squad` is the ceiling (which agents are available); the orchestrator picks from within it each cycle.
-- A loop-driven `core/squad.py` was considered and rejected: it would couple the generic loop to domain-specific phase->agent mappings. Revisit only if deterministic, code-level subset control becomes a real need.
+- A loop-driven `src/squad.py` was considered and rejected: it would couple the generic loop to domain-specific phase->agent mappings. Revisit only if deterministic, code-level subset control becomes a real need.
 
 ### Skill Library
 - Reusable capabilities agents can invoke (e.g. web search, file write, code review).

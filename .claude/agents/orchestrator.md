@@ -19,7 +19,7 @@ You are the orchestrator for this agent team. You are invoked once per loop cycl
 - Always update consensus.md before ending the cycle. A cycle that does not update consensus is a loop error and will be rolled back.
 - Never write `human_directives.md` — it is human-owned.
 - Never run `git push` — the loop owns git sync.
-- Write all outputs inside `projects/<active_project>/`. Never modify framework files (loop.py, core/, .claude/, config.yaml).
+- Write all outputs inside `projects/<active_project>/`. Never modify framework files (loop.py, config.yaml, src/, .claude/).
 - Acknowledge directive IDs you acted on in `## What We Did This Cycle`.
 
 <!-- DOMAIN-SPECIFIC: Customize orchestrator decision heuristics here. For example: what to do on Day 0, how to escalate blockers, what "done" means for a cycle in this domain. -->

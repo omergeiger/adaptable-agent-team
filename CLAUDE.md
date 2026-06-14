@@ -30,9 +30,9 @@ Two working files under `.dev-docs/`, kept distinct:
 
 ## Loop Agent Guardrails
 
-These apply to agents running inside loop cycles (enforced via the cycle prompt built from PROMPT.md):
+These apply to agents running inside loop cycles (enforced via the cycle prompt built from `src/resources/PROMPT.md`):
 
-- Write only inside `projects/<active_project>/`. Never modify framework files (`loop.py`, `core/`, `.claude/`, `config.yaml`).
+- Write only inside `projects/<active_project>/`. Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`).
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents. consensus.md is agent-owned; humans steer only via human_directives.md.
 

@@ -24,14 +24,14 @@ Run `/adapt` when:
 
 This wizard interviews you about your domain and generates:
 1. A new project folder at `projects/<your-project-name>/` with `docs/`, `logs/`, and `memory/` subfolders
-2. Customized worker agent files in `.claude/agents/` - one per worker role (replaces the generic placeholders). The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into PROMPT.md. After generating, every agent file NOT in the new squad is deleted (the generic `worker.md`/`orchestrator.md` placeholders and any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
-3. A tailored `PROMPT.md` embedding the orchestrator persona and domain-specific rules
+2. Customized worker agent files in `.claude/agents/` - one per worker role (replaces the generic placeholders). The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into `src/resources/PROMPT.md`. After generating, every agent file NOT in the new squad is deleted (the generic `worker.md`/`orchestrator.md` placeholders and any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
+3. A tailored `src/resources/PROMPT.md` embedding the orchestrator persona and domain-specific rules
 4. Domain skill files at `.claude/skills/<name>/SKILL.md` - one per convention, template, or rubric that must not drift across cycles. Agents load these during loop cycles.
 5. A starter `consensus.md` for the new project (ready to run - no sentinel marker)
 6. A starter `human_directives.md` pre-filled with the standing directives gathered in the interview
 7. `config.yaml` updates: `active_project`, `squad` (the worker role slugs), and `single_cycle` + `loop_interval_seconds` from the cadence answer
 
-Agent files, skill files, and PROMPT.md are repo-global: adapting to a new domain replaces the previous domain's versions. Tell the user this and confirm before overwriting.
+Agent files, skill files, and `src/resources/PROMPT.md` are repo-global: adapting to a new domain replaces the previous domain's versions. Tell the user this and confirm before overwriting.
 
 ---
 
@@ -160,7 +160,7 @@ One skill per convention, kebab-case name. These are loaded by agents during loo
 <which roles use this, at which point in the cycle, and what counts as compliant>
 ```
 
-### `PROMPT.md`
+### `src/resources/PROMPT.md`
 
 Replace the `<!-- DOMAIN-SPECIFIC -->` placeholders with:
 - The orchestrator persona from question 3 (role name, responsibilities, decision style) - this is where the coordinator role lives
@@ -184,8 +184,8 @@ Leave `cycle_timeout_seconds`, `verbosity`, and `max_cycle_logs` unchanged unles
 
 Tell the user:
 - Their project is ready at `projects/<name>/`
-- They can review and edit any generated file before running the loop - especially the standing directives, the generated skills, and the squad list in config.yaml
+- They can review and edit any generated file before running the loop - especially the standing directives, the generated skills, and the squad list in `config.yaml`
 - Run `.venv/bin/python loop.py` to start the first cycle (single_cycle: true is recommended for the first run)
 - Edit `human_directives.md` between cycles to steer the team
 
-For worked end-to-end examples of completed interviews and the files they should produce, see `example_cases.md` at the repo root.
+For worked end-to-end examples of completed interviews and the files they should produce, see `.dev-docs/example_cases.md`.
