@@ -16,7 +16,7 @@ The patterns are extracted and generalized from the [Auto-Company](https://githu
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
    ```
-2. **Adapt the framework to your domain.** Run the `/adapt` skill interactively in a Claude Code session at the repo root. It interviews you (domain, purpose, roles, phases, cadence) and generates the worker agent files, a tailored `PROMPT.md`, the domain skills, and a starter `projects/<name>/consensus.md` + `human_directives.md`. See `.dev-docs/example_cases.md` for ten worked adaptation cases.
+2. **Adapt the framework to your domain.** Run the `/adapt` skill interactively in a Claude Code session at the repo root. It interviews you (domain, purpose, roles, phases, cadence) and generates the worker agent files, a tailored `PROMPT.md`, the domain skills, and a starter `steering/<name>/consensus.md` + `human_directives.md`. See `.dev-docs/example_cases.md` for ten worked adaptation cases.
 3. **Configure** `config.yaml` - set `active_project`, the `squad` roster, cadence, and toggles (see below).
 4. **Run the loop:**
    ```bash
@@ -52,13 +52,17 @@ AgentTeam/
 │   ├── example_cases.md       # Worked adaptation cases (end-to-end test recipes)
 │   ├── todos.md
 │   └── discussions.md
-└── projects/                  # All project workspaces (one folder per project)
-    └── <project-name>/
-        ├── consensus.md        # Relay baton for this project's loop (agent-owned)
-        ├── human_directives.md # Human steering file (human-owned, read-only to agents)
-        ├── docs/               # Durable deliverables (agent-written, human-read)
-        ├── logs/               # Operational audit trail (loop-written)
-        └── memory/             # Agent long-term memory and consensus history
+├── steering/                  # Human<->agent control channel (git-tracked)
+│   └── <project-name>/
+│       ├── consensus.md        # Relay baton (agent-owned)
+│       └── human_directives.md # Steering file (human-owned, read-only to agents)
+├── auto-outputs/              # Framework-generated process trail (partially git-tracked)
+│   └── <project-name>/
+│       ├── docs/              # Per-cycle by-products: one file per persona turn (tracked)
+│       ├── logs/              # Loop audit trail: loop.log + cycle-NNNN/ folders (ignored)
+│       └── memory/            # Consensus snapshots for restore (ignored)
+└── projects/                  # Deliverables only - the domain product (git-tracked)
+    └── <project-name>/        # Domain-native files; no framework stamps or subfolders
 ```
 
 ## Workflows
@@ -66,7 +70,7 @@ AgentTeam/
 The recurring flows of operating the repo. Each links to the relevant detail under Core Concepts.
 
 ### 1. Adapt the framework to a domain (once per domain)
-Run `/adapt` interactively at the repo root. The wizard interviews you and generates the worker agent files (`.claude/agents/`), domain skills (`.claude/skills/`), a tailored `src/resources/PROMPT.md`, and a starter `projects/<name>/` (with `consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
+Run `/adapt` interactively at the repo root. The wizard interviews you and generates the worker agent files (`.claude/agents/`), domain skills (`.claude/skills/`), a tailored `src/resources/PROMPT.md`, and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
 
 ### 2. Run the loop
 Two operating modes, selected by `single_cycle` in `config.yaml`:
@@ -82,20 +86,21 @@ Two operating modes, selected by `single_cycle` in `config.yaml`:
   ```
 
 ### 3. Steer the team between cycles
-Edit `projects/<active>/human_directives.md` - the human's only write channel (agents read it, never write it). Add a `## Cycle Overrides` entry for a one-off instruction that supersedes the consensus `## Next Action` (remove it once satisfied), a numbered `## Standing Directives` rule (D1, D2, ...) for a persistent constraint, or an entry under `## Answers` to resolve a question the agents raised in consensus `## Open Questions`. In continuous mode with `git_sync` on, the pre-cycle commit captures edits made between cycles. See [Human Directives File](#human-directives-file).
+Edit `steering/<active>/human_directives.md` - the human's only write channel (agents read it, never write it). Add a `## Cycle Overrides` entry for a one-off instruction that supersedes the consensus `## Next Action` (remove it once satisfied), a numbered `## Standing Directives` rule (D1, D2, ...) for a persistent constraint, or an entry under `## Answers` to resolve a question the agents raised in consensus `## Open Questions`. In continuous mode with `git_sync` on, the pre-cycle commit captures edits made between cycles. See [Human Directives File](#human-directives-file).
 
 ### 4. Review progress
-- **`projects/<active>/consensus.md`** - current state at a glance: phase, what the last cycle did, the next action, and open questions.
-- **`projects/<active>/docs/`** - the actual deliverables to judge the work by.
-- **`projects/<active>/logs/cycle-NNNN-<timestamp>/`** - per-cycle audit trail (`prompt.md`, `output.json`, `metadata.json`, and `transcript.jsonl` when `verbosity` is on) for debugging what a cycle actually did.
-- **History over time** - the per-cycle git history of `consensus.md` (with `git_sync`), or the `memory/consensus-step-NNNN.md` snapshots when it is off.
+- **`steering/<active>/consensus.md`** - current state at a glance: phase, what the last cycle did, the next action, and open questions.
+- **`projects/<active>/`** - the actual deliverables to judge the work by.
+- **`auto-outputs/<active>/docs/`** - per-cycle by-products: each persona's synthesized turn, named `cycle-NNNN-<timestamp>-<persona>-<slug>.md`.
+- **`auto-outputs/<active>/logs/cycle-NNNN-<timestamp>/`** - per-cycle audit trail (`prompt.md`, `output.json`, `metadata.json`, and `transcript.jsonl` when `verbosity` is on).
+- **History over time** - the per-cycle git history of `consensus.md` (with `git_sync`), or the `auto-outputs/<active>/memory/consensus-step-NNNN.md` snapshots when it is off.
 
 ### 5. Switch or re-adapt a project
-`projects/` can hold several project folders; each is self-contained. Point the loop at a different one by changing `active_project` in `config.yaml`. To repurpose the framework for a new domain, re-run `/adapt` - remember it overwrites the repo-global agent/skill/`PROMPT.md` files for the previous domain.
+Each project lives across three top-level spaces (`steering/`, `auto-outputs/`, `projects/`) but is self-contained within its named subfolder. Point the loop at a different project by changing `active_project` in `config.yaml`. To repurpose the framework for a new domain, re-run `/adapt` - remember it overwrites the repo-global agent/skill/`PROMPT.md` files for the previous domain.
 
 ### 6. When the loop stops itself
-- **Unadapted project** (missing `consensus.md` or carrying the starter sentinel) - the loop exits immediately; run `/adapt`.
-- **Validation failure or no-op cycle** - consensus is restored from `memory/consensus.md.bak` and the consecutive-error counter increments; five in a row trips the circuit breaker and exits. Check `logs/loop.log` and the failing cycle's `metadata.json` / `output.json`. See [Consensus Validation & Recovery](#consensus-validation--recovery).
+- **Unadapted project** (missing `steering/<active>/consensus.md` or carrying the starter sentinel) - the loop exits immediately; run `/adapt`.
+- **Validation failure or no-op cycle** - consensus is restored from the pre-cycle in-memory snapshot and the consecutive-error counter increments; five in a row trips the circuit breaker and exits. Check `auto-outputs/<active>/logs/loop.log` and the failing cycle's `metadata.json` / `output.json`. See [Consensus Validation & Recovery](#consensus-validation--recovery).
 - **Rate limit / billing** - in continuous mode the loop waits before retrying; in gated mode it exits.
 - **Cycle timeout** - if consensus was updated and still valid, progress is kept; otherwise the cycle counts as a failure.
 
@@ -105,17 +110,23 @@ Edit `projects/<active>/human_directives.md` - the human's only write channel (a
 ## Core Concepts
 
 ### Active Project
-- `projects/` may contain multiple project folders.
+- Each project has named subfolders across three top-level spaces: `steering/`, `auto-outputs/`, `projects/`.
 - Exactly one project is active at a time, identified by `active_project` in `config.yaml`.
-- The loop always operates on the active project. All outputs, logs, docs, and memory artifacts write into the active project folder.
+- The loop always operates on the active project.
 
 ### Project Workspace Layout
-Each `projects/<name>/` folder is self-contained - everything the loop produces for that project lives inside it. At the root sit the two steering files (`consensus.md`, `human_directives.md`); the three subfolders divide the rest by purpose:
+Each project's workspace spans three top-level directories, separated by purpose:
 
-**`docs/` - durable work products (agent-written, human-read).** The actual deliverables of the loop: research summaries, design docs, decision records, drafts, reports - whatever the domain produces. Organized by agent role or topic (the adapt skill sets the convention for the domain). This is the folder a human reviews to judge progress. Anything meant to outlive a cycle and be read later belongs here, not in consensus.md (which stays small).
+**`steering/<name>/` - human-agent control channel (git-tracked).**
+- `consensus.md` - relay baton (agent-owned): current state, last cycle's work, next action, open questions.
+- `human_directives.md` - steering file (human-owned, read-only to agents): standing directives, cycle overrides, answers to open questions.
 
-**`logs/` - operational audit trail (loop-written, agents never write here).**
-- `loop.log` - loop-level event log: cycle start/end, validation pass/fail, restores, circuit-breaker trips, rate-limit waits. Rotated when it grows large.
+**`auto-outputs/<name>/` - framework-generated process trail.**
+
+*`docs/` (git-tracked) - per-cycle by-products.* Each persona's synthesized account of what it did this cycle. Flat directory (no role subfolders), named `cycle-NNNN-<YYYY-MM-DDTHH-MM-SS>-<persona>-<slug>.md` so sorting by name reproduces the real sequence. Files are made read-only by the loop at cycle end (write-once).
+
+*`logs/` (git-ignored) - operational audit trail (loop-written, agents never write here).*
+- `loop.log` - loop-level event log: cycle start/end, validation pass/fail, restores, circuit-breaker trips, rate-limit waits. Rotated when it grows large. Exempt from read-only finalization (live-appended).
 - `cycle-NNNN-<timestamp>/` - one folder per cycle, containing:
   - `prompt.md` - the full assembled prompt sent to the orchestrator (PROMPT.md + guardrails + injected consensus + injected human directives)
   - `output.json` - the CLI's final result message (cost, subtype, result text)
@@ -123,47 +134,47 @@ Each `projects/<name>/` folder is self-contained - everything the loop produces 
   - `metadata.json` - exit code, duration, timed-out flag, consensus-validation outcome
 - Retention: the loop prunes the oldest cycle folders beyond `max_cycle_logs`.
 
-**`memory/` - agent long-term memory and consensus history.** consensus.md is *current state only*; memory/ is where history and accumulated knowledge live:
-- `consensus-step-NNNN.md` - numbered snapshot of consensus after each successful cycle (the audit trail of how the project evolved when `git_sync` is off; redundant with consensus.md's git history when it is on)
-- `consensus.md.bak` - the pre-cycle backup used for restore on validation failure
-- free-form agent notes/learnings that should persist across cycles but don't belong in the relay baton (e.g. things tried and ruled out, domain facts discovered)
+*`memory/` (git-ignored) - consensus snapshots for restore.*
+- `consensus-step-NNNN.md` - immutable (read-only) numbered snapshot of consensus after each successful cycle. Used to restore on validation failure instead of a mutable .bak file. Also the audit trail when `git_sync` is off.
 
-Rule of thumb: deliverables -> `docs/`, diagnostics -> `logs/`, agent recall -> `memory/`.
+**`projects/<name>/` - deliverables only (git-tracked).** The domain-native product: code, reports, slides, digests - whatever the project is chartered to produce. Domain-native filenames, no cycle or persona stamps, no consensus/loop references. Updated in place as the canonical version. A human (or stakeholder) should be able to read this folder with no knowledge of the framework.
+
+Deliverable vs by-product rule: deliverable = the artifact the project is chartered to produce (mutable, domain-native, stands alone if the process history is deleted); by-product = the agent's synthesized account of producing it (immutable, cycle-stamped, meaningful only as a trail). Each persona writes one by-product per turn to `auto-outputs/<name>/docs/`; writes/updates deliverables in `projects/<name>/`.
 
 ### Loop Behavior
 `loop.py` runs iterations. Each iteration makes **one** headless Claude Code CLI call (the orchestrator session); worker agents are subagents the orchestrator delegates to *within* that session via the Task tool. The loop never invokes workers directly.
 
 Each iteration:
 1. Pre-iteration: `git add . && git commit && git push` (if git_sync enabled)
-2. Back up consensus.md to `memory/consensus.md.bak`
+2. Read consensus.md into memory (used as pre-cycle snapshot for restore on failure)
 3. Build the cycle prompt: PROMPT.md + runtime guardrails + pre-injected consensus content + pre-injected human_directives.md content + cycle number
 4. Invoke `claude -p <prompt> --permission-mode bypassPermissions` with a watchdog timeout
-5. Validate consensus.md; on failure (or if consensus is unchanged), restore from backup and count toward the circuit breaker
-6. Save a numbered per-cycle snapshot (`memory/consensus-step-NNNN.md`) and write logs
+5. Validate consensus.md; on failure (or if consensus is unchanged), restore from the in-memory pre-cycle snapshot and count toward the circuit breaker
+6. On success: write a read-only numbered snapshot (`auto-outputs/<name>/memory/consensus-step-NNNN.md`), finalize new files in `auto-outputs/<name>/docs/` as read-only, write logs
 7. Post-iteration: `git add . && git commit && git push` (if git_sync enabled)
 
 ### Consensus Validation & Recovery
 - `src/consensus.py` validates that every required `## ` section heading exists in consensus.md (exact heading text, case-sensitive, any order) - a loop-level integrity check that catches an agent mangling or truncating the relay baton.
 - Required sections: `## Last Updated`, `## Current Phase`, `## What We Did This Cycle`, `## Key Decisions`, `## Next Action`, `## Team State`, `## Open Questions`.
 - human_directives.md is not validated by the loop (human-owned, free-form).
-- On validation failure the loop restores `consensus.md.bak`, logs the rejected version, and increments the consecutive-error counter. The circuit breaker exits the loop after five consecutive failures.
+- On validation failure the loop restores consensus.md from the in-memory pre-cycle snapshot, logs the rejected version, and increments the consecutive-error counter. The circuit breaker exits the loop after five consecutive failures.
 - An unchanged consensus after a cycle is treated as a failed cycle (no-op detection).
 
 ### Logging & Visibility
-- Every cycle writes to `projects/<active>/logs/cycle-NNNN-<timestamp>/`: the full prompt sent to the orchestrator, the CLI's final output, and cycle metadata (exit code, cost, duration). See "Project Workspace Layout" for the per-file breakdown.
+- Every cycle writes to `auto-outputs/<active>/logs/cycle-NNNN-<timestamp>/`: the full prompt sent to the orchestrator, the CLI's final output, and cycle metadata (exit code, cost, duration). See "Project Workspace Layout" for the per-file breakdown.
 - `verbosity` flag in config.yaml: when verbose, the loop uses `--output-format stream-json` and persists the full transcript - including the orchestrator's Task-tool delegations to workers, which captures the per-agent prompts. The direction is maximum visibility into the loop from logs alone.
 
 ### Runtime Guardrails (enforced via prompt + loop)
-- The cycle prompt instructs agents: write only inside `projects/<active>/`, never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`), never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents).
-- The CLI runs from the repo root (required so the session discovers `.claude/agents/`), so these restrictions are prompt-level, backed by the loop's backup/restore of critical files.
+- The cycle prompt instructs agents: write deliverables to `projects/<active>/`, write per-cycle by-product docs to `auto-outputs/<active>/docs/`, never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files, never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents).
+- The CLI runs from the repo root (required so the session discovers `.claude/agents/`), so these restrictions are prompt-level, backed by the loop's restore of consensus from the pre-cycle in-memory snapshot.
 
 ### Consensus.md Relay Baton
-- Single file per project that agents read before acting and update after acting.
+- Single file per project at `steering/<name>/consensus.md` that agents read before acting and update after acting.
 - Carries: current objective, last completed step, next step, open questions, blockers.
 - **Agent-owned**: only agents write it. Human steering lives in `human_directives.md` instead, so the two never collide and a corrupted consensus never loses human input.
 
 ### Human Directives File
-- `projects/<name>/human_directives.md` is the human's steering channel. Agents read it every cycle but never write it.
+- `steering/<name>/human_directives.md` is the human's steering channel. Agents read it every cycle but never write it.
 - Sections: `## Standing Directives` (persistent rules, numbered D1, D2, ... for unambiguous reference), `## Cycle Overrides` (one-off instructions that supersede consensus `## Next Action`; the human removes them once satisfied), `## Answers` (responses to consensus.md's `## Open Questions`).
 - Precedence: Cycle Overrides > Standing Directives > consensus `## Next Action`.
 - The loop injects the file's content into the cycle prompt, marked read-only. Agents acknowledge directive IDs they acted on in consensus.md's `## What We Did This Cycle`.
@@ -180,8 +191,8 @@ Each iteration:
 
 ### Adapt Skill (human-facing, pre-launch)
 - `.claude/skills/adapt/` is a setup wizard run **by the human** in an interactive Claude Code session, *before* launching the loop on a new domain. It is not invoked by the loop or by agents.
-- It interviews the user (domain, purpose, roles, phases, cadence) and generates customized agent files, a tailored PROMPT.md, a starter consensus.md, and a starter human_directives.md.
-- The loop detects an unadapted project (missing consensus.md or one still carrying the starter sentinel marker) and exits with instructions to run /adapt interactively.
+- It interviews the user (domain, purpose, roles, phases, cadence) and generates customized agent files, a tailored PROMPT.md, domain skills, and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`).
+- The loop detects an unadapted project (missing `steering/<active>/consensus.md` or one still carrying the starter sentinel marker) and exits with instructions to run /adapt interactively.
 
 ### Git Sync
 - **Single-repo model:** the framework and all project folders live in one repo - the deployment clone of this template. The loop commits and pushes this repo as a whole; there is no separate per-project repo and no external artifact sync.
@@ -189,8 +200,8 @@ Each iteration:
 - Enforced in the loop, not in prompts (agents are additionally prompt-forbidden from running `git push`).
 - Two commits per cycle: pre-cycle captures human edits made between cycles (e.g. `human_directives.md`), post-cycle captures agent artifacts.
 - The sync set is governed by `.gitignore` - the ignore rules ARE the sync policy:
-  - **Tracked (synced):** project `docs/` deliverables, `consensus.md`, `human_directives.md`. consensus.md's per-cycle commit history is the project's decision log.
-  - **Ignored (local-only):** `projects/*/logs/` and `projects/*/memory/` - regenerable runtime artifacts. The `consensus-step-NNNN.md` snapshots duplicate what git history provides; they are the fallback audit trail for `git_sync: false` operation.
+  - **Tracked (synced):** `steering/<name>/` (consensus.md + human_directives.md), `auto-outputs/<name>/docs/` (per-cycle by-products), `projects/<name>/` (deliverables). consensus.md's per-cycle commit history is the project's decision log.
+  - **Ignored (local-only):** `auto-outputs/*/logs/` and `auto-outputs/*/memory/` - regenerable runtime artifacts. The `consensus-step-NNNN.md` snapshots are the fallback restore source and audit trail for `git_sync: false` operation.
 
 ## Configuration
 

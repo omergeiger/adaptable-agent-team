@@ -32,7 +32,7 @@ Two working files under `.dev-docs/`, kept distinct:
 
 These apply to agents running inside loop cycles (enforced via the cycle prompt built from `src/resources/PROMPT.md`):
 
-- Write only inside `projects/<active_project>/`. Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`).
+- Write deliverables to `projects/<active_project>/` and per-cycle by-product docs to `auto-outputs/<active_project>/docs/`. Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files in `steering/`.
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents. consensus.md is agent-owned; humans steer only via human_directives.md.
 

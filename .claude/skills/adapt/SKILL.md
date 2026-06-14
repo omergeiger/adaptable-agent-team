@@ -23,12 +23,12 @@ Run `/adapt` when:
 ## What This Skill Does
 
 This wizard interviews you about your domain and generates:
-1. A new project folder at `projects/<your-project-name>/` with `docs/`, `logs/`, and `memory/` subfolders
+1. A steering folder at `steering/<your-project-name>/` with `consensus.md` and `human_directives.md` (the loop creates the `auto-outputs/` and `projects/` directories on first run)
 2. Customized worker agent files in `.claude/agents/` - one per worker role (replaces the generic placeholders). The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into `src/resources/PROMPT.md`. After generating, every agent file NOT in the new squad is deleted (the generic `worker.md`/`orchestrator.md` placeholders and any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
 3. A tailored `src/resources/PROMPT.md` embedding the orchestrator persona and domain-specific rules
 4. Domain skill files at `.claude/skills/<name>/SKILL.md` - one per convention, template, or rubric that must not drift across cycles. Agents load these during loop cycles.
-5. A starter `consensus.md` for the new project (ready to run - no sentinel marker)
-6. A starter `human_directives.md` pre-filled with the standing directives gathered in the interview
+5. A starter `consensus.md` at `steering/<your-project-name>/consensus.md` (ready to run - no sentinel marker)
+6. A starter `human_directives.md` at `steering/<your-project-name>/human_directives.md` pre-filled with the standing directives gathered in the interview
 7. `config.yaml` updates: `active_project`, `squad` (the worker role slugs), and `single_cycle` + `loop_interval_seconds` from the cadence answer
 
 Agent files, skill files, and `src/resources/PROMPT.md` are repo-global: adapting to a new domain replaces the previous domain's versions. Tell the user this and confirm before overwriting.
@@ -61,7 +61,7 @@ Ask the user these questions (one at a time, conversationally):
 
 After gathering answers, generate the following files:
 
-### `projects/<name>/consensus.md`
+### `steering/<name>/consensus.md`
 
 All 7 required sections, filled with domain-appropriate placeholder text. **Do NOT include the sentinel marker** `<!-- AGENTTEAM_UNADAPTED -->` - this file must be runnable immediately.
 
@@ -91,7 +91,7 @@ All agents standing by. First cycle not yet run.
 
 In `## Team State`, define the tracking fields this domain needs as labeled starter lines (e.g. a pipeline count per stage, a ledger of items already processed, doc maturity per discipline) so every later cycle updates a stable structure instead of inventing one.
 
-### `projects/<name>/human_directives.md`
+### `steering/<name>/human_directives.md`
 
 Pre-fill `## Standing Directives` with the rules gathered in question 8, numbered D1, D2, ... If an answer references something the user must still fill in, keep an explicit `<placeholder>` in the directive text.
 
@@ -165,7 +165,7 @@ One skill per convention, kebab-case name. These are loaded by agents during loo
 Replace the `<!-- DOMAIN-SPECIFIC -->` placeholders with:
 - The orchestrator persona from question 3 (role name, responsibilities, decision style) - this is where the coordinator role lives
 - The delegation strategy across the worker roles (ordering rules, when to involve which worker, max workers per cycle if relevant)
-- Domain output rules: where deliverables go under `projects/<name>/docs/`, naming patterns, quality bar
+- Domain output rules: deliverables go in `projects/<name>/` (domain-native filenames, no framework stamps); by-product docs go in `auto-outputs/<name>/docs/` named `cycle-NNNN-<timestamp>-<persona>-<slug>.md`; naming patterns, quality bar
 - An explicit instruction to apply each generated skill by name (e.g. "format every digest per the digest-format skill")
 - Phase semantics from question 4: what `## Current Phase` values exist and what permits advancing
 
@@ -183,7 +183,8 @@ Leave `cycle_timeout_seconds`, `verbosity`, and `max_cycle_logs` unchanged unles
 ## Final Step
 
 Tell the user:
-- Their project is ready at `projects/<name>/`
+- Their project steering files are at `steering/<name>/` (`consensus.md` + `human_directives.md`)
+- Deliverables will accumulate in `projects/<name>/`; process trail (docs, logs, snapshots) in `auto-outputs/<name>/` - both created by the loop on first run
 - They can review and edit any generated file before running the loop - especially the standing directives, the generated skills, and the squad list in `config.yaml`
 - Run `.venv/bin/python loop.py` to start the first cycle (single_cycle: true is recommended for the first run)
 - Edit `human_directives.md` between cycles to steer the team

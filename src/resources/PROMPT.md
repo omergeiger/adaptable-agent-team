@@ -32,7 +32,7 @@ Collect worker outputs. Resolve conflicts. Decide what actually happened this cy
 
 ### 5. Update Consensus
 
-Before this cycle ends, you **must** update `projects/<active_project>/consensus.md` with this exact format. All 7 sections must be present, using the exact heading text shown (case-sensitive):
+Before this cycle ends, you **must** update `steering/<active_project>/consensus.md` with this exact format. All 7 sections must be present, using the exact heading text shown (case-sensitive):
 
 ```
 ## Last Updated
@@ -60,4 +60,4 @@ Before this cycle ends, you **must** update `projects/<active_project>/consensus
 
 The format is non-negotiable. Any missing section causes a loop validation error and the cycle is rolled back.
 
-<!-- DOMAIN-SPECIFIC: Add domain-specific output rules here. For example: all deliverables go in docs/<role>/; naming conventions; quality bar; when to escalate to Open Questions. -->
+<!-- DOMAIN-SPECIFIC: Add domain-specific output rules here. For example: deliverables go in projects/<active>/; by-product docs in auto-outputs/<active>/docs/ named cycle-NNNN-<timestamp>-<persona>-<slug>.md; quality bar; when to escalate to Open Questions. -->

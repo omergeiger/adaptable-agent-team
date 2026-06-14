@@ -120,13 +120,17 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
     squad = config.get("squad", [])
     roster = "\n".join(f"- {s}" for s in squad) if squad else "(none configured)"
     cycle_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # File-safe timestamp for by-product doc naming (colons replaced with hyphens, no Z)
+    cycle_time_file = cycle_time[:-1].replace(":", "-")
 
     guardrails = f"""
 ---
 
 ## Runtime Guardrails (required)
 
-- Write only inside `projects/{active}/`. Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`).
+- **Deliverables** (the domain product the project is chartered to produce): write to `projects/{active}/`. Use domain-native filenames with no cycle or persona stamps; no framework references.
+- **By-products** (your synthesized account of this cycle's work): write one file per persona turn to `auto-outputs/{active}/docs/`. Name each file `cycle-{cycle_num:04d}-{cycle_time_file}-<persona>-<slug>.md`.
+- Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files in `steering/`.
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents.
 - Never invoke the /adapt skill - it is human-run only.
@@ -275,6 +279,22 @@ def save_state(state_file: Path, cycle_count: int, status: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Read-only finalization
+# ---------------------------------------------------------------------------
+
+def finalize_auto_outputs(docs_dir: Path, memory_dir: Path) -> None:
+    """Make all files in auto-outputs docs/ and memory/ read-only after a successful cycle."""
+    for directory in [docs_dir, memory_dir]:
+        if directory.exists():
+            for f in directory.rglob("*"):
+                if f.is_file():
+                    try:
+                        f.chmod(0o444)
+                    except OSError:
+                        pass
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -285,15 +305,25 @@ def main() -> None:
 
     config = load_config()
     active = config["active_project"]
-    project_dir = REPO_ROOT / "projects" / active
-    logs_dir = project_dir / "logs"
-    memory_dir = project_dir / "memory"
-    consensus_path = project_dir / "consensus.md"
-    directives_path = project_dir / "human_directives.md"
+
+    # Three top-level spaces per project
+    steering_dir = REPO_ROOT / "steering" / active
+    auto_outputs_dir = REPO_ROOT / "auto-outputs" / active
+    project_dir = REPO_ROOT / "projects" / active  # deliverables only
+
+    logs_dir = auto_outputs_dir / "logs"
+    memory_dir = auto_outputs_dir / "memory"
+    docs_dir = auto_outputs_dir / "docs"
+
+    consensus_path = steering_dir / "consensus.md"
+    directives_path = steering_dir / "human_directives.md"
     state_file = logs_dir / "loop_state.json"
 
+    steering_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
     memory_dir.mkdir(parents=True, exist_ok=True)
+    docs_dir.mkdir(parents=True, exist_ok=True)
+    project_dir.mkdir(parents=True, exist_ok=True)
 
     log = setup_logging(logs_dir / "loop.log")
 
@@ -326,10 +356,7 @@ def main() -> None:
         if config.get("git_sync", True):
             git_sync.pre_cycle(cycle_count, REPO_ROOT, log)
 
-        # Back up consensus
-        con.backup(project_dir)
-
-        # Read steering files
+        # Read steering files (pre-cycle snapshot held in memory for restore)
         consensus_content = con.read(consensus_path)
         directives_content = (
             directives_path.read_text(encoding="utf-8")
@@ -371,7 +398,7 @@ def main() -> None:
 
         if timed_out:
             # Soft timeout: keep progress if consensus was updated and valid
-            if con.changed_since_backup(project_dir):
+            if con.changed_since(consensus_path, consensus_content):
                 try:
                     con.validate(con.read(consensus_path))
                     validation_outcome = "ok:timeout_with_update"
@@ -389,7 +416,7 @@ def main() -> None:
             try:
                 new_content = con.read(consensus_path)
                 con.validate(new_content)
-                if not con.changed_since_backup(project_dir):
+                if not con.changed_since(consensus_path, consensus_content):
                     log.warning(f"Cycle #{cycle_count}: consensus unchanged (no-op)")
                     cycle_failed = True
                     validation_outcome = "fail:unchanged"
@@ -419,9 +446,9 @@ def main() -> None:
         # Handle failure vs success
         # ------------------------------------------------------------------
         if cycle_failed:
-            restored = con.restore(project_dir)
+            restored = con.restore(consensus_path, consensus_content)
             if restored:
-                log.info(f"Cycle #{cycle_count}: consensus restored from backup")
+                log.info(f"Cycle #{cycle_count}: consensus restored from pre-cycle snapshot")
             error_count += 1
             log.warning(
                 f"Cycle #{cycle_count}: FAIL [{validation_outcome}] "
@@ -457,7 +484,8 @@ def main() -> None:
                 continue
         else:
             error_count = 0
-            con.snapshot(project_dir, cycle_count)
+            con.snapshot(steering_dir, memory_dir, cycle_count)
+            finalize_auto_outputs(docs_dir, memory_dir)
             log.info(
                 f"Cycle #{cycle_count}: OK [{validation_outcome}] "
                 f"(cost: {cost}, duration: {duration:.1f}s)"

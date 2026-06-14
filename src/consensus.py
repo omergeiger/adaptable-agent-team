@@ -1,4 +1,4 @@
-"""Consensus relay baton: read, validate, backup, restore, snapshot."""
+"""Consensus relay baton: read, validate, restore, snapshot."""
 
 import shutil
 from pathlib import Path
@@ -42,39 +42,26 @@ def is_unadapted(consensus_path: Path) -> bool:
     return SENTINEL in consensus_path.read_text(encoding="utf-8")
 
 
-def backup(project_dir: Path) -> None:
-    """Copy consensus.md to memory/consensus.md.bak."""
-    src = project_dir / "consensus.md"
-    dst = project_dir / "memory" / "consensus.md.bak"
-    if src.exists():
-        shutil.copy2(src, dst)
-
-
-def restore(project_dir: Path) -> bool:
-    """Restore consensus.md from memory/consensus.md.bak. Returns True if restored."""
-    bak = project_dir / "memory" / "consensus.md.bak"
-    dst = project_dir / "consensus.md"
-    if bak.exists():
-        shutil.copy2(bak, dst)
-        return True
-    return False
-
-
-def changed_since_backup(project_dir: Path) -> bool:
-    """Return True if consensus.md differs from the backup."""
-    src = project_dir / "consensus.md"
-    bak = project_dir / "memory" / "consensus.md.bak"
-    if not src.exists():
+def restore(consensus_path: Path, pre_content: str) -> bool:
+    """Restore consensus.md from the pre-cycle in-memory snapshot. Returns True if restored."""
+    if not pre_content:
         return False
-    if not bak.exists():
-        return True
-    return src.read_bytes() != bak.read_bytes()
+    consensus_path.write_text(pre_content, encoding="utf-8")
+    return True
 
 
-def snapshot(project_dir: Path, cycle_num: int) -> None:
-    """Copy consensus.md to memory/consensus-step-NNNN.md after a successful cycle."""
-    src = project_dir / "consensus.md"
+def changed_since(consensus_path: Path, pre_content: str) -> bool:
+    """Return True if consensus.md differs from the pre-cycle snapshot."""
+    if not consensus_path.exists():
+        return False
+    return consensus_path.read_text(encoding="utf-8") != pre_content
+
+
+def snapshot(steering_dir: Path, memory_dir: Path, cycle_num: int) -> None:
+    """Copy consensus.md to memory/consensus-step-NNNN.md and make it read-only."""
+    src = steering_dir / "consensus.md"
     if not src.exists():
         return
-    dst = project_dir / "memory" / f"consensus-step-{cycle_num:04d}.md"
+    dst = memory_dir / f"consensus-step-{cycle_num:04d}.md"
     shutil.copy2(src, dst)
+    dst.chmod(0o444)

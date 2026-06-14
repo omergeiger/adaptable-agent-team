@@ -7,8 +7,8 @@ __pycache__/
 .venv/
 
 # Runtime artifacts - regenerable every loop run
-projects/*/logs/
-projects/*/memory/
+auto-outputs/*/logs/
+auto-outputs/*/memory/
 
 # Dev scratchpads - not framework source
 #.dev-docs/
