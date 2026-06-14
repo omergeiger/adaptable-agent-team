@@ -61,6 +61,47 @@ AgentTeam/
         └── memory/             # Agent long-term memory and consensus history
 ```
 
+## Workflows
+
+The recurring flows of operating the repo. Each links to the relevant detail under Core Concepts.
+
+### 1. Adapt the framework to a domain (once per domain)
+Run `/adapt` interactively at the repo root. The wizard interviews you and generates the worker agent files (`.claude/agents/`), domain skills (`.claude/skills/`), a tailored `src/resources/PROMPT.md`, and a starter `projects/<name>/` (with `consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
+
+### 2. Run the loop
+Two operating modes, selected by `single_cycle` in `config.yaml`:
+
+- **Gated / supervised** (`single_cycle: true`) - runs one cycle and exits. Inspect the result, edit `human_directives.md`, re-run. Recommended for the first runs of a new domain and whenever you want tight control. `git_sync` is typically off here.
+  ```bash
+  .venv/bin/python loop.py
+  ```
+- **Continuous / autonomous** (`single_cycle: false`) - the loop self-drives, sleeping `loop_interval_seconds` between cycles, until you stop it (Ctrl-C / SIGTERM finishes the in-flight cycle, then exits cleanly) or it trips the circuit breaker. Use `--cycles N` to cap successful cycles. `git_sync: true` is the usual pairing so every cycle is committed.
+  ```bash
+  .venv/bin/python loop.py            # run until stopped
+  .venv/bin/python loop.py --cycles 5 # stop after 5 successful cycles
+  ```
+
+### 3. Steer the team between cycles
+Edit `projects/<active>/human_directives.md` - the human's only write channel (agents read it, never write it). Add a `## Cycle Overrides` entry for a one-off instruction that supersedes the consensus `## Next Action` (remove it once satisfied), a numbered `## Standing Directives` rule (D1, D2, ...) for a persistent constraint, or an entry under `## Answers` to resolve a question the agents raised in consensus `## Open Questions`. In continuous mode with `git_sync` on, the pre-cycle commit captures edits made between cycles. See [Human Directives File](#human-directives-file).
+
+### 4. Review progress
+- **`projects/<active>/consensus.md`** - current state at a glance: phase, what the last cycle did, the next action, and open questions.
+- **`projects/<active>/docs/`** - the actual deliverables to judge the work by.
+- **`projects/<active>/logs/cycle-NNNN-<timestamp>/`** - per-cycle audit trail (`prompt.md`, `output.json`, `metadata.json`, and `transcript.jsonl` when `verbosity` is on) for debugging what a cycle actually did.
+- **History over time** - the per-cycle git history of `consensus.md` (with `git_sync`), or the `memory/consensus-step-NNNN.md` snapshots when it is off.
+
+### 5. Switch or re-adapt a project
+`projects/` can hold several project folders; each is self-contained. Point the loop at a different one by changing `active_project` in `config.yaml`. To repurpose the framework for a new domain, re-run `/adapt` - remember it overwrites the repo-global agent/skill/`PROMPT.md` files for the previous domain.
+
+### 6. When the loop stops itself
+- **Unadapted project** (missing `consensus.md` or carrying the starter sentinel) - the loop exits immediately; run `/adapt`.
+- **Validation failure or no-op cycle** - consensus is restored from `memory/consensus.md.bak` and the consecutive-error counter increments; five in a row trips the circuit breaker and exits. Check `logs/loop.log` and the failing cycle's `metadata.json` / `output.json`. See [Consensus Validation & Recovery](#consensus-validation--recovery).
+- **Rate limit / billing** - in continuous mode the loop waits before retrying; in gated mode it exits.
+- **Cycle timeout** - if consensus was updated and still valid, progress is kept; otherwise the cycle counts as a failure.
+
+### Developing the framework itself
+`main` is the pristine, domain-agnostic template - adapt a domain on a **branch** so `main` stays generic and reusable. Framework dev notes live under `.dev-docs/` (`todos.md`, `discussions.md`, `example_cases.md`); they are tracked but are not part of an operator's runtime.
+
 ## Core Concepts
 
 ### Active Project
