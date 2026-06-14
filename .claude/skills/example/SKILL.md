@@ -58,3 +58,5 @@ Brief description of what this skill does and when to use it.
 3. Test by running `/skillname` in an interactive Claude Code session
 
 Skills do not require registration - any file at `.claude/skills/<name>/SKILL.md` is automatically available as `/<name>`.
+
+**Two skill homes:** `.claude/skills/` (this directory) holds human-run skills, available only in interactive sessions. Loop-only skills - applied by agents mid-cycle - instead live in `src/resources/loop-plugin/skills/<name>/SKILL.md`, are invisible to interactive sessions, and are addressed namespaced as `loop-plugin:<name>`. See that directory's `example-loop-skill` for the pattern.

@@ -173,6 +173,10 @@ def run_cycle(
     transcript_lines is populated only when verbose=True.
     """
     cmd = [claude_bin, "-p", prompt, "--permission-mode", "bypassPermissions"]
+    # Load loop-only skills as a plugin, scoped to this invocation. Interactive
+    # Claude Code sessions never pass --plugin-dir, so these skills stay invisible
+    # to them and are addressed namespaced as `loop-plugin:<skill-name>`.
+    cmd += ["--plugin-dir", str(REPO_ROOT / "src" / "resources" / "loop-plugin")]
     if verbose:
         # The CLI requires --verbose for stream-json in print mode
         cmd += ["--output-format", "stream-json", "--verbose"]

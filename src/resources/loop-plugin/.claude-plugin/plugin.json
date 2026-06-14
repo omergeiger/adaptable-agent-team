@@ -1,0 +1,5 @@
+{
+  "name": "loop-plugin",
+  "version": "0.0.1",
+  "description": "Skills available only to headless agents running inside loop cycles. Loaded per-invocation via `claude -p --plugin-dir`, so they are invisible to interactive Claude Code sessions at the repo. Skills are addressed namespaced, e.g. `loop-plugin:<skill-name>`."
+}

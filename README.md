@@ -38,7 +38,7 @@ AgentTeam/
 │   ├── agents/                # Agent persona definitions (worker placeholders)
 │   │   ├── orchestrator.md
 │   │   └── worker.md
-│   └── skills/                # Skill library
+│   └── skills/                # Human-run skills (interactive sessions only)
 │       ├── adapt/             # Setup wizard: guides user to customize the framework
 │       │   └── SKILL.md
 │       └── example/           # Placeholder skill template
@@ -47,7 +47,10 @@ AgentTeam/
 │   ├── consensus.py           # Reads/writes/validates the consensus.md relay baton
 │   ├── git_sync.py            # Pre/post loop git commit+push
 │   └── resources/
-│       └── PROMPT.md          # Cycle prompt template (orchestrator persona)
+│       ├── PROMPT.md          # Cycle prompt template (orchestrator persona)
+│       └── loop-plugin/       # Loop-only skills (agents only, never interactive)
+│           ├── .claude-plugin/plugin.json
+│           └── skills/        # Loaded per-cycle via `claude -p --plugin-dir`
 ├── .dev-docs/                 # Dev docs and scratchpads
 │   ├── example_cases.md       # Worked adaptation cases (end-to-end test recipes)
 │   ├── todos.md
@@ -186,8 +189,10 @@ Each iteration:
 - A loop-driven `src/squad.py` was considered and rejected: it would couple the generic loop to domain-specific phase->agent mappings. Revisit only if deterministic, code-level subset control becomes a real need.
 
 ### Skill Library
-- Reusable capabilities agents can invoke (e.g. web search, file write, code review).
-- Defined as callable units, not baked into agent prompts.
+- Reusable capabilities, defined as callable units rather than baked into agent prompts.
+- Skills live in one of two homes depending on audience:
+  - **`.claude/skills/`** - human-run skills (e.g. `/adapt`), available in interactive Claude Code sessions at the repo. Invoked as `/<name>`.
+  - **`src/resources/loop-plugin/skills/`** - loop-only skills, applied **by agents** during cycles. Packaged as the `loop-plugin` plugin, which `loop.py` loads per-invocation via `claude -p --plugin-dir`. They are invisible to interactive sessions and are addressed namespaced as `loop-plugin:<name>`.
 
 ### Adapt Skill (human-facing, pre-launch)
 - `.claude/skills/adapt/` is a setup wizard run **by the human** in an interactive Claude Code session, *before* launching the loop on a new domain. It is not invoked by the loop or by agents.
