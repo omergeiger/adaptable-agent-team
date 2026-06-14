@@ -47,7 +47,7 @@ Authoring conventions: each `SKILL.md` declares its audience at the top, is self
 
 ## Adapt Skill
 
-`.claude/skills/adapt/` is a human-run setup wizard for customizing the framework to a new domain before launching the loop. It generates the worker agent files, a tailored `src/resources/PROMPT.md`, the domain-convention skills (into `src/resources/loop-plugin/skills/`), and the starter steering files. Agents and the loop never invoke it; the loop only detects an unadapted project and exits, directing the user to run /adapt interactively.
+`.claude/skills/adapt/` is a human-run setup wizard for customizing the framework to a new domain before launching the loop. It generates the sub-agent files (one per domain role - **all** domain roles are sub-agents; the headless cycle session itself is the generic orchestrator, never a domain role), a tailored `src/resources/PROMPT.md`, the domain-convention skills (into `src/resources/loop-plugin/skills/`), and the starter steering files. Agents and the loop never invoke it; the loop only detects an unadapted project and exits, directing the user to run /adapt interactively.
 
 ## Project Structure
 

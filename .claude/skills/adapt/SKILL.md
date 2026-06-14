@@ -5,65 +5,96 @@ description: Human-run setup wizard for adapting the framework to a new domain. 
 
 # /adapt - AgentTeam Setup Wizard
 
-**Run this skill interactively before launching the loop on a new domain.**
+**Run this skill interactively before launching the loop on a new domain.** It is HUMAN-RUN only - never invoked by the loop or by agents.
 
-This skill is HUMAN-RUN only. It is never invoked by the loop or by agents.
+`/adapt` does not march through a fixed question list. It works as a loop:
+
+1. **Extract** everything it can from the human's opening request.
+2. **Triage** every field it needs into *provided* / *missing* / *ambiguous*, and show that read back.
+3. **Propose** a concrete preview of all files it will generate (written to a temp file) and flag any concerns.
+4. **Iterate** on the human's fixes until the proposal is approved, then generate the real artifacts and delete the temp file.
+
+---
+
+## Orchestration model (read first - do not violate)
+
+- The **main headless cycle session** (the `claude -p` invocation the loop makes) is the orchestrator. Its coordinator persona is generic and already lives in `src/resources/PROMPT.md`.
+- **The orchestrator is never a domain role.** Every specialist role the human names becomes a **sub-agent**: one `.claude/agents/<role>.md` file plus an entry in the full `config.yaml > squad`.
+- Therefore: do NOT ask "which role coordinates", do NOT write an orchestrator agent file, and do NOT embed any domain role's persona into `PROMPT.md`. The orchestrator's *domain-specific decision logic* (priorities, when to advance a phase, what "done" means, delegation order) goes into `PROMPT.md`'s domain sections - as rules the generic session follows, not as a role.
 
 ---
 
 ## When to Run
 
-Run `/adapt` when:
-- You are setting up AgentTeam for a new domain or purpose for the first time
-- You want to create a new project workspace with customized agents and prompts
-- The loop exits with an "unadapted project" error
+- Setting up AgentTeam for a new domain for the first time.
+- Creating a new project workspace with customized sub-agents and prompt.
+- The loop exited with an "unadapted project" error.
+
+If invoked with no accompanying request ("bare `/adapt`"), open with one line - *"What are you building, and what should the team do each cycle?"* - then run the loop above.
 
 ---
 
-## What This Skill Does
+## Information the setup needs
 
-This wizard interviews you about your domain and generates:
-1. A steering folder at `steering/<your-project-name>/` with `consensus.md` and `human_directives.md` (the loop creates the `auto-outputs/` and `projects/` directories on first run)
-2. Customized worker agent files in `.claude/agents/` - one per worker role. The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into `src/resources/PROMPT.md`. After generating, every agent file NOT in the new squad is deleted (any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
-3. A tailored `src/resources/PROMPT.md` embedding the orchestrator persona and domain-specific rules
-4. Domain skill files at `src/resources/loop-plugin/skills/<name>/SKILL.md` - one per convention, template, or rubric that must not drift across cycles. These load into headless loop sessions via the `loop-plugin` plugin (not into interactive sessions) and agents apply them as `loop-plugin:<name>`. Never put domain skills in `.claude/skills/` - that home is reserved for human-run setup skills like /adapt.
-5. A starter `consensus.md` at `steering/<your-project-name>/consensus.md` (ready to run - no sentinel marker)
-6. A starter `human_directives.md` at `steering/<your-project-name>/human_directives.md` pre-filled with the standing directives gathered in the interview
-7. `config.yaml` updates: `active_project`, `squad` (the worker role slugs), and `single_cycle` + `loop_interval_seconds` from the cadence answer
+Everything below exists only to fill the generated artifacts (see Generation). Triage each into one of three buckets and handle accordingly:
 
-Agent files, skill files, and `src/resources/PROMPT.md` are repo-global: adapting to a new domain replaces the previous domain's versions. Tell the user this and confirm before overwriting.
+**Must-ask - cannot be guessed:**
+- **Domain & purpose** - what the team is chartered to accomplish.
+- **Roles** - the 2-6 specialist sub-agents, each with a one-line responsibility. (All become sub-agents.)
+- **Hard constraints / standing directives** - non-negotiables: exclusions, quality bars, anything needing human sign-off.
 
----
+**Propose-and-confirm - infer from the request + the worked cases in `.dev-docs/example_cases.md`, then let the human correct:**
+- **Project name** (kebab-case slug, usually derivable from the domain).
+- **Phases** (e.g. Explore → Draft → Review → Ship).
+- **Deliverable format & location** under `projects/<name>/`.
+- **Conventions → skills** - which formats/rubrics/protocols must not drift across cycles.
+- **Delegation strategy** - ordering rules, max sub-agents per cycle.
 
-## Interview Questions
+**Default silently - state the assumption, do not ask:**
+- **Cadence**: `single_cycle: true`, `loop_interval_seconds: 30` (gated first run).
+- `cycle_timeout_seconds`, `verbosity`, `max_cycle_logs`: leave template defaults.
 
-Ask the user these questions (one at a time, conversationally):
-
-1. **Project name** - What should this project be called? (This becomes the folder name under `projects/`.)
-
-2. **Domain and purpose** - What is this agent team trying to accomplish? (e.g., "research competitor products", "write and refine a technical specification", "build and iterate on a software project")
-
-3. **Agent roles** - What specialist roles do you need? List 2-6 roles with a one-sentence description of each. (e.g., Researcher, Writer, Critic, Engineer.) Establish which ONE role is the coordinator/orchestrator - it becomes the PROMPT.md persona; all the others become worker agent files and the config squad.
-
-4. **Phases** - What are the major phases of work? (e.g., Explore → Draft → Review → Ship, or Discover → Design → Build → Launch)
-
-5. **Output format** - What does a cycle's deliverable look like? Where does it live in the project folder? (e.g., markdown docs in `docs/research/`, code files in `docs/code/`)
-
-6. **Cadence** - How often should cycles run (loop_interval_seconds)? Should single_cycle be true (gated, human reviews each cycle) or false (autonomous, runs until stopped)?
-
-7. **Conventions (skills)** - What formats, templates, rubrics, or protocols must stay identical across cycles? (e.g., a digest template, a review-memo format, a fit-scoring rubric, a test-gate procedure.) Each one becomes a skill file under `src/resources/loop-plugin/skills/` that agents apply during cycles.
-
-8. **Standing directives** - What persistent rules should the team always follow? (e.g., focus area, exclusions, quality thresholds, things that need human sign-off.) These pre-fill `human_directives.md` as D1, D2, ...
+Spend the question budget only on must-ask fields and genuinely blocking ambiguities. Make the orchestrator/role split and everything in "propose-and-confirm" a *proposal you confirm*, not a question you ask.
 
 ---
 
-## Generation Instructions
+## Question protocol
 
-After gathering answers, generate the following files:
+- Ask in rounds; **at most 3 questions per round, 30 lines max per round**. Multiple rounds are fine.
+- **Every question must offer 2-3 diverse candidate answers** - meaningfully different options (not minor variants) - so the human can pick one, combine, or redirect. In an interactive session prefer the `AskUserQuestion` tool for this; otherwise list the options inline.
+- Batch related questions into one round rather than trickling them out.
+- Prefer "here is my proposal - ok?" framing over open-ended asks; it converges faster and respects the budget.
+
+---
+
+## Proposal preview (the temp file)
+
+Before writing any real artifact, write the full proposal to **`ADAPT_PROPOSAL.tmp.md`** at the repo root. Open it with this banner verbatim:
+
+```
+> ⚠️ TEMPORARY - /adapt proposal for review only. Not authoritative; not committed.
+> This file is deleted automatically once you approve. Edit it or reply with fixes, then tell /adapt to proceed.
+```
+
+Below the banner, lay out exactly what will be generated, one section per artifact:
+- **Project**: name (slug), domain & purpose.
+- **Sub-agents**: each role + one-line responsibility (all are sub-agents / squad members).
+- **Phases** and the delegation strategy the session will follow.
+- **Deliverables**: format + location under `projects/<name>/`.
+- **Skills**: each convention that becomes a `loop-plugin:<name>` skill.
+- **Standing directives**: D1, D2, ... as they will appear in `human_directives.md`.
+- **config.yaml**: the exact values to be set.
+- **Concerns / risks**: anything underspecified, contradictory, or likely to need a second pass.
+
+Then ask the human to approve or send fixes. On fixes, update the temp file and re-present. **Do not generate real artifacts until the human approves.**
+
+---
+
+## Generation (after approval)
 
 ### `steering/<name>/consensus.md`
 
-All 7 required sections, filled with domain-appropriate placeholder text. **Do NOT include the sentinel marker** `<!-- AGENTTEAM_UNADAPTED -->` - this file must be runnable immediately.
+All 7 sections, domain-appropriate placeholder text. **No sentinel marker** - this file must be runnable immediately.
 
 ```markdown
 ## Last Updated
@@ -79,42 +110,39 @@ All 7 required sections, filled with domain-appropriate placeholder text. **Do N
 - Project initialized via /adapt for domain: <domain>
 
 ## Next Action
-<first concrete action the team should take, based on the domain>
+<first concrete action, based on the domain>
 
 ## Team State
 All agents standing by. First cycle not yet run.
-<tracking fields for this domain>
+<labeled starter tracking fields this domain needs - e.g. per-stage pipeline counts, a ledger of processed items, doc maturity per discipline - so every later cycle updates a stable structure>
 
 ## Open Questions
 (none)
 ```
 
-In `## Team State`, define the tracking fields this domain needs as labeled starter lines (e.g. a pipeline count per stage, a ledger of items already processed, doc maturity per discipline) so every later cycle updates a stable structure instead of inventing one.
-
 ### `steering/<name>/human_directives.md`
 
-Pre-fill `## Standing Directives` with the rules gathered in question 8, numbered D1, D2, ... If an answer references something the user must still fill in, keep an explicit `<placeholder>` in the directive text.
+Pre-fill `## Standing Directives` from the must-ask constraints, numbered D1, D2, ... Keep explicit `<placeholder>` text for anything the human still needs to fill.
 
 ```markdown
 ## Standing Directives
 
-D1. <first standing rule from the interview>
-D2. <second standing rule from the interview>
+D1. <first standing rule>
+D2. <second standing rule>
 
 ## Cycle Overrides
 
-<!-- Add one-off instructions here. They supersede consensus Next Action. Remove when satisfied. -->
+<!-- One-off instructions; supersede consensus Next Action. Remove when satisfied. -->
 
 ## Answers
 
 <!-- Responses to Open Questions from consensus.md. -->
 ```
 
-### `.claude/agents/<role>.md` for each WORKER role
+### `.claude/agents/<role>.md` - one per role (ALL roles)
 
-Generate one file per worker role from question 3. Do NOT generate an agent file for the orchestrator/coordinator role - that persona goes into PROMPT.md (the headless cycle session is the orchestrator and never delegates to itself).
+Every domain role becomes a sub-agent file. Never create an orchestrator agent file.
 
-Use this frontmatter and structure:
 ```
 ---
 name: <role-slug>
@@ -122,29 +150,37 @@ description: <one-line role description>
 model: inherit
 ---
 
-You are the <role> for this agent team. <2-3 sentences describing responsibilities and style.>
+You are the <role> for this agent team. <2-3 sentences on responsibilities and style.>
 
 ## Your Responsibilities
 
-<bullet list of what this agent does each cycle>
+<what this sub-agent does when delegated to>
 
 ## Rules
 
 - Write only inside `projects/<active_project>/`.
-- Do not update consensus.md - that is the orchestrator's responsibility.
+- Do not update consensus.md - the orchestrator session owns it.
 - Do not run git push.
 - Report blockers clearly so the orchestrator can surface them.
 
 ## Output Format
 
-<how this agent should structure its output report>
+<how this sub-agent structures its report back to the orchestrator>
 ```
 
-**Cleanup (required):** after writing the new agent files, delete every other `.claude/agents/*.md` whose `name` is not in the new squad - i.e. any agent files left over from a previous domain. The cycle session discovers all agent files and could delegate to a stale one. List the deletions to the user as part of the overwrite confirmation.
+**Cleanup (required):** after writing the new files, delete every other `.claude/agents/*.md` whose `name` is not in the new squad (leftovers from a previous domain). List the deletions in the overwrite confirmation.
 
-### `src/resources/loop-plugin/skills/<name>/SKILL.md` for each convention from question 7
+### `src/resources/PROMPT.md`
 
-One skill per convention, kebab-case name. These live in the `loop-plugin` plugin, so they load only into headless loop sessions and agents apply them as `loop-plugin:<name>` (never into interactive sessions). Do NOT write domain skills to `.claude/skills/` - that home is reserved for human-run setup skills like /adapt. Leave the framework-provided `example-loop-skill` in place; delete only domain skills left over from a previous domain. Structure:
+Replace the `<!-- DOMAIN-SPECIFIC -->` placeholders. Do **not** add a domain role persona - the orchestrator stays generic. Fill in:
+- **Delegation strategy** across the sub-agents (ordering, when to involve which, max per cycle).
+- **Domain output rules**: deliverables → `projects/<name>/` (domain-native filenames, no framework stamps); by-product docs → `auto-outputs/<name>/docs/` named `cycle-NNNN-<timestamp>-<persona>-<slug>.md`; quality bar; when to escalate to Open Questions.
+- **An explicit instruction to apply each generated skill by its namespaced name** (e.g. "format every digest per the `loop-plugin:digest-format` skill").
+- **Phase semantics**: which `## Current Phase` values exist and what permits advancing.
+
+### `src/resources/loop-plugin/skills/<name>/SKILL.md` - one per convention
+
+These load only into headless loop sessions via the `loop-plugin` plugin; agents apply them as `loop-plugin:<name>`. Never put domain skills in `.claude/skills/`. Leave the framework-provided `example-loop-skill` in place; delete only domain skills from a previous domain.
 
 ```markdown
 # <name> - <Short Title>
@@ -157,36 +193,27 @@ One skill per convention, kebab-case name. These live in the `loop-plugin` plugi
 
 ## When to Apply
 
-<which roles use this, at which point in the cycle, and what counts as compliant>
+<which sub-agents use this, at which point in the cycle, and what counts as compliant>
 ```
-
-### `src/resources/PROMPT.md`
-
-Replace the `<!-- DOMAIN-SPECIFIC -->` placeholders with:
-- The orchestrator persona from question 3 (role name, responsibilities, decision style) - this is where the coordinator role lives
-- The delegation strategy across the worker roles (ordering rules, when to involve which worker, max workers per cycle if relevant)
-- Domain output rules: deliverables go in `projects/<name>/` (domain-native filenames, no framework stamps); by-product docs go in `auto-outputs/<name>/docs/` named `cycle-NNNN-<timestamp>-<persona>-<slug>.md`; naming patterns, quality bar
-- An explicit instruction to apply each generated skill by its namespaced name (e.g. "format every digest per the `loop-plugin:digest-format` skill")
-- Phase semantics from question 4: what `## Current Phase` values exist and what permits advancing
 
 ### `config.yaml`
 
-Update:
-- `active_project`: the new project name
-- `squad`: the worker role slugs from question 3 (NEVER include the orchestrator - the session itself is the orchestrator)
-- `single_cycle` and `loop_interval_seconds`: from the cadence answer (question 6)
+- `active_project`: the new project slug.
+- `squad`: **all** the role slugs (every role is a sub-agent).
+- `single_cycle` and `loop_interval_seconds`: from the cadence (default `true` / `30`).
+- Leave `cycle_timeout_seconds`, `verbosity`, `max_cycle_logs` unless the human asked otherwise; mention they can hand-tune them.
 
-Leave `cycle_timeout_seconds`, `verbosity`, and `max_cycle_logs` unchanged unless the user expressed a preference; mention they can tune these by hand.
+Agent files, skill files, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Confirm before overwriting.
 
 ---
 
-## Final Step
+## Final step
 
-Tell the user:
-- Their project steering files are at `steering/<name>/` (`consensus.md` + `human_directives.md`)
-- Deliverables will accumulate in `projects/<name>/`; process trail (docs, logs, snapshots) in `auto-outputs/<name>/` - both created by the loop on first run
-- They can review and edit any generated file before running the loop - especially the standing directives, the generated skills, and the squad list in `config.yaml`
-- Run `.venv/bin/python loop.py` to start the first cycle (single_cycle: true is recommended for the first run)
-- Edit `human_directives.md` between cycles to steer the team
+1. **Delete `ADAPT_PROPOSAL.tmp.md`** - the proposal is now realized in the actual files.
+2. Tell the human:
+   - Steering files are at `steering/<name>/` (`consensus.md` + `human_directives.md`); deliverables accumulate in `projects/<name>/` and the process trail in `auto-outputs/<name>/` (both created by the loop on first run).
+   - They can review/edit any generated file before running - especially the standing directives, the generated skills, and the squad in `config.yaml`.
+   - Run `.venv/bin/python loop.py` to start the first cycle (`single_cycle: true` recommended for the first run).
+   - Edit `human_directives.md` between cycles to steer the team.
 
-For worked end-to-end examples of completed interviews and the files they should produce, see `.dev-docs/example_cases.md`.
+For worked end-to-end examples of completed setups, see `.dev-docs/example_cases.md`.

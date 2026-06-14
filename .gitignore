@@ -16,3 +16,6 @@ auto-outputs/*/memory/
 # Tool-generated artifacts - not framework source
 INSTINCT-PATTERNS.md
 .claude/scheduled_tasks.lock
+
+# /adapt scratch - the proposal preview is deleted on approval; ignore as a backstop
+*.tmp.md

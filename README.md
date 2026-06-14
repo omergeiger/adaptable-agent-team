@@ -16,7 +16,7 @@ The patterns are extracted and generalized from the [Auto-Company](https://githu
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
    ```
-2. **Adapt the framework to your domain.** Run the `/adapt` skill interactively in a Claude Code session at the repo root. It interviews you (domain, purpose, roles, phases, cadence) and generates the worker agent files, a tailored `PROMPT.md`, the domain skills, and a starter `steering/<name>/consensus.md` + `human_directives.md`. See `.dev-docs/example_cases.md` for ten worked adaptation cases.
+2. **Adapt the framework to your domain.** Run the `/adapt` skill interactively in a Claude Code session at the repo root. It extracts what it can from your request, proposes a setup for your approval, then generates a sub-agent file per role, a tailored `PROMPT.md`, the domain skills, and a starter `steering/<name>/consensus.md` + `human_directives.md`. See `.dev-docs/example_cases.md` for ten worked adaptation cases.
 3. **Configure** `config.yaml` - set `active_project`, the `squad` roster, cadence, and toggles (see below).
 4. **Run the loop:**
    ```bash
@@ -71,7 +71,7 @@ AgentTeam/
 The recurring flows of operating the repo. Each links to the relevant detail under Core Concepts.
 
 ### 1. Adapt the framework to a domain (once per domain)
-Run `/adapt` interactively at the repo root. The wizard interviews you and generates the worker agent files (`.claude/agents/`), domain skills (`src/resources/loop-plugin/skills/`), a tailored `src/resources/PROMPT.md`, and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
+Run `/adapt` interactively at the repo root. The wizard extracts what it can from your request, triages the gaps, and proposes a setup before generating: one sub-agent file per role (`.claude/agents/` - every role is a sub-agent; the cycle session itself is the generic orchestrator), domain skills (`src/resources/loop-plugin/skills/`), a tailored `src/resources/PROMPT.md`, and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
 
 ### 2. Run the loop
 Two operating modes, selected by `single_cycle` in `config.yaml`:
