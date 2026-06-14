@@ -323,6 +323,12 @@ def main() -> None:
     directives_path = steering_dir / "human_directives.md"
     state_file = logs_dir / "loop_state.json"
 
+    # Unadapted project guard — runs before any mkdir so no stray directories are created
+    if con.is_unadapted(consensus_path):
+        print(f"[agentteam] ERROR: Project '{active}' is unadapted or missing consensus.md.", file=sys.stderr)
+        print("[agentteam] Run the /adapt skill interactively to set up this project, then rerun the loop.", file=sys.stderr)
+        sys.exit(1)
+
     steering_dir.mkdir(parents=True, exist_ok=True)
     logs_dir.mkdir(parents=True, exist_ok=True)
     memory_dir.mkdir(parents=True, exist_ok=True)
@@ -330,12 +336,6 @@ def main() -> None:
     project_dir.mkdir(parents=True, exist_ok=True)
 
     log = setup_logging(logs_dir / "loop.log")
-
-    # Unadapted project guard
-    if con.is_unadapted(consensus_path):
-        log.error(f"Project '{active}' is unadapted or missing consensus.md.")
-        log.error("Run the /adapt skill interactively to set up this project, then rerun the loop.")
-        sys.exit(1)
 
     claude_bin = find_claude_bin()
     log.info("=== AgentTeam Loop Starting ===")
