@@ -40,7 +40,7 @@ Everything below exists only to fill the generated artifacts (see Generation). T
 
 **Must-ask - cannot be guessed:**
 - **Domain & purpose** - what the team is chartered to accomplish.
-- **Roles** - the 2-6 specialist sub-agents, each with a one-line responsibility. (All become sub-agents.)
+- **Roles** - the 2-20 specialist sub-agents, each with a one-line responsibility. (All become sub-agents.)
 - **Hard constraints / standing directives** - non-negotiables: exclusions, quality bars, anything needing human sign-off.
 
 **Propose-and-confirm - infer from the request + the worked cases in `.dev-docs/example_cases.md`, then let the human correct:**
