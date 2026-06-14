@@ -19,7 +19,7 @@ description: Human-run setup wizard for adapting the framework to a new domain. 
 ## Orchestration model (read first - do not violate)
 
 - The **main headless cycle session** (the `claude -p` invocation the loop makes) is the orchestrator. Its coordinator persona is generic and already lives in `src/resources/PROMPT.md`.
-- **The orchestrator is never a domain role.** Every specialist role the human names becomes a **sub-agent**: one `.claude/agents/<role>.md` file plus an entry in the full `config.yaml > squad`.
+- **The orchestrator is never a domain role.** Every specialist role the human names becomes a **sub-agent**: one `src/resources/loop-plugin/.claude/agents/<role>.md` file plus an entry in the full `config.yaml > squad`.
 - Therefore: do NOT ask "which role coordinates", do NOT write an orchestrator agent file, and do NOT embed any domain role's persona into `PROMPT.md`. The orchestrator's *domain-specific decision logic* (priorities, when to advance a phase, what "done" means, delegation order) goes into `PROMPT.md`'s domain sections - as rules the generic session follows, not as a role.
 
 ---
@@ -139,7 +139,7 @@ D2. <second standing rule>
 <!-- Responses to Open Questions from consensus.md. -->
 ```
 
-### `.claude/agents/<role>.md` - one per role (ALL roles)
+### `src/resources/loop-plugin/.claude/agents/<role>.md` - one per role (ALL roles)
 
 Every domain role becomes a sub-agent file. Never create an orchestrator agent file.
 
@@ -168,7 +168,7 @@ You are the <role> for this agent team. <2-3 sentences on responsibilities and s
 <how this sub-agent structures its report back to the orchestrator>
 ```
 
-**Cleanup (required):** after writing the new files, delete every other `.claude/agents/*.md` whose `name` is not in the new squad (leftovers from a previous domain). List the deletions in the overwrite confirmation.
+**Cleanup (required):** after writing the new files, delete every other `src/resources/loop-plugin/.claude/agents/*.md` whose `name` is not in the new squad (leftovers from a previous domain). List the deletions in the overwrite confirmation.
 
 ### `src/resources/PROMPT.md`
 
