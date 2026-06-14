@@ -24,9 +24,9 @@ Run `/adapt` when:
 
 This wizard interviews you about your domain and generates:
 1. A steering folder at `steering/<your-project-name>/` with `consensus.md` and `human_directives.md` (the loop creates the `auto-outputs/` and `projects/` directories on first run)
-2. Customized worker agent files in `.claude/agents/` - one per worker role (replaces the generic placeholders). The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into `src/resources/PROMPT.md`. After generating, every agent file NOT in the new squad is deleted (the generic `worker.md`/`orchestrator.md` placeholders and any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
+2. Customized worker agent files in `.claude/agents/` - one per worker role. The orchestrator persona does NOT get an agent file: the headless cycle session IS the orchestrator, so its persona is written into `src/resources/PROMPT.md`. After generating, every agent file NOT in the new squad is deleted (any previous domain's roles) - stale agent files are discoverable by cycle sessions and can be mis-delegated to.
 3. A tailored `src/resources/PROMPT.md` embedding the orchestrator persona and domain-specific rules
-4. Domain skill files at `.claude/skills/<name>/SKILL.md` - one per convention, template, or rubric that must not drift across cycles. Agents load these during loop cycles.
+4. Domain skill files at `src/resources/loop-plugin/skills/<name>/SKILL.md` - one per convention, template, or rubric that must not drift across cycles. These load into headless loop sessions via the `loop-plugin` plugin (not into interactive sessions) and agents apply them as `loop-plugin:<name>`. Never put domain skills in `.claude/skills/` - that home is reserved for human-run setup skills like /adapt.
 5. A starter `consensus.md` at `steering/<your-project-name>/consensus.md` (ready to run - no sentinel marker)
 6. A starter `human_directives.md` at `steering/<your-project-name>/human_directives.md` pre-filled with the standing directives gathered in the interview
 7. `config.yaml` updates: `active_project`, `squad` (the worker role slugs), and `single_cycle` + `loop_interval_seconds` from the cadence answer
@@ -51,7 +51,7 @@ Ask the user these questions (one at a time, conversationally):
 
 6. **Cadence** - How often should cycles run (loop_interval_seconds)? Should single_cycle be true (gated, human reviews each cycle) or false (autonomous, runs until stopped)?
 
-7. **Conventions (skills)** - What formats, templates, rubrics, or protocols must stay identical across cycles? (e.g., a digest template, a review-memo format, a fit-scoring rubric, a test-gate procedure.) Each one becomes a skill file under `.claude/skills/` that agents apply during cycles.
+7. **Conventions (skills)** - What formats, templates, rubrics, or protocols must stay identical across cycles? (e.g., a digest template, a review-memo format, a fit-scoring rubric, a test-gate procedure.) Each one becomes a skill file under `src/resources/loop-plugin/skills/` that agents apply during cycles.
 
 8. **Standing directives** - What persistent rules should the team always follow? (e.g., focus area, exclusions, quality thresholds, things that need human sign-off.) These pre-fill `human_directives.md` as D1, D2, ...
 
@@ -140,11 +140,11 @@ You are the <role> for this agent team. <2-3 sentences describing responsibiliti
 <how this agent should structure its output report>
 ```
 
-**Cleanup (required):** after writing the new agent files, delete every other `.claude/agents/*.md` whose `name` is not in the new squad - including the generic `worker.md` and `orchestrator.md` placeholders and any agent files left over from a previous domain. The cycle session discovers all agent files and could delegate to a stale one. List the deletions to the user as part of the overwrite confirmation.
+**Cleanup (required):** after writing the new agent files, delete every other `.claude/agents/*.md` whose `name` is not in the new squad - i.e. any agent files left over from a previous domain. The cycle session discovers all agent files and could delegate to a stale one. List the deletions to the user as part of the overwrite confirmation.
 
-### `.claude/skills/<name>/SKILL.md` for each convention from question 7
+### `src/resources/loop-plugin/skills/<name>/SKILL.md` for each convention from question 7
 
-One skill per convention, kebab-case name. These are loaded by agents during loop cycles (unlike /adapt itself, which is human-run). Structure:
+One skill per convention, kebab-case name. These live in the `loop-plugin` plugin, so they load only into headless loop sessions and agents apply them as `loop-plugin:<name>` (never into interactive sessions). Do NOT write domain skills to `.claude/skills/` - that home is reserved for human-run setup skills like /adapt. Leave the framework-provided `example-loop-skill` in place; delete only domain skills left over from a previous domain. Structure:
 
 ```markdown
 # <name> - <Short Title>
@@ -166,7 +166,7 @@ Replace the `<!-- DOMAIN-SPECIFIC -->` placeholders with:
 - The orchestrator persona from question 3 (role name, responsibilities, decision style) - this is where the coordinator role lives
 - The delegation strategy across the worker roles (ordering rules, when to involve which worker, max workers per cycle if relevant)
 - Domain output rules: deliverables go in `projects/<name>/` (domain-native filenames, no framework stamps); by-product docs go in `auto-outputs/<name>/docs/` named `cycle-NNNN-<timestamp>-<persona>-<slug>.md`; naming patterns, quality bar
-- An explicit instruction to apply each generated skill by name (e.g. "format every digest per the digest-format skill")
+- An explicit instruction to apply each generated skill by its namespaced name (e.g. "format every digest per the `loop-plugin:digest-format` skill")
 - Phase semantics from question 4: what `## Current Phase` values exist and what permits advancing
 
 ### `config.yaml`

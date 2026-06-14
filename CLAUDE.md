@@ -36,9 +36,18 @@ These apply to agents running inside loop cycles (enforced via the cycle prompt 
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents. consensus.md is agent-owned; humans steer only via human_directives.md.
 
+## Skills
+
+Skills are reusable, callable units rather than instructions baked into agent prompts. There are two homes, split by audience:
+
+- **`.claude/skills/<name>/SKILL.md`** - human-run setup skills (currently just `/adapt`). Discovered by both interactive Claude Code sessions and headless loop sessions (same cwd), so loop agents are explicitly forbidden from invoking them via PROMPT.md. Invoked interactively as `/<name>`.
+- **`src/resources/loop-plugin/skills/<name>/SKILL.md`** - agent-applied skills, loaded only into headless loop sessions via `claude -p --plugin-dir` (see `run_cycle` in `loop.py`). Invisible to interactive sessions; addressed namespaced as `loop-plugin:<name>`. This is the home for both framework loop skills and the domain-convention skills `/adapt` generates (digest templates, scoring rubrics, test-gate protocols - anything that must not drift across cycles).
+
+Authoring conventions: each `SKILL.md` declares its audience at the top, is self-contained (does not rely on other skills being loaded), and is written as instructions Claude follows when the skill runs (not human documentation). See `src/resources/loop-plugin/skills/example-loop-skill/` for the agent-applied pattern.
+
 ## Adapt Skill
 
-`.claude/skills/adapt/` is a human-run setup wizard for customizing the framework to a new domain before launching the loop. Agents and the loop never invoke it; the loop only detects an unadapted project and exits, directing the user to run /adapt interactively.
+`.claude/skills/adapt/` is a human-run setup wizard for customizing the framework to a new domain before launching the loop. It generates the worker agent files, a tailored `src/resources/PROMPT.md`, the domain-convention skills (into `src/resources/loop-plugin/skills/`), and the starter steering files. Agents and the loop never invoke it; the loop only detects an unadapted project and exits, directing the user to run /adapt interactively.
 
 ## Project Structure
 

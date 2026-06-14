@@ -13,7 +13,9 @@ can see and invoke it.
 
 Use this directory (`src/resources/loop-plugin/skills/`) for any skill that should
 steer agent behavior mid-cycle without leaking into the human's interactive
-session. For human-run setup skills (like /adapt), use `.claude/skills/` instead.
+session. This is also where `/adapt` writes the domain-convention skills it
+generates (digest templates, scoring rubrics, test-gate protocols). For human-run
+setup skills (like /adapt itself), use `.claude/skills/` instead.
 
 ---
 
