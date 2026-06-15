@@ -60,4 +60,20 @@ Before this cycle ends, you **must** update `steering/<active_project>/consensus
 
 The format is non-negotiable. Any missing section causes a loop validation error and the cycle is rolled back.
 
+**Loop Signal protocol**
+
+You may append one optional line to consensus.md to signal the loop runner to exit after this cycle. The line must appear as a top-level heading with this exact text:
+
+```
+## Loop Signal: <value>
+```
+
+The loop reads this only on a successful cycle (valid, changed consensus). Three recognized values:
+
+- `## Loop Signal: done` - the final project deliverable was written this cycle. Loop exits cleanly (exit 0).
+- `## Loop Signal: stop` - a human Cycle Override instructed you to stop. Loop exits cleanly (exit 0).
+- `## Loop Signal: block - <reason>` - you are stuck on required human input and cannot make progress without it. Loop exits with an error (exit 1) and logs the reason with instructions to update `human_directives.md` and restart. The reason is mandatory - do not write bare `block`.
+
+You must still produce a valid, changed consensus in the same cycle you write a signal. The signal does not replace the 7 required sections; it is appended after them. If no signal applies, omit the heading entirely.
+
 <!-- DOMAIN-SPECIFIC: Add domain-specific output rules here. For example: deliverables go in projects/<active>/; by-product docs in auto-outputs/<active>/docs/ named cycle-NNNN-<timestamp>-<persona>-<slug>.md; quality bar; when to escalate to Open Questions. -->
