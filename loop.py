@@ -498,7 +498,7 @@ def main() -> None:
                 git_sync.post_cycle(cycle_count, REPO_ROOT, log)
 
             signal_text = con.read_signal(con.read(consensus_path))
-            if signal_text is not None:
+            if signal_text:  # truthy: skip None and empty/whitespace-only signals
                 token = signal_text.split()[0].lower()
                 if token == "done":
                     log.info(f"Cycle #{cycle_count}: Loop Signal 'done' - final deliverable written. Exiting.")
