@@ -2,6 +2,7 @@
 """AgentTeam loop - drives headless Claude Code cycles against a project."""
 
 import argparse
+import fcntl
 import json
 import logging
 import os
@@ -108,6 +109,43 @@ def find_claude_bin() -> str:
     raise RuntimeError(
         "Claude CLI not found. Install Claude Code and verify with 'claude --version'."
     )
+
+
+# ---------------------------------------------------------------------------
+# Single-instance lock
+# ---------------------------------------------------------------------------
+
+def acquire_singleton_lock(lock_path: Path):
+    """Ensure only one loop runs per repo. Two concurrent loops race on git
+    sync (both commit/push the same branch) and double-run cycles.
+
+    Uses an advisory flock held for the process lifetime. The OS releases it
+    automatically when the process dies - including SIGKILL and crashes - so
+    there is no stale-lock problem. Returns the open handle, which the caller
+    MUST keep referenced (garbage-collecting it closes the fd and releases the
+    lock).
+    """
+    fd = open(lock_path, "a+")  # a+ does not truncate, so an existing PID survives the failed-acquire read
+    try:
+        fcntl.flock(fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        fd.seek(0)
+        existing = fd.read().strip() or "unknown"
+        fd.close()
+        print(
+            f"[agentteam] ERROR: another loop.py is already running (PID {existing}).",
+            file=sys.stderr,
+        )
+        print(
+            f"[agentteam] Refusing to start a second loop on this repo - it would race on git sync. Lock: {lock_path}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    fd.seek(0)
+    fd.truncate()
+    fd.write(str(os.getpid()))
+    fd.flush()
+    return fd
 
 
 # ---------------------------------------------------------------------------
@@ -336,6 +374,10 @@ def main() -> None:
     project_dir.mkdir(parents=True, exist_ok=True)
 
     log = setup_logging(logs_dir / "loop.log")
+
+    # Single-instance guard - held for the whole process lifetime (do not let
+    # _lock fall out of scope, or the fd closes and the lock releases).
+    _lock = acquire_singleton_lock(REPO_ROOT / ".loop.lock")
 
     claude_bin = find_claude_bin()
     log.info("=== AgentTeam Loop Starting ===")
