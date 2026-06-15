@@ -57,6 +57,14 @@ def changed_since(consensus_path: Path, pre_content: str) -> bool:
     return consensus_path.read_text(encoding="utf-8") != pre_content
 
 
+def read_signal(content: str) -> str | None:
+    """Return the text after '## Loop Signal:' if present, else None."""
+    for line in content.splitlines():
+        if line.startswith("## Loop Signal:"):
+            return line[len("## Loop Signal:"):].strip()
+    return None
+
+
 def snapshot(steering_dir: Path, memory_dir: Path, cycle_num: int) -> None:
     """Copy consensus.md to memory/consensus-step-NNNN.md and make it read-only."""
     src = steering_dir / "consensus.md"

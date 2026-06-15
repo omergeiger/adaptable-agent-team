@@ -497,6 +497,28 @@ def main() -> None:
             if config.get("git_sync", True):
                 git_sync.post_cycle(cycle_count, REPO_ROOT, log)
 
+            signal_text = con.read_signal(con.read(consensus_path))
+            if signal_text is not None:
+                token = signal_text.split()[0].lower()
+                if token == "done":
+                    log.info(f"Cycle #{cycle_count}: Loop Signal 'done' - final deliverable written. Exiting.")
+                    save_state(state_file, cycle_count, "done")
+                    sys.exit(0)
+                elif token == "stop":
+                    log.info(f"Cycle #{cycle_count}: Loop Signal 'stop' - stop acknowledged. Exiting.")
+                    save_state(state_file, cycle_count, "stopped")
+                    sys.exit(0)
+                elif token == "block":
+                    reason = signal_text[len("block"):].lstrip(" -").strip()
+                    log.warning(
+                        f"Cycle #{cycle_count}: Loop Signal 'block' - {reason}. "
+                        "Update human_directives.md and restart the loop."
+                    )
+                    save_state(state_file, cycle_count, "blocked")
+                    sys.exit(1)
+                else:
+                    log.warning(f"Cycle #{cycle_count}: Loop Signal '{token}' unrecognized - ignoring.")
+
             if remaining_cycles is not None:
                 remaining_cycles -= 1
                 if remaining_cycles <= 0:
