@@ -1,108 +1,79 @@
-# ATS Report - Talia Brennwood (Lead Product Designer, Care Platform)
+# ATS Report - Talia Brennwood (review attempt 2)
 
-Reviewed: cv-draft.md against the target JD in intake/raw-material.md. Skill applied: loop-plugin:ats-checklist (with loop-plugin:cv-section-template for heading names). Review cycle 3. Recommendations only; the draft was not modified.
+Audited: projects/cv-designer/talia-brennwood/cv-draft.md against intake/raw-material.md, using loop-plugin:ats-checklist and loop-plugin:cv-section-template.
 
-## Verdict: FAIL (1 compliance violation, fixable with a one-line edit)
+## Verdict: PASS
 
-- Confirmed compliance violations: 1 (inconsistent date format, "Spring 2022").
-- Advisories (non-failing): 4.
-- The known inline [MISSING]/[CONFIRM] tags alone do NOT change the verdict. They are legitimate draft-stage placeholders under the section template, and no REQUIRED item depends on them (name, email and phone, headings, and company/title/dates per entry are all present). They remain a hard blocker for Design (see "Tags to resolve").
-- The FAIL stands even if the tags are ignored, because of the date-format violation (R4). Once R4 is fixed, the draft would pass the format checklist, with the tags still open.
-- A second draft pass is needed before Design: small content-writer pass for R4 and keyword wording, plus human input for the tags.
+- FORBIDDEN items triggered: 0
+- REQUIRED items failing: 0
+- Compliance violations: 0 (3 advisory notes below)
+- Second draft pass needed before Design: No (optional polish and open questions only)
 
-## 1. Compliance Checklist
+## Compliance checklist
 
-### FORBIDDEN (all clear)
+FORBIDDEN (none present)
 
-- Tables: clear. Pipes appear only as inline separators in the contact line and entry headings (template-mandated); there is no header-separator row or column grid.
-- Multi-column layouts: clear (pure Markdown, single flow).
-- Text boxes or frames: clear.
-- Inline images or logos: clear.
-- Headers or footers with name/page number: none in the Markdown. Must be re-verified in the Design output (HTML/PDF print CSS must not add running headers or footers).
-- Decorative Unicode: clear. Only ASCII hyphens and standard punctuation found; no check marks, arrows, or stars. The "---" rules are plain.
-- Non-standard fonts: not assessable in Markdown. Deferred to Design; ATS version should use a standard system font.
-- Embedded hyperlinks in display text: clear. No [text](url) links; the portfolio URL is raw text.
+- [x] Tables: none. Pipes appear only as inline separators in the contact line and entry headings; no Markdown table header/separator rows.
+- [x] Multi-column layouts: none.
+- [x] Text boxes or frames: none.
+- [x] Inline images or logos: none.
+- [x] Headers/footers with name or page number: none.
+- [x] Decorative Unicode: none. Bullets are plain "-", separators are ASCII "|" and "---".
+- [x] Non-standard fonts: not applicable to Markdown source; re-check in the Design phase.
+- [x] Embedded hyperlinks: none; no [text](url) links in the draft.
 
-### REQUIRED
+REQUIRED (all present)
 
-- Full name as first line: PASS ("# Talia Brennwood").
-- Email plus phone or LinkedIn in the first 5 lines: PASS (email and phone on line 5; LinkedIn is a [MISSING] tag but is not needed to satisfy this item).
-- Section headings plain text and matching the template: PASS for Professional Summary, Experience, Education, Skills, Publications & Projects. See advisory A3 on the omitted Certifications & Awards section.
-- Consistent date format (Month YYYY or MM/YYYY): FAIL. See R4.
-- Company, title, and dates on every experience entry: PASS (cities are [MISSING], but city is not one of the three required fields).
+- [x] Full name is the first line ("# Talia Brennwood").
+- [x] Email and phone are on line 5, within the first 5 lines.
+- [x] Section headings are plain text and match the template exactly: Professional Summary, Experience, Education, Skills, Publications & Projects. Certifications & Awards is omitted (see advisory 3).
+- [x] Dates are consistent: Month YYYY - Month YYYY / Present for roles; year-only for Education and Publications, which the template allows.
+- [x] Every experience entry has title, company and dates (3 of 3 entries).
 
-### Violations
+## Advisory notes (not failures)
 
-- V1 (R4): Fernhollow Health entry uses "Spring 2022 - Present". "Spring" is not a Month YYYY value, an ATS date parser may drop it, and the experience duration (and thus the JD's "7+ years" match) can be miscomputed. The other roles use full Month YYYY ("June 2018 - February 2022", "January 2017 - May 2018") so the format is also mixed. The intake gives "March 2022" as the candidate's best recollection, flagged UNCONFIRMED.
+1. Portfolio URL has no scheme ("portfolio.example.com/talia"). The checklist wants raw URLs as https://...; the draft carries an inline [CONFIRM https:// scheme] tag. Recommend writing https://portfolio.example.com/talia once confirmed. The source omits the scheme too, so this is a confirmation, not an invention.
+2. Headline "Lead Product Designer" is the target role, while the current title is Senior Product Designer. This is how the template defines the headline and is not fabrication, but ATS title matching reads the Experience entry; keep the Fernhollow title as stated.
+3. Raw material lists the Ridgecrest Design Prize under Certifications & Awards. The draft carries it as a thesis bullet in Education. This is acceptable and avoids duplication. An ATS keyword for "awards" will not fire, which is minor.
 
-### Advisories
+## Known open tags (tracked, do not fail ATS)
 
-- A1: Portfolio URL is "portfolio.example.com/talia" with no scheme. The checklist wants URLs as raw text in the form https://... for the ATS-submitted version. Confirm the scheme with the candidate rather than assuming.
-- A2: Year-only dates in Education (2016) and Publications ("2023", "Since 2021") are consistent with the template and acceptable, but note they are not Month YYYY. Fine as is; do not mix further.
-- A3: The Ridgecrest Design Prize appears only as an Education bullet. The intake lists it under Certifications & Awards, and ATS award parsers look for that heading. Consider a short Certifications & Awards section (heading must match the template exactly) with the prize, Ridgecrest Institute of Art & Design, 2016. Do not add the unfinished UX certificate; the candidate said SKIP.
-- A4: Headline "Lead Product Designer" is the target role (template-mandated), while the current title is Senior Product Designer. Keep as is, but the Design phase should not present it as a held title.
+- [MISSING - LinkedIn URL] (contact line)
+- [MISSING - city] x4 (Fernhollow, Quillmark, Copperline, Ridgecrest)
+- [CONFIRM start month] (Fernhollow, March 2022)
+- [CONFIRM currency] (Quillmark ARR)
+- [CONFIRM https:// scheme] (portfolio)
 
-## 2. Keyword Alignment
+These tags must be resolved or removed before the final ATS plain-text export, because a parser will read them as literal text. Contact has email plus phone, so the missing LinkedIn URL does not break the REQUIRED rule.
 
-Scale: High = 2+ appearances in context; Medium = once; Low = absent or skills list only.
+## Fidelity spot-check against raw-material.md
 
-### Cluster 1 - Core skills (design systems, accessibility, measurable outcomes): High
-- Design system: High (summary, Fern UI bullet, Skills).
-- Accessibility / WCAG: High (summary, audit bullet, Skills, kiosk low-vision testing).
-- Measurable outcomes: High (61% to 84%, 18%, 22%, 58% to 89%).
-- Cross-functional partnership with product and engineering leads: Low. Engineers appear once ("3 engineers"); "product" partnership is not evidenced anywhere.
+All figures match the source: 61% to 84% over about 2 quarters; Fern UI with 1 designer and 3 engineers across 5 teams; no-shows down 18%; 2M to 9M ARR worded as "contributing to" (team effort preserved); 58% to 89% task success; about 40 interviews per year; low-vision kiosk testing. Deliberately omitted per source: the unconfirmed +22% trial-to-paid, 2015-2016 freelance, headcount, UX certificate, and the leadership workshop. No fabricated claims found. "Regulated healthcare setting" in the summary is a reasonable reading of the JD framing.
 
-### Cluster 2 - Seniority and leadership language: Medium
-- "Lead"/"Senior": Medium (headline, "Senior Product Designer", "led accessibility").
-- "Mentor": High.
-- Leading a product area / managing designers / direct reports: Low (absent). This is the JD's central requirement. The intake itself marks it [MISSING]; see Gaps. The draft correctly does not claim it.
-- "7+ years": Medium. Draft says "since 2017", which an ATS cannot always convert to a year count. The candidate said "8ish"; dates from January 2017 span longer than that. Do not state a number until confirmed.
+## Keyword alignment (JD: Lead Product Designer - Care Platform)
 
-### Cluster 3 - Domain vocabulary (health tech, regulated domains): Medium
-- Healthcare / telehealth / patient / clinicians: High.
-- "Health tech" or "care" phrasing: Low (absent).
-- "Regulated" / compliance: Low (absent). Evidence exists in the facts (WCAG 2.1 AA audit, coordination with legal, healthcare employer) but the word is never used. Do not add HIPAA or any specific regulation; the source does not support it.
+| Cluster | Rating | Evidence |
+|---|---|---|
+| Design systems / systems thinking | High | Summary, Fernhollow bullet, Skills |
+| Accessibility (WCAG) | High | Summary, Fernhollow bullet, Skills, kiosk low-vision |
+| Measurable outcomes | High | 61 to 84%, 18%, 58 to 89%, ARR in multiple places |
+| Facilitation | High | Summary, critique bullet, Skills |
+| Regulated domain (healthcare) | Medium | "regulated healthcare setting" once in Summary; "legal" in a bullet |
+| Seniority language (Senior / Lead) | Medium | "Senior Product Designer" title and "Lead" headline; no "led design for an area" |
+| Health-tech / patients and care teams | Medium | "telehealth", "patient", "clinicians" appear; "care teams" absent |
+| 7+ years | Medium | "since 2017" implies 9+ years; the number is never stated |
+| People management (manage 2-3 designers) | Low | Only "mentors 2 mid-level designers"; no "manage/lead team" language, correctly, per source |
+| Leading a product area | Low | Not supported by source; see gap 1 |
+| Partnering with product and engineering leads | Low | Engineers appear only as co-builders; "partner" appears only for clinicians |
 
-### Cluster 4 - Soft skills named in the JD (facilitation, communication): Low
-- Facilitation: Low. Appears only in the Skills list ("workshops and facilitation"); the critique bullet does not use the word.
-- Communication: Low (absent). Evidence exists (Cascadia UX talk, weekly critique, legal coordination) but is not worded as such.
+Clusters below Medium: 3 of 11. This is a content gap, not a formatting defect.
 
-### Scoring outcome
-- One of four clusters is below Medium (Cluster 4). The checklist threshold for a mandatory revision pass (more than two clusters below Medium) is not met. A pass is still needed because of V1 and the tags.
+## Top 3 keyword gaps and recommendations (recommendations only; draft not modified)
 
-### Top 3 keyword gaps
-1. Product-area ownership and people management (lead a product area, manage 2-3 designers). Needs candidate confirmation; cannot be fixed by wording alone.
-2. Facilitation and communication language in context (currently Skills-list only).
-3. Regulated-domain and health-tech vocabulary ("regulated", "health tech", care team context).
+1. Product-area ownership and people management (Low). Do not claim ownership or line management without the candidate's answer to intake question 7. If she confirms either, add it as a Fernhollow bullet using the JD wording ("led design for ..." / "managed N designers"). If not, keep "mentors 2 mid-level designers" and consider "leads the design critique" in the Summary.
+2. Cross-functional partnership (Low). The source supports working with clinicians and with 3 engineers on Fern UI. Suggest: "Partnered with clinicians, product and engineering ..." only to the extent the facts support it (clinicians and engineers are supported; "product leads" is not stated and needs confirmation).
+3. Years of experience and domain terms (Medium). Add an explicit "8+ years" to the Summary opening (supported by the 2017 start; the candidate says "8ish") and include "health-tech" and "care teams" phrasing only where facts support it (patients and clinicians are supported).
 
-## 3. Rewrite Suggestions (for content-writer or orchestrator; all within intake facts)
+## Pre-Design handoff
 
-- S1 (fixes V1): Fernhollow header date to "March 2022 - Present" and keep a [CONFIRM start month] tag until the candidate verifies. Do not invent a different month.
-- S2 (Gap 2): In the Fernhollow critique bullet, use the word directly, for example "Facilitate the weekly design critique and mentor 2 mid-level designers (one has been promoted)." Optionally reference the 2023 Cascadia UX talk in the summary as evidence of communication. Do not write "excellent communication" as a claim.
-- S3 (Gap 3): In the accessibility bullet or summary, state the context from the source, for example "Led accessibility audit and remediation to WCAG 2.1 AA on the web app in a healthcare setting, coordinating with legal." In the summary, "health tech" may replace or sit beside "healthcare" since Fernhollow is described as a telehealth company. No named regulations.
-- S4 (Gap 1): Do not write product-area ownership or direct-report claims. If the candidate confirms (intake question 7), add an accurate line. Until then, strongest honest framing is already present: built Fern UI used by 5 product teams, mentors 2 designers, runs the critique. Consider "partnered with engineers and clinicians" since both are supported; do not add product-leader partnership without confirmation.
-- S5 (A3): Add the Certifications & Awards section for the Ridgecrest Design Prize, or explicitly decide to keep it in Education only.
-- S6 (A1): Confirm the portfolio URL with the https:// prefix.
-- S7 (years): Leave "since 2017". Add an explicit years figure only after the candidate reconciles "8ish" with the dated history.
-
-## 4. Fabrication Check (D3)
-
-No fabricated claims found. Observations:
-- Quillmark ARR bullet keeps the team-effort caveat and does not attribute growth solely to her. Good.
-- "$" was dropped from the ARR figures; source also had no symbol. Keep as is until currency is confirmed.
-- "coordinating closely with legal" is a mild paraphrase of "extensive coordination with legal"; acceptable.
-- Freelance 2015-2016, the 2023 workshop, and the unfinished UX certificate are correctly absent.
-
-## 5. Tags to Resolve Before Design (flagged only; they do not change the verdict)
-
-- [MISSING - LinkedIn URL] (contact line).
-- [MISSING - city] on Fernhollow Health, Quillmark, Copperline Transit Authority, and Ridgecrest (4 entries).
-- [CONFIRM currency] on the Quillmark ARR bullet.
-- [CONFIRM relative vs. percentage points] on the 22% trial-to-paid bullet.
-
-Design should not start until these are resolved or deliberately dropped. Any unresolved bracket tag would be printed into the ATS output and read as literal text by parsers.
-
-## 6. Design Handoff Notes
-
-- Re-verify the FORBIDDEN items that cannot be judged in Markdown: no running header/footer, no embedded images, standard font, no CSS columns or flex layout for body text, URLs as raw text.
-- Ship a plain-text version with the same heading names.
+Before the graphical-designer builds the plain-text ATS version, resolve or strip all bracketed tags, write the portfolio URL as raw https text, and keep the contact line free of tables. No second Draft pass is required for ATS; one is optional to apply gap 3 and any answers to the open questions.
