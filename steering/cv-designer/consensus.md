@@ -1,37 +1,39 @@
 ## Last Updated
-2026-11-18T22:27:01Z
+2026-11-18T22:28:11Z
 
 ## Current Phase
-Review passed; draft is tag-free; ready for Design
+Finalize (Design complete; awaiting human sign-off)
 
 ## What We Did This Cycle
-- Delegated to content-writer only for the tag-cleanup pass on cv-draft.md.
-- Removed every [MISSING]/[CONFIRM] tag without adding facts: LinkedIn and cities omitted, Fernhollow start year-only (2022), ARR without currency symbol, portfolio URL as plain domain, +22% metric kept out. Grep confirms no tags remain.
-- Applied the three proofreader wording fixes ("Designed", "co-built", "customer" dropped).
-- Rubric re-score: 4/4/3/4/4, all >= 3. Account saved to auto-outputs/cv-designer/docs/cycle-0008-2026-11-18T22-27-01-content-writer-tag-cleanup.md.
-- Acknowledged directives: D1, D3, D4 (one-page fit not yet rendered)
+- Delegated to graphical-designer only. Produced cv-final.html, cv-final-ats.txt and cv-final.pdf in projects/cv-designer/talia-brennwood/ from the tag-free cv-draft.md; the rubric comment was stripped and no facts were added.
+- PDF verified at 1 page (D4 met). ATS text file is plain ASCII with no tables, columns or decorative elements (D1).
+- cv-final.md deliberately not written (D2, sign-off gated). Account saved to auto-outputs/cv-designer/docs/cycle-0009-2026-11-18T22-28-11-graphical-designer-design-outputs.md.
+- Acknowledged directives: D1, D2, D3, D4
 
 ## Key Decisions
-- No full re-review: the change was removal and light wording only, and no new content was added.
-- Unconfirmed facts stay out (D3) rather than being guessed.
-- "9+ years", product-area ownership and people management are still not claimed.
+- Design -> Finalize: HTML, ATS text and PDF all exist, so the phase gate is met.
+- Layout is Letter size; switch to A4 only if the target employer is outside the US.
+- Known content gaps carried over rather than filled (D3): ARR has no currency, and the onboarding bullet has no metric.
 
 ## Next Action
-Delegate to graphical-designer only: produce cv-final.html, cv-final-ats.txt and cv-final.pdf from cv-draft.md. The PDF must fit one page (D4). Do not write cv-final.md until approval (D2).
+Wait for human approval. When `- [x] approve talia-brennwood` appears under `## Approvals` in human_directives.md, copy cv-draft.md to cv-final.md with an `approved-by: talia-brennwood` YAML frontmatter block and write `## Loop Signal: done`.
 
 ## Team State
-Candidate: Talia Brennwood (talia-brennwood). Draft is tag-free and rubric-passing; Review gate was cleared in attempt 3. Design has not started. The rubric score comment at the end of cv-draft.md may need stripping if Design reads raw Markdown. No blockers.
+Candidate: Talia Brennwood (talia-brennwood). All Design deliverables are written and verified. No in-flight agents. The only gate is human sign-off.
 
 ## Open Questions
-No human action is required to continue. Answers would improve the CV:
+CV ready for sign-off: Talia Brennwood. To approve, add `- [x] approve talia-brennwood` under `## Approvals` in human_directives.md.
+
+Optional improvements (not blocking):
 1. LinkedIn URL, and confirm the portfolio URL scheme (https://).
 2. Cities for Fernhollow Health, Quillmark, Copperline Transit Authority, Ridgecrest.
 3. Confirm Fernhollow start month and that the role is current.
 4. Year of the mentee promotion at Fernhollow.
-5. ARR currency (USD?). If the +22% trial-to-paid metric should return, say whether it is relative or percentage points.
+5. ARR currency (USD?), and whether the +22% trial-to-paid metric should return (relative or percentage points).
 6. Hiring company name for the target JD.
-7. Does she have formal direct reports, or has she owned a product area (a key JD requirement)? This is a real gap in the source.
+7. Formal direct reports, or ownership of a product area (a key JD requirement)? Real gap in the source.
 8. Any HIPAA or regulated-data experience? None in the source, so none claimed.
-9. 2023 design leadership workshop: provider and name, if it should be added for the Lead target.
-10. Experience length: she said "8ish years", but January 2017 to now is nearly 10 years; prefer "9+ years" or no figure?
-11. The headline reads "Lead Product Designer" (the target role) while her current title is Senior Product Designer; confirm this is intended.
+9. 2023 design leadership workshop: provider and name, if it should be added.
+10. Experience length: "8ish years" said, but January 2017 to now is nearly 10; prefer "9+ years" or no figure?
+11. Headline reads "Lead Product Designer" (target role) while the current title is Senior Product Designer; confirm intended.
+12. Paper size: Letter (current) or A4?
