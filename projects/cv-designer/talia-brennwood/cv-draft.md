@@ -8,7 +8,7 @@ Portland, OR, US | talia.brennwood@example.com | 555-0142 | [MISSING - LinkedIn 
 
 ## Professional Summary
 
-Product designer working since 2017 across healthcare, B2B SaaS and public transit, focused on forms, workflows, accessibility and design systems. At Fernhollow Health, a telehealth company, raised patient intake completion from 61% to 84%, co-built the Fern UI design system with 1 other designer and 3 engineers (now used by 5 product teams), and led an accessibility audit and remediation to WCAG 2.1 AA in a regulated healthcare setting. Mentors 2 mid-level designers, facilitates the weekly design critique and gave a 2023 meetup talk on intake forms.
+Product designer working since 2017 across healthcare, B2B SaaS and public transit, focused on forms, workflows, accessibility and design systems. At Fernhollow Health, a telehealth company, improved patient intake completion, built the Fern UI design system adopted across product teams, and led an accessibility remediation to WCAG 2.1 AA in a regulated healthcare setting. Mentors 2 mid-level designers, facilitates the weekly design critique and gave a 2023 talk at Cascadia UX Meetup on intake forms.
 
 ---
 
@@ -19,7 +19,7 @@ Product designer working since 2017 across healthcare, B2B SaaS and public trans
 - Redesigned patient intake for a telehealth product, raising completion rate from 61% to 84% over about 2 quarters.
 - Co-built the Fern UI design system with 1 other designer and 3 engineers; now used by 5 product teams.
 - Led an accessibility audit and remediation to reach WCAG 2.1 AA on the web app, coordinating with legal.
-- Partnered with clinicians to design provider-side appointment scheduling (reminders, easier rescheduling), cutting no-shows by 18%.
+- Partnered with clinicians to design provider-side appointment scheduling (reminders, easier rescheduling), with no-shows down 18%.
 - Facilitate the weekly design critique and mentor 2 mid-level designers (one has been promoted).
 
 ### Product Designer | Quillmark | [MISSING - city] | June 2018 - February 2022
@@ -40,8 +40,7 @@ Product designer working since 2017 across healthcare, B2B SaaS and public trans
 
 **Design and Prototyping:** Figma, FigJam, ProtoPie
 **Practice Areas:** Design systems, user research, usability testing, journey maps, accessibility / WCAG, workshops and facilitation, mentoring
-**Research and Analytics Tools:** Dovetail, Amplitude
-**Collaboration:** Jira
+**Research, Analytics and Collaboration Tools:** Dovetail, Amplitude, Jira
 **Front-end:** HTML, CSS (basic)
 
 ---
@@ -56,5 +55,5 @@ Product designer working since 2017 across healthcare, B2B SaaS and public trans
 
 ## Publications & Projects
 
-- "Designing intake forms people actually finish" - meetup talk | Cascadia UX Meetup | 2023
+- Talk: "Designing intake forms people actually finish" | Cascadia UX Meetup | 2023
 - Volunteer mentor to designers at a local bootcamp | Since 2021
