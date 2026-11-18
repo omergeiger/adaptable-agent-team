@@ -20,6 +20,8 @@ Two complete adapted runs live on their own branches, so `main` stays a clean te
 - [`example/personalized-feed`](../../tree/example/personalized-feed) - a team that builds a personalized news-feed pipeline (ingest, rank, render, feedback) in Python, with tests.
 - [`example/cv-designer`](../../tree/example/cv-designer) - a team that turns a (fictional) candidate's raw material into a CV with several HTML layouts, a PDF and an ATS report.
 
+Example data includes titles and excerpts of publicly available posts, kept for illustration; open an issue to request removal.
+
 ## Scope
 
 - **LLM provider**: Claude only, via the Claude Code CLI (`--permission-mode bypassPermissions`). No multi-provider abstraction.
