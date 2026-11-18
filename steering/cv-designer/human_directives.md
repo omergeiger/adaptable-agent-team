@@ -16,3 +16,4 @@ D4. Export to PDF within the loop; the PDF must fit on one page.
 ## Approvals
 
 <!-- To approve a final CV, add: - [x] approve <candidate-slug> -->
+- [x] approve talia-brennwood
