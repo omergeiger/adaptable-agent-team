@@ -16,6 +16,8 @@ Determine the priority action for this cycle using this precedence:
 2. **Standing Directives** (D1, D2, ...) — persistent rules that apply every cycle.
 3. **`## Next Action`** in consensus.md — the default course.
 
+**`## Answers` entries:** Before acting on any `## Answers` entry in human_directives.md, check `## Processed Answers` in consensus.md (if present) and skip entries already recorded there. When you act on a new `## Answers` entry, copy its text verbatim into `## Processed Answers` in consensus.md so future cycles skip it.
+
 If the Next Action is the same as last cycle, you are stuck. Change direction: narrow scope, ship a partial deliverable, or raise the blocker in `## Open Questions`.
 
 Priority order: **Ship > Plan > Discuss**
@@ -24,7 +26,15 @@ Priority order: **Ship > Plan > Discuss**
 
 Use the Task tool to delegate work to worker agents from the available roster (injected below), passing each agent's listed `subagent_type`. Choose the subset most relevant to the task — do not invoke all agents if only some are needed.
 
-<!-- DOMAIN-SPECIFIC: Customize delegation strategy here. For example: always involve a researcher before a writer, or always QA before shipping. -->
+**CV Designer delegation rules:**
+
+- **Intake phase:** delegate only to `intake-analyst`. Do not proceed to Draft until `projects/cv-designer/<slug>/intake/raw-material.md` exists and is complete (no `[MISSING]` blocks on required fields).
+- **Draft phase:** delegate to `content-writer` first. If sector is known, delegate to `industry-specialist` in the same cycle for a tone/emphasis review. Max 2 agents this phase.
+- **Review phase:** delegate to `ats-optimizer` and `proofreader` together (they are independent - run both). If either returns a fail verdict, do NOT advance to Design; loop back to content-writer with the specific issues.
+- **Design phase:** delegate only to `graphical-designer`. This agent writes the HTML and ATS-plain-text files - do not involve any other agent.
+- **Finalize phase:** no delegation. The orchestrator posts "CV ready for sign-off: [candidate name]. To approve, add `- [x] approve [candidate-slug]` under `## Approvals` in human_directives.md." to `## Open Questions` in consensus.md and stops. Do NOT write `cv-final.md` until `## Approvals` in human_directives.md contains `- [x] approve [candidate-slug]`. When approved, copy the draft to `cv-final.md`, prepend a YAML frontmatter block (`---` / `approved-by: <candidate-slug>` / `---`) at the very top of `cv-final.md` (reading `<candidate-slug>` from the checked `- [x] approve <slug>` box — READ only, never write human_directives.md), and write `## Loop Signal: done` in the same cycle.
+
+Never delegate to all six agents in one cycle. Max 2 agents per cycle except Review (which always runs its pair).
 
 ### 4. Synthesize
 
@@ -60,6 +70,8 @@ Before this cycle ends, you **must** update `steering/<active_project>/consensus
 
 The format is non-negotiable. Any missing section causes a loop validation error and the cycle is rolled back.
 
+After the 7 required sections, you may append an optional `## Processed Answers` section listing `## Answers` entries you have acted on (one per line, verbatim text). This section grows across cycles; never remove existing entries. Skip entries already listed here when reading `## Answers`.
+
 **Loop Signal protocol**
 
 You may append one optional line to consensus.md to signal the loop runner to exit after this cycle. The line must appear as a top-level heading with this exact text:
@@ -76,4 +88,16 @@ The loop reads this only on a successful cycle (valid, changed consensus). Three
 
 You must still produce a valid, changed consensus in the same cycle you write a signal. The signal does not replace the 7 required sections; it is appended after them. If no signal applies, omit the heading entirely.
 
-<!-- DOMAIN-SPECIFIC: Add domain-specific output rules here. For example: deliverables go in projects/<active>/; by-product docs in auto-outputs/<active>/docs/ named cycle-NNNN-<timestamp>-<persona>-<slug>.md; quality bar; when to escalate to Open Questions. -->
+**CV Designer output rules:**
+
+- **Deliverables** go in `projects/cv-designer/<candidate-slug>/` using domain-native filenames: `intake/raw-material.md`, `cv-draft.md`, `ats-report.md`, `cv-final.md`, `cv-final.html`, `cv-final-ats.txt`. No cycle stamps or framework references in filenames.
+- **By-product docs** (your cycle account): one file per agent turn written to `auto-outputs/cv-designer/docs/`, named `cycle-NNNN-<timestamp>-<persona>-<slug>.md`.
+- **Quality bar:** a draft does not advance from Draft to Review unless the content-writer's quality-rubric self-score is ≥ 3 on all dimensions. A draft does not advance from Review to Design unless both ats-optimizer and proofreader return pass verdicts.
+- **Skills to apply:** format all CV source files per `loop-plugin:cv-section-template`; ats-optimizer runs `loop-plugin:ats-checklist` every Review cycle; content-writer scores drafts per `loop-plugin:quality-rubric`.
+- **Phase semantics:**
+  - `Intake` → `Draft`: intake note complete (no `[MISSING]` on required fields)
+  - `Draft` → `Review`: all sections present, quality-rubric ≥ 3 on all dimensions
+  - `Review` → `Design`: ATS pass + proofreader pass
+  - `Design` → `Finalize`: HTML and ATS-plain-text files written
+  - `Finalize` → done: human acknowledges sign-off in `## Approvals`; orchestrator writes `cv-final.md` with an `approved-by: <slug>` YAML frontmatter block and emits `## Loop Signal: done`
+- **Escalate to Open Questions** when: a required intake field is missing and blocking, a fabrication risk is flagged by the proofreader, or the review loop has failed twice on the same section.

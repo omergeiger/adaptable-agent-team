@@ -1,7 +1,7 @@
 # Pristine template defaults. `active_project` and `squad` are set by /adapt;
 # until then the loop detects an unadapted project and exits, directing you to
 # run /adapt. Do not point `active_project` at a real project before adapting.
-active_project: example
+active_project: cv-designer
 
 loop_interval_seconds: 30
 single_cycle: true
@@ -9,8 +9,15 @@ git_sync: false
 
 # Worker role slugs, populated by /adapt (one src/resources/loop-plugin/agents/<role>.md per entry).
 # The orchestrator is never listed here - the headless cycle session is the orchestrator.
-squad: []
+squad:
+  - intake-analyst
+  - content-writer
+  - ats-optimizer
+  - industry-specialist
+  - graphical-designer
+  - proofreader
 
+# The original cv-designer run used claude-sonnet-4-6; this example was re-run with a fictional candidate.
 model: claude-sonnet-5-5
 
 cycle_timeout_seconds: 1800
