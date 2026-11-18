@@ -67,9 +67,7 @@ AgentTeam/
 │           └── skills/        # Loaded per-cycle via `claude -p --plugin-dir`;
 │                              #   holds framework loop skills + /adapt-generated domain skills
 ├── .dev-docs/                 # Dev docs and scratchpads
-│   ├── example_cases.md       # Worked adaptation cases (end-to-end test recipes)
-│   ├── todos.md
-│   └── discussions.md
+│   └── example_cases.md       # Worked adaptation cases (end-to-end test recipes)
 ├── steering/                  # Human<->agent control channel (git-tracked)
 │   └── <project-name>/
 │       ├── consensus.md        # Relay baton (agent-owned)
@@ -123,7 +121,7 @@ Each project lives across three top-level spaces (`steering/`, `auto-outputs/`, 
 - **Cycle timeout** - if consensus was updated and still valid, progress is kept; otherwise the cycle counts as a failure.
 
 ### Developing the framework itself
-`main` is the pristine, domain-agnostic template - adapt a domain on a **branch** so `main` stays generic and reusable. Framework dev notes live under `.dev-docs/` (`todos.md`, `discussions.md`, `example_cases.md`); they are tracked but are not part of an operator's runtime.
+`main` is the pristine, domain-agnostic template - adapt a domain on a **branch** so `main` stays generic and reusable. Framework dev notes live under `.dev-docs/` (`example_cases.md`); they are tracked but are not part of an operator's runtime.
 
 ## Core Concepts
 

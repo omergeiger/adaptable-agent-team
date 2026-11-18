@@ -9,18 +9,6 @@ AgentTeam is a generic multi-agent loop framework for Claude Code. It extracts t
 - **LLM provider**: Claude only (Claude Code CLI, `--permission-mode bypassPermissions`).
 - **OS**: macOS only.
 
-## Communication Convention
-
-Two working files under `.dev-docs/`, kept distinct:
-
-**`discussions.md` - discussion thread.** For any exchange that needs more than a few lines: design decisions, planning, feedback, open questions.
-- Each turn is appended to the file, preceded by `---` and a `[Name]` marker.
-- Do not truncate or rewrite prior turns. Append only.
-- Read from the last `[User]` marker when picking up a thread.
-- Keep responses to ~50 lines per turn in the file.
-
-**`todos.md` - action items only.** No discussion - only concrete, actionable tasks. Two sections: a flat numbered **Pending items** list where each item carries an inline priority (P1 must do next / P2 important / P3 nice to have, same scheme as agent-team priorities), and a short **Next** queue that names the immediate actions by referencing pending items by number. Compact aggressively: delete items once done and renumber Pending from 1. Decisions and rationale belong in `discussions.md`, not here.
-
 ## Safety Guardrails
 
 - Never `git push --force` to main.

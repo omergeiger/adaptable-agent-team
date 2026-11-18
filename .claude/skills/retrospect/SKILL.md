@@ -61,7 +61,7 @@ For each, ask "what worked, what hurt, and what is the concrete fix":
 ### 4. Categorize and prioritize every finding
 
 - **Level test:** "Would this fix help a *different* domain too?" -> **framework**. "Only relevant to this instantiation's domain?" -> **team**. When unsure, default to **team** and note the framework angle.
-- **Priority** (same scheme as `todos.md`): **P1** must fix (broke the run or the deliverable), **P2** important (meaningful waste or quality loss), **P3** nice to have (polish).
+- **Priority**: **P1** must fix (broke the run or the deliverable), **P2** important (meaningful waste or quality loss), **P3** nice to have (polish).
 - Every finding must be **actionable and grounded**: cite the specific artifact - cycle number, file path, cost figure. No vague advice. Pair each with a concrete fix.
 
 ### 5. Write two files (do NOT commit)
