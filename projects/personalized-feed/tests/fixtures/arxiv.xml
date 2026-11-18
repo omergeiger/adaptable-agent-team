@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/P1BC++0Ra1wwMyrz17uOnatdrbE</id>
+  <title>arXiv Query: search_query=cat:cs.CL AND all:agent AND abs:github&amp;id_list=&amp;start=0&amp;max_results=4</title>
+  <updated>2026-11-18T23:21:12Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=cat:cs.CL+AND+(all:agent+AND+abs:github)&amp;start=0&amp;max_results=4&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>4</opensearch:itemsPerPage>
+  <opensearch:totalResults>139</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2611.22148v1</id>
+    <title>Long-Context Generation Is a Sampling Problem (When You Turn Up the Heat)</title>
+    <updated>2026-11-17T03:30:03Z</updated>
+    <link href="https://arxiv.org/abs/2611.22148v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.22148v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Open-weight language models are widely observed to get worse the longer they generate. Often, attempts to fix this involve more training. At high temperature, The sampler, i.e. the rule that picks the next token out of the model's probabilities, decides whether long and agentic generation survives and/or thrives. We test 29 open-weight models from 1B to 122B parameters on ten established benchmarks plus needle retrieval out to one million tokens, covering SWE-bench Verified coding agents, long chain-of-thought reasoning, long-form writing, long structured output and long-context reading. Samplers that keep their pool of candidate tokens small and steady as temperature rises don't lose accuracy. Samplers that let in low-probability tokens fall apart. At temperature 2, coding agents running top-p, top-k or Top-H resolve 0 of 100 GitHub issues, while the same agents running top-nsigma resolve 46 to 62 and win every issue the two samplers disagree on, on three Qwen3.5 models. Over all benchmarks top-nsigma keeps a median 100% of its temperature-1 score where top-p keeps 26%. Counting how many tokens each sampler lets through explains why. In one Llama-3.1-8B story, going from temperature 1 to 2 grows top-p's pool from 4 tokens to 51,845 while top-nsigma stays at 3. Across 133 combinations of sampler setting and temperature, the typical pool size predicts judged quality (Spearman correlation of -0.77), and when we pick the pool at temperature 1 and only apply temperature afterwards, Top-H, min-p and p-less stop collapsing. At the default temperature of 1 most samplers perform about the same, We release all code and data to the public.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-17T03:30:03Z</published>
+    <arxiv:comment>10 pages, accepted to the 40th Conference on Neural Information Processing Systems (NeurIPS 2026). Track on Evaluations and Datasets</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Allen G. Roush</name>
+    </author>
+    <author>
+      <name>Minh Nhat Nguyen</name>
+    </author>
+    <author>
+      <name>Ravid Shwartz-Ziv</name>
+    </author>
+    <author>
+      <name>Judah Goldfeder</name>
+    </author>
+    <author>
+      <name>Sanjay Basu</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.17294v1</id>
+    <title>Metal Sandbox: Isolated Execution and Command Scheduling for GPU Coding Agents on Apple Silicon</title>
+    <updated>2026-11-12T18:54:42Z</updated>
+    <link href="https://arxiv.org/abs/2611.17294v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.17294v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>On-device inference requires kernels that make effective use of local accelerators. Efficient training and evaluation of models that generate Apple Metal kernels benefit from native macOS tools and concurrent agent sessions. These sessions alternate between model requests, development commands, and GPU execution, leaving GPU capacity idle for much of a rollout. We present Metal Sandbox, infrastructure that combines restricted per-instance file access, native command execution, and command-level scheduling across interconnected Macs. Each agent retains its workspace and private development environment. Parallel commands can run concurrently, while serial commands share one execution slot per node; eligible waiting commands can migrate to available Macs and return results to the original agent. Integration with Harbor supports task execution, automatic verification, and rollout collection through a common workflow. Controlled experiments on four Mac mini M4 nodes achieve $1.68\times$--$2.05\times$ gains in command throughput under concentrated demand. Sixteen static agent traces give an estimated $2.14\times$ sustained-throughput gain for four sessions per node versus one, assuming continuously replenished sessions and unchanged mean durations. Replaying these measured traces under dynamic scheduling reduces mean tool waiting by 18.8% and batch elapsed time by 22.3%, assuming unchanged phase durations. Metal Sandbox and its Harbor integration are open-source on GitHub.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-12T18:54:42Z</published>
+    <arxiv:comment>16 pages, 7 figures, 5 tables. Code available at https://github.com/WangHaoZhe/metal-sandbox and https://github.com/WangHaoZhe/harbor</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Haozhe Wang</name>
+    </author>
+    <author>
+      <name>Lina Chen</name>
+    </author>
+    <author>
+      <name>Fanqi Wan</name>
+    </author>
+    <author>
+      <name>Qi Han</name>
+    </author>
+    <author>
+      <name>Yinmin Zhang</name>
+    </author>
+    <author>
+      <name>Zheng Ge</name>
+    </author>
+    <author>
+      <name>Daxin Jiang</name>
+    </author>
+    <author>
+      <name>Junchi Yan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.14019v2</id>
+    <title>Program-Aided Patchable Skill Evolution</title>
+    <updated>2026-11-11T06:36:07Z</updated>
+    <link href="https://arxiv.org/abs/2611.14019v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.14019v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Agent skills have emerged as an effective means of enabling LLM agents to solve complex, interactive tasks by encoding reusable knowledge without modifying model parameters. Recent approaches further improve skill adaptation by distilling reusable experience from agent execution trajectories and evolving skills based on downstream task feedback. However, existing methods primarily represent skills as natural language documents, intertwining procedural logic with descriptive knowledge and making skills difficult to maintain and evolve. To address this limitation, we propose PASE (Program-Aided Patchable Skill Evolution), a program-aided framework that iteratively evolves skills by associating them with executable programs. Unlike prior approaches that encode trajectory-derived experience primarily in natural language, PASE separates reusable procedural logic into editable programs, enabling targeted updates to executable components while reducing the need to repeatedly revise natural language skills. Extensive experiments across diverse models and benchmarks demonstrate that PASE consistently outperforms all baselines, by achieving over 2.8% improvements. Further analyses show that PASE exhibits greater evolutionary stability and generalisation capability, highlighting the critical role of programmatic knowledge in skill evolution. We will release all data and code via GitHub.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-10T12:53:12Z</published>
+    <arxiv:comment>17 pages, 6 figures, 5 tables</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Jiahao Wang</name>
+    </author>
+    <author>
+      <name>Yuqi Xiong</name>
+    </author>
+    <author>
+      <name>Qing Yang</name>
+    </author>
+    <author>
+      <name>Zhipeng Xu</name>
+    </author>
+    <author>
+      <name>Zhenghao Liu</name>
+    </author>
+    <author>
+      <name>Zulong Chen</name>
+    </author>
+    <author>
+      <name>Yubin Bao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.05512v1</id>
+    <title>SlackBench: Benchmarking Agents on Collaborative Projects Grounded in Real Code Repositories</title>
+    <updated>2026-11-03T19:10:50Z</updated>
+    <link href="https://arxiv.org/abs/2611.05512v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2611.05512v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI Agents are becoming digital coworkers that can browse the web, write code, run experiments, and assist humans over extended horizons. Yet existing benchmarks fall short of real knowledge work: many rely on synthetic data or isolated tasks, missing the complex, multi-party dynamics of collaborative projects, where critical information is scattered across conversations, code, and evolving decisions. Even simple workplace questions may require locating relevant channels and direct messages, recovering context from long discussions, inspecting repository state, reconciling stale or conflicting evidence, and synthesizing across sources.
+  We introduce SlackBench, a benchmark for evaluating agents on realistic research and engineering workflows that require joint reasoning over workplace communication and evolving repository state. Grounded in privacy-preserving reenactments of real academic research projects, SlackBench provides reproducible environments with realistic multi-party dialogue, evolving decisions, and corresponding code changes grounded in GitHub repositories and Google Docs. It contains 140 queries spanning heterogeneous-source agentic search, abstention on unanswerable or false-premise questions, goal-directed summarization, and circumstance inference over long conversations. These tasks are not reducible to static corpus question answering: agents must determine which conversations matter, traverse threads, inspect repository state, and synthesize evidence across communication and code artifacts. Across 33 frontier models and agent harnesses, the best system scores around 80% and most agents score below 66%, highlighting substantial headroom for improvement. SlackBench thus provides an extensible framework for evaluating agents in collaborative work environments. The SlackBench dataset is available at https://huggingface.co/datasets/HuanzhiMao/SlackBench .</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-11-03T19:10:50Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Mingxuan Li</name>
+    </author>
+    <author>
+      <name>Huanzhi Mao</name>
+    </author>
+    <author>
+      <name>Ruitao Zheng</name>
+    </author>
+    <author>
+      <name>Jarod Stanbury James</name>
+    </author>
+    <author>
+      <name>Yunze Li</name>
+    </author>
+    <author>
+      <name>Natanya Anderson</name>
+    </author>
+    <author>
+      <name>Joseph E. Gonzalez</name>
+    </author>
+    <author>
+      <name>Alex Dimakis</name>
+    </author>
+  </entry>
+</feed>

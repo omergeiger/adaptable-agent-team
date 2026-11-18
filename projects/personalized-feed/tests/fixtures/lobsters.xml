@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Lobsters: ai - Developing artificial intelligence, machine learning, LLMs.</title>
+    <link>https://lobste.rs/</link>
+    <atom:link href="https://lobste.rs/t/ai.rss" rel="self"/>
+    <description>ai - Developing artificial intelligence, machine learning, LLMs.</description>
+    <pubDate>Wed, 18 Nov 2026 15:53:43 -0600</pubDate>
+    <ttl>120</ttl>
+    <item>
+      <title>The sleep framework: A new way for LLMs to retain knowledge in continual learning</title>
+      <link>https://research.google/blog/the-sleep-framework-a-new-way-for-llms-to-retain-knowledge-in-continual-learning/</link>
+      <guid>https://lobste.rs/s/svneem</guid>
+      <author>research.google via snej</author>
+      <pubDate>Wed, 18 Nov 2026 15:53:43 -0600</pubDate>
+      <comments>https://lobste.rs/s/svneem/sleep_framework_new_way_for_llms_retain</comments>
+      <description>&lt;p&gt;&lt;a href="https://lobste.rs/s/svneem/sleep_framework_new_way_for_llms_retain"&gt;Comments&lt;/a&gt;&lt;/p&gt;</description>
+      <category>ai</category>
+    </item>
+<item>
+      <title>Energy-Based Reasoners: Your Recurrent Reasoner Should Be an Energy-Based Model</title>
+      <link>https://energy-based-reasoners.github.io/</link>
+      <guid>https://lobste.rs/s/8mbnbd</guid>
+      <author>energy-based-reasoners.github.io via xyproto</author>
+      <pubDate>Wed, 18 Nov 2026 08:45:20 -0600</pubDate>
+      <comments>https://lobste.rs/s/8mbnbd/energy_based_reasoners_your_recurrent</comments>
+      <description>&lt;p&gt;&lt;a href="https://lobste.rs/s/8mbnbd/energy_based_reasoners_your_recurrent"&gt;Comments&lt;/a&gt;&lt;/p&gt;</description>
+      <category>ai</category>
+    </item>
+<item>
+      <title>Program-as-Weights: A Programming Paradigm for Fuzzy Functions</title>
+      <link>https://arxiv.org/abs/2607.02512</link>
+      <guid>https://lobste.rs/s/qkalae</guid>
+      <author>arxiv.org via lr0</author>
+      <pubDate>Tue, 17 Nov 2026 06:55:46 -0600</pubDate>
+      <comments>https://lobste.rs/s/qkalae/program_as_weights_programming_paradigm</comments>
+      <description>&lt;p&gt;&lt;a href="https://lobste.rs/s/qkalae/program_as_weights_programming_paradigm"&gt;Comments&lt;/a&gt;&lt;/p&gt;</description>
+      <category>ai</category>
+    </item>
+<item>
+      <title>The Little Book of Generative AI Foundations: An Intuitive Mathematical Primer</title>
+      <link>https://arxiv.org/abs/2605.29713</link>
+      <guid>https://lobste.rs/s/0aungk</guid>
+      <author>arxiv.org via GrayGnome</author>
+      <pubDate>Fri, 13 Nov 2026 22:51:14 -0600</pubDate>
+      <comments>https://lobste.rs/s/0aungk/little_book_generative_ai_foundations</comments>
+      <description>&lt;p&gt;&lt;a href="https://lobste.rs/s/0aungk/little_book_generative_ai_foundations"&gt;Comments&lt;/a&gt;&lt;/p&gt;</description>
+      <category>ai</category>
+    </item>
+
+  </channel>
+</rss>

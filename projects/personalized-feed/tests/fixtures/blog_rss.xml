@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Hamel&#39;s Blog</title>
+<link>https://hamel.dev/</link>
+<atom:link href="https://hamel.dev/index.xml" rel="self" type="application/rss+xml"/>
+<description>Notes on applied AI engineering, machine learning, and data science.</description>
+<image>
+<url>https://hamel.dev/quarto.png</url>
+<title>Hamel&#39;s Blog</title>
+<link>https://hamel.dev/</link>
+<height>81</height>
+<width>144</width>
+</image>
+<generator>quarto-1.10.19</generator>
+<lastBuildDate>Tue, 20 Oct 2026 07:00:00 GMT</lastBuildDate>
+<item>
+  <title>How To Use Decision Models for Evals</title>
+  <dc:creator>Hamel Husain</dc:creator>
+  <dc:creator>Antaripa Saha</dc:creator>
+  <link>https://hamel.dev/blog/posts/decision-model-evals/</link>
+  <description><![CDATA[ 
+
+<!-- Content inserted at the beginning of body tag -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PKGWQMKL" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+<script async="" data-uid="df8af2b6ed" src="https://hamel.kit.com/df8af2b6ed/index.js"></script>
+
+
+
+
+<style>
+main.content table { display:block; width:100%; max-width:100%; overflow-x:auto; }
+#evaluation-prompt pre { background:var(--bs-body-bg); color:var(--bs-body-color); padding:18px; border:1px solid var(--bs-border-color); border-radius:6px; }
+#evaluation-prompt pre code { color:inherit; white-space:pre-wrap; overflow-wrap:anywhere; }
+</style>
+<p>Decision models have exploded onto the scene recently, starting with TypeSafe’s Jev, followed by Perplexity’s Decider, Liquid’s d1, Cloudflare’s Clef, and OpenAI’s Decisions API<sup>1</sup>. These models promise fast, inexpensive classification.</p>
+<p>Decision models are an appealing low-cost alternative to LLM judges<sup>2</sup> for automated evals. But whether they’re the right choice depends on the cost, performance, and latency requirements of your use case.</p>
+<p>We’ve also noticed people using the default decision threshold of 0.50 without checking whether it works well for their task. This can leave a lot of performance on the table.</p>
+<p>In this post, we’ll start by showing how to tune thresholds to get the best result]]></description>
+  <category>LLMs</category>
+  <category>Evals</category>
+  <guid>https://hamel.dev/blog/posts/decision-model-evals/</guid>
+  <pubDate>Tue, 20 Oct 2026 07:00:00 GMT</pubDate>
+  <media:content url="https://hamel.dev/blog/posts/decision-model-evals/images/cover.png" medium="image" type="image/png" height="76" width="144"/>
+</item>
+<item>
+  <title>Claude’s new auto eval tool</title>
+  <dc:creator>Hamel Husain</dc:creator>
+  <link>https://hamel.dev/blog/posts/claude-auto-evals/</link>
+  <description><![CDATA[ 
+
+<!-- Content inserted at the beginning of body tag -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PKGWQMKL" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+
+
+
+<p>Anthropic released <a href="https://claude.dev/blog/automating-eval-design-and-hillclimbing/">new eval tooling for Claude Code</a>. Their <code>claude-api</code> plugin now includes a new <code>build_eval</code> and <code>hill-climb</code> command that helps you build evals, check the graders, and improve your application against them.</p>
+<p>I usually don’t review eval tools because software changes so often that reviews have a short shelf life. But a first-party tool from Anthropic is likely to influence how people approach evals, so I wanted to try it and share what I found.</p>
+<p><a href="https://isaacflath.com/">Isaac Flath</a> and I <a href="https://x.com/i/broadcasts/1nKOLQOwQEEGR">livestreamed ourselves using it</a> on conversation traces from an apartment leasing assistant. Here’s what we found:</p>
+<section id="the-bad" class="level2">
+<h2 class="anchored" data-anchor-id="the-bad">The bad</h2>
+<section id="it-pushes-you-to-create-an-eval-before-looking-at-data" class="level3">
+<h3 class="anchored" data-anchor-id="it-pushes-you-to-create-an-eval-before-looking-at-data">1. It pushes you to create an eval before looking at data</h3>
+<p>Claude started by suggestin]]></description>
+  <category>AI</category>
+  <category>Evals</category>
+  <guid>https://hamel.dev/blog/posts/claude-auto-evals/</guid>
+  <pubDate>Wed, 30 Sep 2026 07:00:00 GMT</pubDate>
+  <media:content url="https://hamel.dev/blog/posts/claude-auto-evals/cover.png" medium="image" type="image/png" height="108" width="144"/>
+</item>
+<item>
+  <title>AI Evals: Everything You Need to Know</title>
+  <dc:creator>Hamel Husain</dc:creator>
+  <dc:creator>Shreya Shankar</dc:creator>
+  <link>https://hamel.dev/blog/posts/evals-faq/</link>
+  <description><![CDATA[ 
+
+<!-- Content inserted at the beginning of body tag -->
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PKGWQMKL" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+<script async="" data-uid="df8af2b6ed" src="https://hamel.kit.com/df8af2b6ed/index.js"></script>
+
+
+
+
+<p>This document curates the most common questions Shreya and I received while <a href="https://maven.com/parlance-labs/evals?promoCode=evals-info-book" target="_blank" rel="noopener">teaching</a> 5,000+ engineers and PMs AI Evals. <em>Warning: These are sharp opinions about what works in most cases. They are not universal truths. Use your judgment.</em></p>
+<section id="how-to-use-this-faq" class="level1">
+<h1>How to use this FAQ</h1>
+<p>Browse the questions that interest you, or choose a guide below for a curated reading path through the FAQs and related articles.</p>
+<div class="evals-start-table">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Where are you?</th>
+<th style="text-align: left;">This sounds like me</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><a href="../../../notes/llm/evals/start/new-to-evals/index.html" target="_blank" rel="noopener">I’m new to evals</a></td>
+<td style="text-align: left;">I’ve heard the term, but I’m not sure what evals involve or whether I need them.</td>
+</tr>
+<tr c]]></description>
+  <category>LLMs</category>
+  <category>evals</category>
+  <guid>https://hamel.dev/blog/posts/evals-faq/</guid>
+  <pubDate>Fri, 18 Sep 2026 07:00:00 GMT</pubDate>
+  <media:content url="https://hamel.dev/blog/posts/evals-faq/images/eval_faq-social.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>AI Product Engineering Notes</title>
+  <link>https://hamel.dev/</link>
+  <description>Notes from 13 sessions on evals, context, and systems. 9.5 hours of talks distilled into about 20 minutes of reading.
+</description>
+  <category>LLMs</category>
+  <category>Evals</category>
+  <guid>https://hamel.dev/</guid>
+  <pubDate>Wed, 12 Aug 2026 07:00:00 GMT</pubDate>
+</item>
+
+</channel>
+</rss>
