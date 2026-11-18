@@ -1,19 +1,19 @@
 ## Last Updated
-2026-11-18T22:28:11Z
+2026-11-18T22:29:33Z
 
 ## Current Phase
 Finalize (Design complete; awaiting human sign-off)
 
 ## What We Did This Cycle
-- Delegated to graphical-designer only. Produced cv-final.html, cv-final-ats.txt and cv-final.pdf in projects/cv-designer/talia-brennwood/ from the tag-free cv-draft.md; the rubric comment was stripped and no facts were added.
-- PDF verified at 1 page (D4 met). ATS text file is plain ASCII with no tables, columns or decorative elements (D1).
-- cv-final.md deliberately not written (D2, sign-off gated). Account saved to auto-outputs/cv-designer/docs/cycle-0009-2026-11-18T22-28-11-graphical-designer-design-outputs.md.
+- No delegation. Checked human_directives.md: `## Approvals` is still empty and there are no Cycle Overrides or Answers, so the D2 sign-off gate is still closed.
+- cv-final.md deliberately not written (D2). No deliverables changed; Design outputs (cv-final.html, cv-final-ats.txt, cv-final.pdf) remain as verified last cycle.
+- Next Action was unchanged from last cycle, so the loop is stuck on human input. Raised a block signal rather than repeating idle cycles.
 - Acknowledged directives: D1, D2, D3, D4
 
 ## Key Decisions
-- Design -> Finalize: HTML, ATS text and PDF all exist, so the phase gate is met.
-- Layout is Letter size; switch to A4 only if the target employer is outside the US.
-- Known content gaps carried over rather than filled (D3): ARR has no currency, and the onboarding bullet has no metric.
+- Do not fabricate or self-approve: only the human may add the approval line (D2).
+- Emit `## Loop Signal: block` because no further progress is possible without human input.
+- Known content gaps stay unfilled (D3): ARR has no currency, and the onboarding bullet has no metric.
 
 ## Next Action
 Wait for human approval. When `- [x] approve talia-brennwood` appears under `## Approvals` in human_directives.md, copy cv-draft.md to cv-final.md with an `approved-by: talia-brennwood` YAML frontmatter block and write `## Loop Signal: done`.
@@ -37,3 +37,5 @@ Optional improvements (not blocking):
 10. Experience length: "8ish years" said, but January 2017 to now is nearly 10; prefer "9+ years" or no figure?
 11. Headline reads "Lead Product Designer" (target role) while the current title is Senior Product Designer; confirm intended.
 12. Paper size: Letter (current) or A4?
+
+## Loop Signal: block - awaiting human sign-off: add `- [x] approve talia-brennwood` under `## Approvals` in human_directives.md, then restart the loop
