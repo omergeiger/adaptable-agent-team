@@ -39,7 +39,7 @@ The two output files are **NOT added to source control** - the human decides whe
   - `auto-outputs/<project>/logs/` - `loop_state.json`, per-cycle `metadata.json` (cost, duration, `validation_outcome`, `timed_out`), `loop.log`
   - `auto-outputs/<project>/docs/` - per-cycle persona by-product docs
   - `projects/<project>/` - the actual deliverables
-  - The instantiation's generated config: `src/resources/loop-plugin/.claude/agents/*.md`, `src/resources/loop-plugin/skills/*/SKILL.md`, the domain sections of `src/resources/PROMPT.md`, `config.yaml > squad`.
+  - The instantiation's generated config: `src/resources/loop-plugin/agents/*.md`, `src/resources/loop-plugin/skills/*/SKILL.md`, the domain sections of `src/resources/PROMPT.md`, `config.yaml > squad`.
 
 ### 2. Reconstruct the run
 

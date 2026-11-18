@@ -156,7 +156,8 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
     base = (REPO_ROOT / "src" / "resources" / "PROMPT.md").read_text(encoding="utf-8")
     active = config["active_project"]
     squad = config.get("squad", [])
-    roster = "\n".join(f"- {s}" for s in squad) if squad else "(none configured)"
+    # Agents ship in the loop plugin, so their subagent_type is plugin-namespaced.
+    roster = "\n".join(f"- {s} (subagent_type: `loop-plugin:{s}`)" for s in squad) if squad else "(none configured)"
     cycle_time = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     # File-safe timestamp for by-product doc naming (colons replaced with hyphens, no Z)
     cycle_time_file = cycle_time[:-1].replace(":", "-")

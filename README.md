@@ -64,8 +64,9 @@ AgentTeam/
 │   ├── git_sync.py            # Pre/post loop git commit+push
 │   └── resources/
 │       ├── PROMPT.md          # Cycle prompt template (orchestrator persona)
-│       └── loop-plugin/       # Loop-only skills (agents only, never interactive)
+│       └── loop-plugin/       # Loop-only sub-agents + skills (never interactive)
 │           ├── .claude-plugin/plugin.json
+│           ├── agents/        # /adapt-generated role sub-agents (`loop-plugin:<role>`)
 │           └── skills/        # Loaded per-cycle via `claude -p --plugin-dir`;
 │                              #   holds framework loop skills + /adapt-generated domain skills
 ├── .dev-docs/                 # Dev docs and scratchpads
@@ -88,7 +89,7 @@ AgentTeam/
 The recurring flows of operating the repo. Each links to the relevant detail under Core Concepts.
 
 ### 1. Adapt the framework to a domain (once per domain)
-Run `/adapt` interactively at the repo root. The wizard extracts what it can from your request, triages the gaps, and proposes a setup before generating: one sub-agent file per role (`.claude/agents/` - every role is a sub-agent; the cycle session itself is the generic orchestrator), domain skills (`src/resources/loop-plugin/skills/`), a tailored `src/resources/PROMPT.md`, and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
+Run `/adapt` interactively at the repo root. The wizard extracts what it can from your request, triages the gaps, and proposes a setup before generating: one sub-agent file per role (`src/resources/loop-plugin/agents/` - every role is a sub-agent; the cycle session itself is the generic orchestrator), domain skills (`src/resources/loop-plugin/skills/`), a tailored `src/resources/PROMPT.md`, and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`), then sets `active_project` and `squad` in `config.yaml`. Agent files, skills, and `PROMPT.md` are **repo-global** - adapting a new domain replaces the previous one's versions. Review the generated files before the first run. See [Adapt Skill](#adapt-skill-human-facing-pre-launch).
 
 ### 2. Run the loop
 Two operating modes, selected by `single_cycle` in `config.yaml`:
@@ -184,7 +185,7 @@ Each iteration:
 
 ### Runtime Guardrails (enforced via prompt + loop)
 - The cycle prompt instructs agents: write deliverables to `projects/<active>/`, write per-cycle by-product docs to `auto-outputs/<active>/docs/`, never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files, never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents).
-- The CLI runs from the repo root (required so the session discovers `.claude/agents/`), so these restrictions are prompt-level, backed by the loop's restore of consensus from the pre-cycle in-memory snapshot.
+- The CLI runs from the repo root, so these restrictions are prompt-level, backed by the loop's restore of consensus from the pre-cycle in-memory snapshot.
 
 ### Consensus.md Relay Baton
 - Single file per project at `steering/<name>/consensus.md` that agents read before acting and update after acting.
@@ -211,7 +212,7 @@ Each iteration:
 
 ### Adapt Skill (human-facing, pre-launch)
 - `.claude/skills/adapt/` is a setup wizard run **by the human** in an interactive Claude Code session, *before* launching the loop on a new domain. It is not invoked by the loop or by agents.
-- It interviews the user (domain, purpose, roles, phases, cadence) and generates customized agent files (`.claude/agents/`), a tailored PROMPT.md, domain-convention skills (`src/resources/loop-plugin/skills/`, applied by agents as `loop-plugin:<name>`), and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`).
+- It interviews the user (domain, purpose, roles, phases, cadence) and generates customized agent files (`src/resources/loop-plugin/agents/`, delegated to as `loop-plugin:<role>`), a tailored PROMPT.md, domain-convention skills (`src/resources/loop-plugin/skills/`, applied by agents as `loop-plugin:<name>`), and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`).
 - The loop detects an unadapted project (missing `steering/<active>/consensus.md` or one still carrying the starter sentinel marker) and exits with instructions to run /adapt interactively.
 
 ### Git Sync

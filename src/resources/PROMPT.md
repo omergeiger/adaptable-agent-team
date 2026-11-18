@@ -22,7 +22,7 @@ Priority order: **Ship > Plan > Discuss**
 
 ### 3. Delegate
 
-Use the Task tool to delegate work to worker agents from the available roster (injected below). Choose the subset most relevant to the task — do not invoke all agents if only some are needed.
+Use the Task tool to delegate work to worker agents from the available roster (injected below), passing each agent's listed `subagent_type`. Choose the subset most relevant to the task — do not invoke all agents if only some are needed.
 
 <!-- DOMAIN-SPECIFIC: Customize delegation strategy here. For example: always involve a researcher before a writer, or always QA before shipping. -->
 

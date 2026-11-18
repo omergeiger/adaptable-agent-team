@@ -7,7 +7,7 @@ loop_interval_seconds: 30
 single_cycle: true
 git_sync: false
 
-# Worker role slugs, populated by /adapt (one .claude/agents/<role>.md per entry).
+# Worker role slugs, populated by /adapt (one src/resources/loop-plugin/agents/<role>.md per entry).
 # The orchestrator is never listed here - the headless cycle session is the orchestrator.
 squad: []
 
