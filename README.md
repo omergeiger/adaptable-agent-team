@@ -2,7 +2,23 @@
 
 A generic, reusable multi-agent loop framework for Claude Code. Point it at a project, adapt it to your domain, and run a structured multi-agent loop that makes incremental progress on it - one headless Claude Code cycle at a time, coordinated through a shared consensus file.
 
-The patterns are extracted and generalized from the [Auto-Company](https://github.com/omergeiger/Auto-Company) repo into a template that can be adapted to any domain.
+What sets it apart:
+
+- **Any domain, not one fixed team.** The `/adapt` wizard turns the bare template into a team for your goal - a CV studio, a news-feed pipeline, a novel-writing room - generating the role sub-agents, the cycle prompt and the domain skills. Each domain lives on its own branch, so `main` stays a clean template.
+- **Conventions that don't drift.** Domain rules (templates, rubrics, test gates) are packaged as skills loaded only into the headless loop sessions, so every cycle applies them the same way.
+- **Clear human/agent split.** Humans steer through `human_directives.md`; agents own `consensus.md`. The loop validates the consensus after every cycle and rolls back to the last good state on failure, with a circuit breaker after repeated errors.
+- **Built-in review.** `/retrospect` reads a finished run and writes prioritized improvement notes for both the team and the framework.
+
+## Acknowledgments
+
+AgentTeam builds on [Autonomous Company](https://github.com/MaxMiksa/Autonomous-Company) (formerly Auto-Company; MIT License, Copyright (c) 2026 jinmingyang and Copyright (c) 2025-2026 Zheyuan (Max) Kong and contributors), which itself grew from the [nicepkg/auto-company](https://github.com/nicepkg/auto-company) macOS edition. Its core ideas come from that project, reimplemented from scratch as a domain-agnostic Python template.
+
+## Examples
+
+Two complete adapted runs live on their own branches, so `main` stays a clean template. Compare a branch against `main` to see exactly what `/adapt` generated and what the team produced:
+
+- [`example/personalized-feed`](../../tree/example/personalized-feed) - a team that builds a personalized news-feed pipeline (ingest, rank, render, feedback) in Python, with tests.
+- [`example/cv-designer`](../../tree/example/cv-designer) - a team that turns a (fictional) candidate's raw material into a CV with several HTML layouts, a PDF and an ATS report.
 
 ## Scope
 
@@ -31,6 +47,7 @@ The patterns are extracted and generalized from the [Auto-Company](https://githu
 AgentTeam/
 ├── README.md
 ├── CLAUDE.md                  # Directives for Claude Code sessions
+├── LICENSE                    # MIT
 ├── loop.py                    # Main loop entrypoint
 ├── config.yaml                # Top-level config (active project, toggles)
 ├── requirements.txt
@@ -230,3 +247,7 @@ Each iteration:
 | Linux/Windows/WSL support | Excluded - macOS only |
 | Artifact sync to external project tracking folder | Excluded - everything stays in the repo |
 | Loop-driven (code-level) squad selection | Excluded - orchestrator-driven instead |
+
+## License
+
+[MIT](LICENSE)

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-AgentTeam is a generic multi-agent loop framework for Claude Code. It extracts the core patterns from the Auto-Company repo (https://github.com/omergeiger/Auto-Company) into a reusable template that can be adapted to any domain or purpose.
+AgentTeam is a generic multi-agent loop framework for Claude Code. It extracts the core patterns from Autonomous-Company (https://github.com/MaxMiksa/Autonomous-Company, MIT) into a reusable template that can be adapted to any domain or purpose.
 
 ## Scope
 
