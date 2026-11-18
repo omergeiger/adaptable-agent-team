@@ -8,54 +8,56 @@ Pasted by the human, unedited.
 
 ---
 
-Name: Talia Brennwood
-Email: talia.brennwood@example.com
-Phone: +1 555 0142
-Location: Portland, OR (open to remote)
-Portfolio: https://portfolio.example.com/talia
+hi! ok dumping everything here, sorry its a mess. old resume is like 3 yrs out of date so mostly going from memory + my linkedin
 
-## What I want
-Lead Product Designer role at a health-tech or B2B SaaS company. Want to own design for a product
-area end to end and grow a small team. Job description I'm targeting is pasted at the bottom.
+Talia Brennwood
+talia.brennwood@example.com / 555-0142 (cell, US +1)
+portland OR, but remote is fine, actually prefer remote tbh
+portfolio.example.com/talia  <- this one is up to date, the old behance link is NOT
 
-## Work (newest first, rough notes)
+--- from linkedin "about" ---
+Product designer who likes the boring hard stuff: forms, workflows, accessibility, systems. 8ish years
+designing for healthcare, B2B SaaS and public transit. I care about outcomes more than dribbble shots.
+---
 
-**Fernhollow Health** - Senior Product Designer, Mar 2022 - present (telehealth platform, ~400 people)
-- led redesign of patient intake flow, completion went from 61% to 84% over two quarters
-- built the first design system ("Fern UI") with 1 other designer + 3 eng, now used by 5 product teams
-- run weekly design critique, mentor 2 mid-level designers (one promoted last year)
-- did accessibility audit, got web app to WCAG 2.1 AA, worked with legal on it
-- partnered with clinicians on appointment scheduling for providers - cut no-show rate 18% (reminders + easy rescheduling)
+what im going for: lead product designer. health tech ideally, b2b saas also ok. want to actually own an
+area and have a couple designers. the JD i like most is at the very bottom (copied it from their site)
 
-**Quillmark** - Product Designer, Jun 2018 - Feb 2022 (B2B document workflow SaaS)
-- designed approval workflows for enterprise customers, part of team that grew ARR on that product line from $2M to $9M (not just me obviously)
-- ran ~40 customer interviews a year, set up research repository in Dovetail
-- shipped the mobile app v1 (iOS + Android) as sole designer
-- onboarding redesign -> trial-to-paid conversion up 22%
+JOBS
 
-**Copperline Transit Authority** - UX Designer (contract), Jan 2017 - May 2018
-- redesigned trip planner on the public website, usability test task success 58% -> 89%
-- worked on fare kiosk touchscreen UI, tested with riders incl. low-vision users
+fernhollow health (telehealth, maybe 400 ppl now?) senior product designer, since spring '22 (march i think)
+- patient intake redesign!! biggest thing. completion 61% -> 84%, took about 2 quarters
+- design system - "Fern UI" - me + 1 other designer + 3 engineers built it, 5 product teams use it now
+- critique every week, i run it
+- mentoring 2 mid level designers. one got promoted last yr
+- accessibility audit -> we got to WCAG 2.1 AA on the web app. lots of back and forth w/ legal
+- appointment scheduling w/ clinicians (provider side) - reminders + easier rescheduling, no-shows down 18%
+oh also there was an internal "design leadership" workshop thing in 2023, 3 days. prob not CV worthy?
 
-Also freelance stuff 2015-2016, small business websites, not sure if worth including
+before that: Quillmark, product designer, june 2018 to feb 2022
+b2b doc workflow saas. i did approval workflows for the enterprise customers. that product line went from
+2M to 9M ARR while i was there - team effort obviously dont make it sound like it was me. also i did the
+mobile app v1, ios + android, i was the only designer on it. interviews: ~40 customer interviews / year,
+and i set up our research repo in Dovetail. onboarding redesign = +22% trial to paid
 
-## Education
-B.Des. Interaction Design, Ridgecrest Institute of Art & Design, 2016
-- senior thesis on wayfinding for transit apps, won department award (Ridgecrest Design Prize 2016)
+copperline transit authority - contract UX designer jan 2017 - may 2018
+trip planner redesign (public website). usability testing task success went 58% -> 89%
+fare kiosk touchscreen UI too, we tested with riders incl low vision folks
 
-Nielsen-style UX certificate? no - skip. Did a "Design Leadership" workshop series in 2023 (3 days, internal at Fernhollow), probably not CV material
+2015-2016 freelance, small business websites. not sure if worth including??
 
-## Skills (dump)
-Figma, FigJam, design systems, prototyping (Figma, ProtoPie), user research, usability testing,
-journey mapping, accessibility (WCAG), basic HTML/CSS, Dovetail, Amplitude, workshop facilitation,
-Jira, mentoring
+school: Ridgecrest Institute of Art & Design, B.Des interaction design, graduated 2016
+senior thesis = wayfinding for transit apps, won the Ridgecrest Design Prize that year
 
-## Other
-- Spoke at "Cascadia UX Meetup" 2023: "Designing intake forms people actually finish"
-- Volunteer: design mentor at a local bootcamp, 2021-present
+tools/skills in no order: figma figjam protoprototyping (figma + protopie) design systems user research
+usability testing journey maps accessibility/WCAG html css (basic!) dovetail amplitude jira workshops/facilitation mentoring
 
-## Target job description (pasted)
+other stuff
+* talk at Cascadia UX Meetup 2023 - "Designing intake forms people actually finish"
+* mentor designers at a local bootcamp (volunteer), since 2021
+* i started some UX certificate once, never finished, skip it
 
+======= JD (copied) =======
 Lead Product Designer - Care Platform
 We're a growing health-tech company building tools for patients and care teams. You'll lead design
 for our Care Platform area, manage 2-3 designers, and partner with product and engineering leads.
