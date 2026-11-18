@@ -10,9 +10,6 @@ __pycache__/
 auto-outputs/*/logs/
 auto-outputs/*/memory/
 
-# Dev scratchpads - not framework source
-#.dev-docs/
-
 # Tool-generated artifacts - not framework source
 INSTINCT-PATTERNS.md
 .claude/scheduled_tasks.lock
