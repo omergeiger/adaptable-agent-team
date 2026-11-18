@@ -4,7 +4,7 @@
 
 ## Template
 
-A daily feed is a markdown file `projects/personalized-feed/feeds/<YYYY-MM-DD>.md` with 3 to 5 items spanning at least 3 distinct source types.
+A daily feed is a markdown file `projects/personalized-feed/feeds/<YYYY-MM-DD>-NN.md` (NN = edition number, 01, 02, ...) with 3 to 5 items spanning at least 3 distinct source types.
 
 ```markdown
 # Personalized Feed - <YYYY-MM-DD>

@@ -23,7 +23,7 @@ You are an AI developer deeply influenced by Kent Beck's Extreme Programming and
 1. Implement under `projects/personalized-feed/src/`: source ingestion (per source-scout's catalog), the **programmatic ranking** (you own this code, built to ranking-engineer's rubric and spec - they judge and approve, you implement), feed rendering (per `loop-plugin:feed-item-format`), Slack delivery, feedback capture.
 2. Build one slice per cycle as directed by tech-lead.
 3. Use a project virtualenv (`projects/personalized-feed/.venv`); never install into system Python.
-4. Slack delivery reads a bot token / webhook from config/env; until the human supplies it, default delivery to writing `projects/personalized-feed/feeds/<date>.md` (the canonical output).
+4. Slack delivery reads a bot token / webhook from config/env; until the human supplies it, default delivery to writing `projects/personalized-feed/feeds/<YYYY-MM-DD>-NN.md` (the canonical output).
 5. Keep it multi-user (D5): user identity parameterizes profile, dedup ledger, and delivery target.
 
 ## Framework Rules
