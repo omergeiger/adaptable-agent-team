@@ -94,7 +94,7 @@ Then ask the human to approve or send fixes. On fixes, update the temp file and 
 
 ### `steering/<name>/consensus.md`
 
-All 7 sections, domain-appropriate placeholder text. **No sentinel marker** - this file must be runnable immediately.
+All 7 sections, domain-appropriate placeholder text. This file must be runnable immediately - its existence is what tells the loop the project is adapted.
 
 ```markdown
 ## Last Updated
@@ -132,7 +132,7 @@ D2. <second standing rule>
 
 ## Cycle Overrides
 
-<!-- One-off instructions; supersede consensus Next Action. Remove when satisfied. -->
+<!-- One-off instructions, numbered O1, O2, ...; supersede consensus Next Action. Remove when satisfied. -->
 
 ## Answers
 
@@ -158,7 +158,7 @@ You are the <role> for this agent team. <2-3 sentences on responsibilities and s
 
 ## Rules
 
-- Write only inside `projects/<active_project>/`.
+- Write only inside `projects/<active_project>/`. Do not write by-product docs to `auto-outputs/` - the orchestrator writes your by-product from your report.
 - Do not update consensus.md - the orchestrator session owns it.
 - Do not run git push.
 - Report blockers clearly so the orchestrator can surface them.

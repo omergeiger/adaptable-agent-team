@@ -1,4 +1,4 @@
-"""Tests for src.consensus.read_signal — the Loop Signal parser."""
+"""Tests for src.consensus.read_signal - the Loop Signal parser."""
 
 import unittest
 
