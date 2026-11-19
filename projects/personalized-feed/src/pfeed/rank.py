@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from . import rank_data as D
-from .ledger import cluster_key
+from .ledger import cluster_key, name_key, repo_slug
 from .models import Candidate
 
 
@@ -84,7 +84,13 @@ def exclude_reason(c, rules):
     if c.item_type == "paper" and not (c.extras.get("repo_links") or "github.com/" in text):
         return "paper without code"
     for rule, words in D.EXCLUDE_KEYWORDS.items():
-        if rule in rules and any(re.search(r"\b" + re.escape(w), text) for w in words):
+        if rule not in rules:
+            continue
+        if rule in D.EXCLUDE_WHOLE_WORD:
+            hit = _has(text, words)
+        else:
+            hit = any(re.search(r"\b" + re.escape(w), text) for w in words)
+        if hit:
             return rule
     if "listicle" in rules and re.match(D.LISTICLE_RE, c.title.strip(), re.I):
         return "listicle"
@@ -98,8 +104,25 @@ def exclude_reason(c, rules):
 
 # ---------- signals ----------
 
+def _kw_hit(keyword, text):
+    """Stems match as prefixes; every other keyword is a whole word (optional plural s)."""
+    tail = "" if keyword in D.STEM_KEYWORDS else r"s?\b"
+    return re.search(r"\b" + re.escape(keyword) + tail, text) is not None
+
+
+def _interest_hits(it_name, key, c, text):
+    """Distinct keyword hits for one interest; ambiguous interests need context (e.g. rust needs an LLM/ML term)."""
+    context = D.CONTEXT_REQUIRED.get(key)
+    if context and c.item_type not in D.CONTEXT_EXEMPT_TYPES and not _has(text, context):
+        return []
+    return [k for k in D.INTEREST_KEYWORDS.get(key, []) if _kw_hit(k, text)]
+
+
 def match_interest(c, profile):
-    """Best single matching interest -> (name, tier, signal 0-5). Never sums rows; weight 0 is ineligible."""
+    """Best single matching interest -> (name, tier, signal 0-5). Never sums rows; weight 0 is ineligible.
+
+    Strong = >= STRONG_HITS distinct hits, or a non-weak keyword in the title. A lone weak keyword is one tier lower.
+    """
     text, title = _text(c), c.title.lower()
     best = None
     for it in profile.interests:
@@ -107,11 +130,11 @@ def match_interest(c, profile):
         if w <= 0:
             continue
         key = next((k for k in D.INTEREST_KEYWORDS if it.name.lower().startswith(k)), None)
-        hits = [k for k in D.INTEREST_KEYWORDS.get(key, []) if re.search(r"\b" + re.escape(k), text)]
+        hits = _interest_hits(it.name, key, c, text)
         if not hits:
             continue
         tier, base = ("high", 5) if w >= 4 else ("mid", 3) if w == 3 else ("low", 1)
-        strong = len(hits) >= D.STRONG_HITS or any(re.search(r"\b" + re.escape(k), title) for k in hits)
+        strong = len(hits) >= D.STRONG_HITS or any(k not in D.WEAK_KEYWORDS and _kw_hit(k, title) for k in hits)
         rank_key = (base, len(hits), w)
         if best is None or rank_key > best[0]:
             best = (rank_key, it.name, tier, base if strong else max(base - 1, 1))
@@ -238,13 +261,21 @@ def top_interests(profile):
     return {i.name for i in ranked[:D.TOP_INTERESTS_FOR_EXPLORATION]}
 
 
+def _is_tail_repo(s):
+    c = s.candidate
+    stars = c.extras.get("stars")
+    return c.item_type == "repo" and stars is not None and stars < D.TAIL_REPO_STARS
+
+
 def _fits(chosen, s, n, extra_cap, top=frozenset()):
-    """Interest cap, top-3-combined cap, one per cluster, one per author/domain."""
+    """Interest cap, top-3-combined cap, tail-repo cap, one per cluster, one per author/domain."""
     cap = max(1, int(D.INTEREST_CAP_FRACTION * n)) + extra_cap
     if s.interest and sum(x.interest == s.interest for x in chosen) >= cap:
         return False
     top_cap = max(1, int(D.TOP_INTEREST_CAP_FRACTION * n + 0.5)) + extra_cap
     if s.interest in top and sum(x.interest in top for x in chosen) >= top_cap:
+        return False
+    if _is_tail_repo(s) and sum(_is_tail_repo(x) for x in chosen) >= D.MAX_TAIL_REPOS:
         return False
     if any(cluster_key(x.candidate) == cluster_key(s.candidate) for x in chosen):
         return False
@@ -256,17 +287,31 @@ def _types(chosen):
     return {x.candidate.source_type for x in chosen}
 
 
+def _exploration_eligible(s):
+    """Tryable things only: repo/tool, paper with linked code, or a tryable article not from a newsletter headline."""
+    c = s.candidate
+    if s.signals["interest-match"] < D.EXPLORATION_MIN_INTEREST_MATCH:
+        return False
+    if c.item_type in ("repo", "tool"):
+        return True
+    if c.item_type == "paper":
+        return bool(c.extras.get("repo_links"))
+    return (c.item_type == "article" and _tryable(c)
+            and c.source_type not in D.EXPLORATION_EXCLUDED_SOURCE_TYPES)
+
+
 def _exploration_pick(scored, profile, floor, n, extra_cap):
     top = top_interests(profile)
     inferred = {i.name for i in profile.interests if i.status == "inferred"}
-    pool = [s for s in scored if s.interest and s.signals["hands-on"] >= max(D.EXPLORATION_MIN_HANDS_ON, floor)
+    pool = [s for s in scored if s.interest and _exploration_eligible(s)
+            and s.signals["hands-on"] >= max(D.EXPLORATION_MIN_HANDS_ON, floor)
             and s.interest not in top and s.interest not in inferred and _fits([], s, n, extra_cap, top)]
     return _order(pool)[0] if pool else None
 
 
-def _attempt(scored, profile, n, floor, extra_cap):
+def _attempt(scored, profile, n, floor, extra_cap, min_match=D.MIN_INTEREST_MATCH_MAIN):
     """One greedy pass at fixed constraints -> list of Scored, or None if n items with >=3 types are not reachable."""
-    eligible = [s for s in scored if s.signals["hands-on"] >= floor]
+    eligible = [s for s in scored if s.signals["hands-on"] >= floor and s.signals["interest-match"] >= min_match]
     chosen = []
     top = top_interests(profile)
     pick = _exploration_pick(eligible, profile, floor, n, extra_cap)
@@ -299,12 +344,14 @@ def _attempt(scored, profile, n, floor, extra_cap):
     return _order(chosen) if ok else None
 
 
-RELAXATIONS = [  # (hands-on floor, n, extra per-interest cap, warning)
-    (D.DEFAULT_HANDS_ON_FLOOR, D.TARGET_N, 0, ""),
-    (1, D.TARGET_N, 0, "relaxed: hands-on floor lowered to 1"),
-    (1, 4, 0, "relaxed: edition size lowered to 4"),
-    (1, 3, 0, "relaxed: edition size lowered to 3"),
-    (1, 3, 1, "relaxed: allowed a 2nd item for a capped interest"),
+M = D.MIN_INTEREST_MATCH_MAIN
+RELAXATIONS = [  # (hands-on floor, n, extra per-interest cap, min interest-match, warning)
+    (D.DEFAULT_HANDS_ON_FLOOR, D.TARGET_N, 0, M, ""),
+    (1, D.TARGET_N, 0, M, "relaxed: hands-on floor lowered to 1"),
+    (1, 4, 0, M, "relaxed: edition size lowered to 4"),
+    (1, 3, 0, M, "relaxed: edition size lowered to 3"),
+    (1, 3, 1, M, "relaxed: allowed a 2nd item for a capped interest"),
+    (1, 3, 1, 1, "relaxed: interest-match floor lowered to 1 (weak matches allowed in main slots)"),
 ]
 
 
@@ -312,6 +359,27 @@ def zero_traction(c, backed):
     """A GitHub repo under MIN_REPO_STARS that no other candidate (paper, HN post...) points at."""
     return (c.source_type == "GitHub" and c.item_type == "repo" and c.extras.get("stars") is not None
             and c.extras["stars"] < D.MIN_REPO_STARS and cluster_key(c) not in backed)
+
+
+def _traction_rank(c):
+    """Clone-cluster winner order: most stars, then earliest created_at, then owner name (deterministic)."""
+    return (-(_traction_count(c) or 0), c.extras.get("created_at") or "9999", repo_slug(c.canonical_url))
+
+
+def drop_name_clones(kept, stats):
+    """Same distinctive repo name under different owners is one cluster; only the best-ranked owner survives."""
+    groups = {}
+    for c in kept:
+        nk = name_key(c)
+        if nk:
+            groups.setdefault(nk, []).append(c)
+    losers = set()
+    for group in groups.values():
+        if len({cluster_key(c) for c in group}) > 1:
+            win = cluster_key(min(group, key=_traction_rank))
+            losers |= {id(c) for c in group if cluster_key(c) != win}
+    stats["name_clone_dupes"] = len(losers)
+    return [c for c in kept if id(c) not in losers]
 
 
 def select(candidates, profile, weights, ledger, today=None):
@@ -322,7 +390,8 @@ def select(candidates, profile, weights, ledger, today=None):
     for c in candidates:
         counts[cluster_key(c)] = counts.get(cluster_key(c), 0) + 1
     backed = {k for k, n in counts.items() if n > 1}
-    stats = {"candidates": len(candidates), "excluded": {}, "ledger_seen": 0, "same_day_dupes": 0}
+    stats = {"candidates": len(candidates), "excluded": {}, "ledger_seen": 0, "same_day_dupes": 0,
+             "name_clone_dupes": 0}
     kept = []
     for c in candidates:
         reason = exclude_reason(c, rules) or ("zero-traction repo" if zero_traction(c, backed) else None)
@@ -332,6 +401,7 @@ def select(candidates, profile, weights, ledger, today=None):
             stats["ledger_seen"] += 1
         else:
             kept.append(c)
+    kept = drop_name_clones(kept, stats)
     recent, fatigued = recent_domains(ledger), fatigued_interests(ledger, profile)
     stats["fatigued"] = sorted(fatigued)
     scored, best = [], {}
@@ -343,8 +413,8 @@ def select(candidates, profile, weights, ledger, today=None):
             best[key] = s
             scored.append(s)
     stats["scored"] = len(scored)
-    for rung, (floor, n, extra, note) in enumerate(RELAXATIONS):
-        chosen = _attempt(scored, profile, n, floor, extra)
+    for rung, (floor, n, extra, min_match, note) in enumerate(RELAXATIONS):
+        chosen = _attempt(scored, profile, n, floor, extra, min_match)
         if chosen:
             stats["rung"] = rung
             if note:

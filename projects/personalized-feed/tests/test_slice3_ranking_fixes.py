@@ -43,9 +43,9 @@ def test_hn_linked_repo_uses_points_when_stars_unknown():
     assert rank.source_quality(c, TODAY) == 2
 
 
-def test_thought_leadership_notable_repo_at_1000_stars():
-    assert rank.thought_leadership(cand("o/x", "https://github.com/o/x", stars=1000)) == 3
-    assert rank.thought_leadership(cand("o/x", "https://github.com/o/x", stars=999)) == 1
+def test_thought_leadership_notable_repo_at_5000_stars():  # slice 4: reverted from 1000 (popularity is not thought leadership)
+    assert rank.thought_leadership(cand("o/x", "https://github.com/o/x", stars=5000)) == 3
+    assert rank.thought_leadership(cand("o/x", "https://github.com/o/x", stars=4999)) == 1
 
 
 def test_zero_traction_repo_dropped_unless_backed_by_another_item(tmp_path):

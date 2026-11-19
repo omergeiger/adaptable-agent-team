@@ -29,7 +29,15 @@ INTEREST_KEYWORDS = {
                               "post-mortem", "guardrails", "incident", "sla", "failure mode"],
     "classic ml": ["forecasting", "time series"],  # weight 0 in the profile: never eligible
 }
-STRONG_HITS = 2  # >= this many distinct keyword hits, or any hit in the title, is a strong match
+STRONG_HITS = 2  # >= this many distinct keyword hits, or a STRONG keyword in the title, is a strong match
+# Weak keywords are generic: a single weak hit scores one tier lower and is never strong via the title alone.
+WEAK_KEYWORDS = {"production", "document", "form", "schema", "trace", "retrieval", "benchmark", "monitoring",
+                 "incident", "ticket"}
+# Keywords matched as a prefix (stems). Everything else is a whole word with an optional plural "s".
+STEM_KEYWORDS = {"quantiz", "orchestrat"}
+# An interest whose words are ambiguous alone needs one of these terms in the text (repos/tools are exempt).
+CONTEXT_REQUIRED = {"rust tooling": ["llm", "ml", "ai", "agent", "inference", "model", "machine learning"]}
+CONTEXT_EXEMPT_TYPES = ("repo", "tool")
 
 # --- Exclude rules. Profile "Anti-interests" bullet text (lowercase substring) -> rule name. ---
 EXCLUDE_RULE_FOR_TEXT = {
@@ -41,9 +49,11 @@ EXCLUDE_KEYWORDS = {
     "crypto": ["crypto", "blockchain", "web3", "nft", "bitcoin", "ethereum"],
     "funding": ["raises $", "funding round", "series a", "series b", "valuation", "acquires", "acquisition"],
     "listicle": ["prompt hack", "chatgpt prompts", "prompt tricks"],
-    "ai-art": ["ai art"],
+    "ai-art": ["ai art", "ai-art", "ai artist", "ai-generated art", "ai generated art", "artcraft", "photoshop",
+               "image generation", "image generator", "text-to-image", "midjourney", "generative art"],
     "think-piece": ["will change", "future of work", "will replace"],
 }
+EXCLUDE_WHOLE_WORD = {"ai-art"}  # these rules match whole words ("ai art" must not fire on "ai artifacts")
 LISTICLE_RE = r"^\d+\s+(ways|tips|tricks|prompts|tools|hacks)\b"
 ANNOUNCEMENT_WORDS = ["announces", "announcing", "launches", "introducing", "partnership", "now available", "raises"]
 CTA_WORDS = ["pricing", "sign up", "signup", "book a demo", "request a demo", "free trial", "get started for free"]
@@ -64,7 +74,7 @@ SOURCE_QUALITY_BY_TYPE = {"GitHub": 4, "HN": 4, "arXiv": 4, "Lobsters": 4, "blog
 
 # thought-leadership: 5 for notable authors (match on Candidate.source or extras["author"]), 3 for repos >= 5k stars
 NOTABLE_AUTHORS = ["Hamel Husain", "Eugene Yan", "Simon Willison", "Chip Huyen", "Sebastian Raschka", "Lilian Weng"]
-NOTABLE_REPO_STARS = 1000
+NOTABLE_REPO_STARS = 5000
 
 # novelty: recency of delivered author/domain, counted in editions
 NOVELTY_RECENT_EDITIONS = 7
@@ -81,7 +91,7 @@ TOP_INTERESTS_FOR_EXPLORATION = 3  # exploration pick must come from outside the
 
 # --- Traction (critic cycle 3, change 2). Starting guesses; ranking-engineer tunes on real output. ---
 TRACTION_LADDER = [(1000, 5), (200, 4), (50, 3), (10, 2), (0, 1)]  # (min stars or HN points, source-quality)
-MIN_REPO_STARS = 10                   # GitHub repos below this are dropped unless another item points at them
+MIN_REPO_STARS = 25                   # GitHub repos below this are dropped unless another item points at them
 VELOCITY_MAX_AGE_DAYS = 7             # a repo this young with >= VELOCITY_MIN_STARS counts as at least VELOCITY_QUALITY
 VELOCITY_MIN_STARS = 50
 VELOCITY_QUALITY = 4
@@ -93,3 +103,13 @@ FATIGUE_NOVELTY = 3
 
 # --- Top-interest guardrail (critic cycle 3, change 4) ---
 TOP_INTEREST_CAP_FRACTION = 0.6       # at most round(0.6*n) items (3 of 5) from the top-3 interests combined
+
+# --- Slice 4 (ranking-engineer cycle 6 eval) ---
+MIN_INTEREST_MATCH_MAIN = 2           # main slots need interest-match >= this (lowest relaxation rung may drop to 1, warned)
+EXPLORATION_MIN_INTEREST_MATCH = 3    # exploration pick needs a real match, not one generic word
+EXPLORATION_EXCLUDED_SOURCE_TYPES = ("Substack",)  # newsletter headlines are not tryable
+TAIL_REPO_STARS = 50                  # at most MAX_TAIL_REPOS delivered repos below this per edition
+MAX_TAIL_REPOS = 1
+# Same repo name under different owners = one cluster (clone defect), only for distinctive names.
+CLONE_MIN_NAME_LEN = 8
+CLONE_GENERIC_NAMES = {"agent", "agents", "examples", "demo", "starter", "playground", "tutorial"}

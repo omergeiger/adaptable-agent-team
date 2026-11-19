@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+from . import rank_data
 from .models import GITHUB_RESERVED_OWNERS
 
 TRACKING_PARAMS = {"ref", "source"}
@@ -38,6 +39,22 @@ def repo_slug(url):
     if len(segs) < 2 or segs[0] in GITHUB_RESERVED_OWNERS:
         return None
     return f"{segs[0]}/{segs[1]}"
+
+
+def name_key(item):
+    """name:<repo> for a GitHub repo URL (or Candidate) whose repo name is distinctive, else None.
+
+    Same name under different owners is the clone defect; generic names (demo, agent...) are never merged.
+    """
+    slug = repo_slug(item if isinstance(item, str) else item.canonical_url)
+    if not slug:
+        return None
+    name = slug.split("/")[1]
+    if name in rank_data.CLONE_GENERIC_NAMES:
+        return None
+    if len(name) >= rank_data.CLONE_MIN_NAME_LEN or re.search(r"[\d\-_.]", name):
+        return f"name:{name}"
+    return None
 
 
 def cluster_key(item):
@@ -77,7 +94,7 @@ class Ledger:
     def __init__(self, path):
         self.path = Path(path)
         self.rows = []  # (date, edition, canonical_url, cluster_key, title)
-        self._urls, self._clusters = set(), set()
+        self._urls, self._clusters, self._names = set(), set(), set()
         if self.path.exists():
             self._load()
 
@@ -94,9 +111,13 @@ class Ledger:
         self.rows.append(row)
         self._urls.add(row[2])
         self._clusters.add(row[3])
+        if (nk := name_key(row[2])):
+            self._names.add(nk)
 
     def seen(self, candidate):
-        return candidate.canonical_url in self._urls or cluster_key(candidate) in self._clusters
+        # D7: a delivered repo also covers its same-name clones under other owners
+        return (candidate.canonical_url in self._urls or cluster_key(candidate) in self._clusters
+                or name_key(candidate) in self._names)
 
     def append(self, date, edition, candidates):
         new_rows = [(str(date), str(edition), c.canonical_url, cluster_key(c), c.title) for c in candidates]

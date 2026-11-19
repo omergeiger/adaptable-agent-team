@@ -46,5 +46,8 @@ def format_report(r):
         lines.append(f"  #{n} {s.total:.2f} {s.candidate.source_type:<8} {s.interest or '-'}"
                      f"{' [exploration]' if s.exploration else ''} | {s.candidate.title}")
         lines.append(f"      {sig}")
+    stars = sorted(s.candidate.extras["stars"] for s in r["selection"].items if s.candidate.extras.get("stars") is not None)
+    if stars:
+        lines.append(f"repo stars: {stars} median {stars[len(stars) // 2]}")
     lines.append(f"wrote {r['path']}" if r["path"] else "nothing shipped")
     return "\n".join(lines)
