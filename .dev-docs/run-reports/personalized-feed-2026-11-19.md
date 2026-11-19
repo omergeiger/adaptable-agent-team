@@ -38,6 +38,8 @@ The original June run (9 cycles) used the broken agent path: `/adapt` had writte
 
 ## Key events
 
+> **Note (added after the run):** the 4 domain skills were not registered during this run. Their `SKILL.md` files lacked YAML frontmatter, so Claude Code skipped them; agents read some of them by path instead (see the framework retrospective, P1-1). Frontmatter was added afterwards (`dab395f`), and `main` now refuses to start the loop when it is missing (`595a9bf`). The run was not repeated.
+
 1. **The agent-path fix worked.** All 7 `loop-plugin:<role>` personas were really called, which the June run never managed.
 2. **The fictional reader held.** The profile came only from `reader-source.md`; the post-run leak scan (real name, email, "AgentTeam") is clean.
 3. **Running unattended worked.** There were no Open Questions all run; every judgment call was a recorded D9 default (skip Reddit, ship as-is, an empty slot rather than a weak pick).
