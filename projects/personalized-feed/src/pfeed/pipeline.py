@@ -23,7 +23,7 @@ def run_daily(user_id, today=None, http=None, root=DEFAULT_ROOT, out_dir=None, l
     ledger = Ledger(ledger_file or ledger_path(root, user_id))
     result = run_sources(http, sources if sources is not None else build_sources(today))
     fresh, stale = filter_recent(result.candidates, today, window_days)
-    selection = select(fresh, profile, weights, ledger)
+    selection = select(fresh, profile, weights, ledger, today)
     report = {"user": user_id, "date": str(today), "sources": result.reports, "fetched": len(result.candidates),
               "stale_dropped": stale, "selection": selection, "path": None, "edition": None}
     if selection.items:
@@ -39,7 +39,12 @@ def format_report(r):
              f"stats {r['selection'].stats}"]
     lines += [f"  FAIL {s.id}: {s.error}" for s in r["sources"] if not s.ok]
     lines += [f"WARNING: {w}" for w in r["selection"].warnings]
-    lines += [f"  #{n} {s.total:.2f} {s.candidate.source_type:<8} {s.interest or '(exploration)'} | {s.candidate.title}"
-              for n, s in enumerate(r["selection"].items, 1)]
+    rung = r["selection"].stats.get("rung")
+    lines.append(f"relaxation rung used: {rung if rung is not None else 'none (nothing shipped)'}")
+    for n, s in enumerate(r["selection"].items, 1):
+        sig = " ".join(f"{k}={v}" for k, v in s.signals.items())
+        lines.append(f"  #{n} {s.total:.2f} {s.candidate.source_type:<8} {s.interest or '-'}"
+                     f"{' [exploration]' if s.exploration else ''} | {s.candidate.title}")
+        lines.append(f"      {sig}")
     lines.append(f"wrote {r['path']}" if r["path"] else "nothing shipped")
     return "\n".join(lines)

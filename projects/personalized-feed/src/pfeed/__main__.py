@@ -49,9 +49,12 @@ def feedback_cmd(args):
     p.add_argument("--edition", required=True, help="path to feeds/<date>-NN.json (or .md)")
     p.add_argument("--event", action="append", required=True)
     p.add_argument("--simulated", action="store_true")
+    p.add_argument("--root", help="project root whose profile/<user>-weights.json is updated (default: this project)")
+    p.add_argument("--weights", help="explicit weights file (overrides --root); use for trials")
     a = p.parse_args(args)
     side = Path(a.edition).with_suffix(".json")
-    for flag in feedback.apply(weights_path(DEFAULT_ROOT, a.user), side, a.event, a.simulated):
+    target = Path(a.weights) if a.weights else weights_path(a.root or DEFAULT_ROOT, a.user)
+    for flag in feedback.apply(target, side, a.event, a.simulated):
         print("interest flag for user-profiler:", flag)
     return 0
 
@@ -63,7 +66,7 @@ def main(argv):
         return daily(argv[2:])
     if argv[1:2] == ["feedback"]:
         return feedback_cmd(argv[2:])
-    print("usage: python -m pfeed check-live | daily --user U [--date D] [--out DIR] | feedback --user U --edition F --event E", file=sys.stderr)
+    print("usage: python -m pfeed check-live | daily --user U [--date D] [--out DIR] | feedback --user U --edition F --event E [--root DIR | --weights FILE]", file=sys.stderr)
     return 2
 
 

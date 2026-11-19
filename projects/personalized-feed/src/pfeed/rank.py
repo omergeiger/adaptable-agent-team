@@ -5,12 +5,14 @@ relaxation. Heuristic tables live in rank_data.py. Same inputs always give the s
 """
 import json
 import re
+from datetime import date, datetime
 from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlsplit
 
 from . import rank_data as D
 from .ledger import cluster_key
+from .models import Candidate
 
 
 # ---------- data types ----------
@@ -66,7 +68,8 @@ def _text(c):
 
 
 def _has(text, words):
-    return any(w in text for w in words)
+    """Whole-word match (an optional plural s is allowed): 'repo' must not fire on 'report'."""
+    return any(re.search(r"\b" + re.escape(w) + r"s?\b", text) for w in words)
 
 
 def _tryable(c):
@@ -157,7 +160,28 @@ def recent_domains(ledger, n_editions=D.NOVELTY_RECENT_EDITIONS):
     return out
 
 
-def source_quality(c):
+def _traction_count(c):
+    """Stars for repos; HN points for an HN-delivered repo; None when unknown."""
+    stars = c.extras.get("stars")
+    return stars if stars is not None else (c.extras.get("points") if c.item_type in ("repo", "tool") else None)
+
+
+def _age_days(c, today):
+    try:
+        return (today - datetime.fromisoformat(c.extras["created_at"].replace("Z", "+00:00")).date()).days
+    except (KeyError, TypeError, ValueError, AttributeError):
+        return None
+
+
+def source_quality(c, today=None):
+    """Repos are rated on traction (stars / HN points), everything else on its source."""
+    count = _traction_count(c) if c.item_type in ("repo", "tool") else None
+    if count is not None:
+        quality = next(q for floor, q in D.TRACTION_LADDER if count >= floor)
+        age = _age_days(c, today or date.today())
+        if age is not None and age <= D.VELOCITY_MAX_AGE_DAYS and count >= D.VELOCITY_MIN_STARS:
+            quality = max(quality, D.VELOCITY_QUALITY)
+        return quality
     for name, score in D.SOURCE_QUALITY_BY_SOURCE.items():
         if c.source.startswith(name):
             return score
@@ -173,12 +197,32 @@ def thought_leadership(c):
     return 1
 
 
-def score(c, profile, weights, recent):
+def fatigued_interests(ledger, profile):
+    """Interests delivered in >= FATIGUE_MIN_HITS of the last FATIGUE_EDITIONS editions.
+
+    The ledger stores titles only, so interests are re-derived from titles (an undercount, never an overcount).
+    """
+    editions = {}
+    for date_, edition, url, _cluster, title in ledger.rows:
+        c = Candidate(title, url, url, "", "", "article")
+        interest = match_interest(c, profile)[0]
+        editions.setdefault((date_, edition), set())
+        if interest:
+            editions[(date_, edition)].add(interest)
+    recent = list(editions.values())[-D.FATIGUE_EDITIONS:]
+    names = {i for hits in recent for i in hits}
+    return {i for i in names if sum(i in hits for hits in recent) >= D.FATIGUE_MIN_HITS}
+
+
+def score(c, profile, weights, recent, today=None, fatigued=frozenset()):
     interest, tier, match = match_interest(c, profile)
     dom = domain_key(c)
-    signals = {"interest-match": match, "novelty": 3 if dom and dom in recent else 5,
+    novelty = 3 if dom and dom in recent else 5
+    if interest in fatigued:
+        novelty = min(novelty, D.FATIGUE_NOVELTY)
+    signals = {"interest-match": match, "novelty": novelty,
                "hands-on": hands_on(c), "thought-leadership": thought_leadership(c),
-               "source-quality": source_quality(c)}
+               "source-quality": source_quality(c, today)}
     total = round(sum(weights[k] * signals[k] for k in signals), 4)
     return Scored(c, signals, total, interest, tier)
 
@@ -189,10 +233,18 @@ def _order(pool):
     return sorted(pool, key=lambda s: (-s.total, s.candidate.title.lower(), s.candidate.canonical_url))
 
 
-def _fits(chosen, s, n, extra_cap):
-    """Interest cap, one per cluster, one per author/domain."""
+def top_interests(profile):
+    ranked = sorted(profile.interests, key=lambda i: -i.effective_weight)
+    return {i.name for i in ranked[:D.TOP_INTERESTS_FOR_EXPLORATION]}
+
+
+def _fits(chosen, s, n, extra_cap, top=frozenset()):
+    """Interest cap, top-3-combined cap, one per cluster, one per author/domain."""
     cap = max(1, int(D.INTEREST_CAP_FRACTION * n)) + extra_cap
     if s.interest and sum(x.interest == s.interest for x in chosen) >= cap:
+        return False
+    top_cap = max(1, int(D.TOP_INTEREST_CAP_FRACTION * n + 0.5)) + extra_cap
+    if s.interest in top and sum(x.interest in top for x in chosen) >= top_cap:
         return False
     if any(cluster_key(x.candidate) == cluster_key(s.candidate) for x in chosen):
         return False
@@ -204,11 +256,11 @@ def _types(chosen):
     return {x.candidate.source_type for x in chosen}
 
 
-def _exploration_pick(scored, profile, floor):
-    top = {i.name for i in sorted(profile.interests, key=lambda i: -i.effective_weight)[:D.TOP_INTERESTS_FOR_EXPLORATION]}
+def _exploration_pick(scored, profile, floor, n, extra_cap):
+    top = top_interests(profile)
     inferred = {i.name for i in profile.interests if i.status == "inferred"}
-    pool = [s for s in scored if s.signals["hands-on"] >= max(D.EXPLORATION_MIN_HANDS_ON, floor)
-            and s.interest not in top and s.interest not in inferred]
+    pool = [s for s in scored if s.interest and s.signals["hands-on"] >= max(D.EXPLORATION_MIN_HANDS_ON, floor)
+            and s.interest not in top and s.interest not in inferred and _fits([], s, n, extra_cap, top)]
     return _order(pool)[0] if pool else None
 
 
@@ -216,7 +268,8 @@ def _attempt(scored, profile, n, floor, extra_cap):
     """One greedy pass at fixed constraints -> list of Scored, or None if n items with >=3 types are not reachable."""
     eligible = [s for s in scored if s.signals["hands-on"] >= floor]
     chosen = []
-    pick = _exploration_pick(eligible, profile, floor)
+    top = top_interests(profile)
+    pick = _exploration_pick(eligible, profile, floor, n, extra_cap)
     for s in scored:
         s.exploration = False
     if pick:
@@ -225,7 +278,7 @@ def _attempt(scored, profile, n, floor, extra_cap):
     for s in _order(eligible):
         if len(chosen) >= n:
             break
-        if s.interest and s not in chosen and _fits(chosen, s, n, extra_cap):
+        if s.interest and s not in chosen and _fits(chosen, s, n, extra_cap, top):
             chosen.append(s)
     # D2 diversity: swap the lowest-scored duplicated-type, non-exploration item for the best missing-type candidate
     while len(_types(chosen)) < D.MIN_SOURCE_TYPES:
@@ -234,7 +287,7 @@ def _attempt(scored, profile, n, floor, extra_cap):
             counts = {t: sum(x.candidate.source_type == t for x in chosen) for t in _types(chosen)}
             for out in reversed(_order(x for x in chosen if not x.exploration and counts[x.candidate.source_type] > 1)):
                 rest = [x for x in chosen if x is not out]
-                if _fits(rest, cand, n, extra_cap):
+                if _fits(rest, cand, n, extra_cap, top):
                     chosen = rest + [cand]
                     swapped = True
                     break
@@ -255,22 +308,34 @@ RELAXATIONS = [  # (hands-on floor, n, extra per-interest cap, warning)
 ]
 
 
-def select(candidates, profile, weights, ledger):
+def zero_traction(c, backed):
+    """A GitHub repo under MIN_REPO_STARS that no other candidate (paper, HN post...) points at."""
+    return (c.source_type == "GitHub" and c.item_type == "repo" and c.extras.get("stars") is not None
+            and c.extras["stars"] < D.MIN_REPO_STARS and cluster_key(c) not in backed)
+
+
+def select(candidates, profile, weights, ledger, today=None):
     """Candidates -> Selection. Drops excludes, ledger repeats and same-day cluster duplicates, then ranks."""
+    today = today or date.today()
     rules, warnings = active_exclude_rules(profile)
+    counts = {}
+    for c in candidates:
+        counts[cluster_key(c)] = counts.get(cluster_key(c), 0) + 1
+    backed = {k for k, n in counts.items() if n > 1}
     stats = {"candidates": len(candidates), "excluded": {}, "ledger_seen": 0, "same_day_dupes": 0}
     kept = []
     for c in candidates:
-        reason = exclude_reason(c, rules)
+        reason = exclude_reason(c, rules) or ("zero-traction repo" if zero_traction(c, backed) else None)
         if reason:
             stats["excluded"][reason] = stats["excluded"].get(reason, 0) + 1
         elif ledger.seen(c):
             stats["ledger_seen"] += 1
         else:
             kept.append(c)
-    recent = recent_domains(ledger)
+    recent, fatigued = recent_domains(ledger), fatigued_interests(ledger, profile)
+    stats["fatigued"] = sorted(fatigued)
     scored, best = [], {}
-    for s in _order(score(c, profile, weights, recent) for c in kept):
+    for s in _order(score(c, profile, weights, recent, today, fatigued) for c in kept):
         key = cluster_key(s.candidate)
         if key in best:
             stats["same_day_dupes"] += 1
@@ -278,9 +343,10 @@ def select(candidates, profile, weights, ledger):
             best[key] = s
             scored.append(s)
     stats["scored"] = len(scored)
-    for floor, n, extra, note in RELAXATIONS:
+    for rung, (floor, n, extra, note) in enumerate(RELAXATIONS):
         chosen = _attempt(scored, profile, n, floor, extra)
         if chosen:
+            stats["rung"] = rung
             if note:
                 warnings.append(note)
             if not any(s.exploration for s in chosen):
@@ -288,5 +354,6 @@ def select(candidates, profile, weights, ledger):
             return Selection(chosen, warnings, stats)
         if note:
             warnings.append(note + " - still unsatisfiable")
+    stats["rung"] = None
     warnings.append("ALARM: cannot assemble >= 3 items across >= 3 source types; shipping nothing")
     return Selection([], warnings, stats)

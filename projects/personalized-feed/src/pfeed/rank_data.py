@@ -48,7 +48,7 @@ LISTICLE_RE = r"^\d+\s+(ways|tips|tricks|prompts|tools|hacks)\b"
 ANNOUNCEMENT_WORDS = ["announces", "announcing", "launches", "introducing", "partnership", "now available", "raises"]
 CTA_WORDS = ["pricing", "sign up", "signup", "book a demo", "request a demo", "free trial", "get started for free"]
 VENDOR_SOURCES = ["Hugging Face blog", "LangChain blog"]  # company blogs: CTA test applies
-TRYABLE_WORDS = ["github.com", "notebook", "step-by-step", "tutorial", "code", "repo", "colab", "quickstart"]
+TRYABLE_WORDS = ["github.com", "notebook", "step-by-step", "tutorial", "colab", "quickstart", "repository"]  # whole words only
 
 # --- Signal heuristics ---
 HANDS_ON_BY_ITEM_TYPE = {"repo": 5, "tool": 4, "paper": 2, "article": 2, "discussion": 2}
@@ -64,7 +64,7 @@ SOURCE_QUALITY_BY_TYPE = {"GitHub": 4, "HN": 4, "arXiv": 4, "Lobsters": 4, "blog
 
 # thought-leadership: 5 for notable authors (match on Candidate.source or extras["author"]), 3 for repos >= 5k stars
 NOTABLE_AUTHORS = ["Hamel Husain", "Eugene Yan", "Simon Willison", "Chip Huyen", "Sebastian Raschka", "Lilian Weng"]
-NOTABLE_REPO_STARS = 5000
+NOTABLE_REPO_STARS = 1000
 
 # novelty: recency of delivered author/domain, counted in editions
 NOVELTY_RECENT_EDITIONS = 7
@@ -78,3 +78,18 @@ MIN_SOURCE_TYPES = 3
 DEFAULT_HANDS_ON_FLOOR = 2   # items with hands-on below this are dropped (design says "<= 1 dropped")
 EXPLORATION_MIN_HANDS_ON = 4
 TOP_INTERESTS_FOR_EXPLORATION = 3  # exploration pick must come from outside the top N interests by weight
+
+# --- Traction (critic cycle 3, change 2). Starting guesses; ranking-engineer tunes on real output. ---
+TRACTION_LADDER = [(1000, 5), (200, 4), (50, 3), (10, 2), (0, 1)]  # (min stars or HN points, source-quality)
+MIN_REPO_STARS = 10                   # GitHub repos below this are dropped unless another item points at them
+VELOCITY_MAX_AGE_DAYS = 7             # a repo this young with >= VELOCITY_MIN_STARS counts as at least VELOCITY_QUALITY
+VELOCITY_MIN_STARS = 50
+VELOCITY_QUALITY = 4
+
+# --- Topic fatigue (critic cycle 3, change 5) ---
+FATIGUE_EDITIONS = 5                  # look at the last N editions
+FATIGUE_MIN_HITS = 3                  # interest delivered in >= this many of them -> novelty capped
+FATIGUE_NOVELTY = 3
+
+# --- Top-interest guardrail (critic cycle 3, change 4) ---
+TOP_INTEREST_CAP_FRACTION = 0.6       # at most round(0.6*n) items (3 of 5) from the top-3 interests combined
