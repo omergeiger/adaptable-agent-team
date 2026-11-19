@@ -1,3 +1,8 @@
+---
+name: cv-section-template
+description: Canonical Markdown section schema for cv-draft.md and raw-material.md. Apply when the intake-analyst organizes raw material, the content-writer writes or revises the draft, and the graphical-designer anchors the HTML layout.
+---
+
 # cv-section-template - Canonical CV Section Schema
 
 Enforces a consistent Markdown structure for all CV files so every agent reads and writes to the same schema without ambiguity.

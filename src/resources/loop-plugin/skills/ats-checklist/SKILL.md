@@ -1,3 +1,8 @@
+---
+name: ats-checklist
+description: ATS compliance rule set (forbidden formatting, required elements, keyword alignment). Apply when the ats-optimizer reviews a CV draft in the Review phase and writes ats-report.md.
+---
+
 # ats-checklist - ATS Compliance Rule Set
 
 Prevents formatting choices that cause applicant tracking systems to misparse or reject a CV before a human ever reads it. Applied every Review cycle by the ats-optimizer.

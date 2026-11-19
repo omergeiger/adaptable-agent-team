@@ -1,3 +1,8 @@
+---
+name: quality-rubric
+description: 1-5 CV content quality rubric (impact language, quantification, and more). Apply when the content-writer self-scores a draft before handing it to Review; any dimension below 3 blocks advancing.
+---
+
 # quality-rubric - CV Content Quality Scoring Rubric
 
 Provides a consistent scoring standard so content quality is measurable across cycles and agents, not subjective. Applied by the content-writer before handoff to Review.
