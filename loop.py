@@ -283,8 +283,40 @@ def extract_output_json(raw: str, verbose: bool) -> dict:
         return {}
 
 
-def is_rate_limited(raw: str, exit_code: int) -> bool:
-    lower = raw.lower()
+def _non_json_text(raw: str) -> str:
+    """Return the parts of the CLI output that are not JSON (stderr, plain error lines).
+
+    Output that is a single JSON document (json mode) yields "". Otherwise
+    (stream-json, or mixed output) every line that does not parse as JSON is kept.
+    """
+    try:
+        json.loads(raw)
+        return ""
+    except json.JSONDecodeError:
+        pass
+    kept = []
+    for line in raw.splitlines():
+        try:
+            json.loads(line)
+        except json.JSONDecodeError:
+            kept.append(line)
+    return "\n".join(kept)
+
+
+def is_rate_limited(raw: str, exit_code: int, output_obj: dict) -> bool:
+    """True if the CLI itself failed with a rate-limit/billing error.
+
+    Only CLI-level failures count (non-zero exit or an error result), and only
+    the error text is searched - never the agents' transcript, which may
+    legitimately mention words like "billing" or "quota".
+    """
+    is_error = bool(output_obj.get("is_error"))
+    if exit_code == 0 and not is_error:
+        return False
+    error_text = _non_json_text(raw)
+    if is_error:
+        error_text += "\n" + str(output_obj.get("result", ""))
+    lower = error_text.lower()
     return any(p in lower for p in RATE_LIMIT_PATTERNS)
 
 
@@ -525,7 +557,7 @@ def main() -> None:
                 save_state(state_file, cycle_count, "circuit_broken")
                 sys.exit(1)
 
-            if is_rate_limited(raw_output, exit_code):
+            if is_rate_limited(raw_output, exit_code, output_obj):
                 log.warning(f"Cycle #{cycle_count}: rate limit detected.")
                 save_state(state_file, cycle_count, "rate_limited")
                 if config.get("single_cycle", False):
