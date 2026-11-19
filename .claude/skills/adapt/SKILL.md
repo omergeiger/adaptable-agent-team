@@ -94,7 +94,7 @@ Then ask the human to approve or send fixes. On fixes, update the temp file and 
 
 ### `steering/<name>/consensus.md`
 
-All 7 sections, domain-appropriate placeholder text. **No sentinel marker** - this file must be runnable immediately.
+All 7 sections, domain-appropriate placeholder text. This file must be runnable immediately - its existence is what tells the loop the project is adapted.
 
 ```markdown
 ## Last Updated

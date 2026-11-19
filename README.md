@@ -42,7 +42,7 @@ Example data includes titles and excerpts of publicly available posts, kept for 
    .venv/bin/python loop.py --cycles 3 # continuous (single_cycle: false): stop after 3 successful cycles
    ```
    `--cycles` only takes effect with `single_cycle: false`; in gated mode the loop always exits after one cycle.
-   The loop detects an unadapted project (missing `consensus.md` or one still carrying the starter sentinel) and exits, directing you to run `/adapt` first.
+   The loop detects an unadapted project (no `steering/<active>/consensus.md`) and exits, directing you to run `/adapt` first.
 
 ## Repo Structure
 
@@ -121,7 +121,7 @@ Edit `steering/<active>/human_directives.md` - the human's only write channel (a
 Each project lives across three top-level spaces (`steering/`, `auto-outputs/`, `projects/`) but is self-contained within its named subfolder. Point the loop at a different project by changing `active_project` in `config.yaml`. To repurpose the framework for a new domain, re-run `/adapt` - remember it overwrites the repo-global agent/skill/`PROMPT.md` files for the previous domain.
 
 ### 6. When the loop stops itself
-- **Unadapted project** (missing `steering/<active>/consensus.md` or carrying the starter sentinel) - the loop exits immediately; run `/adapt`.
+- **Unadapted project** (missing `steering/<active>/consensus.md`) - the loop exits immediately; run `/adapt`.
 - **Validation failure or no-op cycle** - consensus is restored from the pre-cycle in-memory snapshot and the consecutive-error counter increments; five in a row trips the circuit breaker and exits. Check `auto-outputs/<active>/logs/loop.log` and the failing cycle's `metadata.json` / `output.json`. See [Consensus Validation & Recovery](#consensus-validation--recovery).
 - **Rate limit / billing** - in continuous mode the loop waits before retrying; in gated mode it exits.
 - **Cycle timeout** - if consensus was updated and still valid, progress is kept; otherwise the cycle counts as a failure.
@@ -216,7 +216,7 @@ Each iteration:
 ### Adapt Skill (human-facing, pre-launch)
 - `.claude/skills/adapt/` is a setup wizard run **by the human** in an interactive Claude Code session, *before* launching the loop on a new domain. It is not invoked by the loop or by agents.
 - It interviews the user (domain, purpose, roles, phases, cadence) and generates customized agent files (`src/resources/loop-plugin/agents/`, delegated to as `loop-plugin:<role>`), a tailored PROMPT.md, domain-convention skills (`src/resources/loop-plugin/skills/`, applied by agents as `loop-plugin:<name>`), and starter steering files at `steering/<name>/` (`consensus.md` + `human_directives.md`).
-- The loop detects an unadapted project (missing `steering/<active>/consensus.md` or one still carrying the starter sentinel marker) and exits with instructions to run /adapt interactively.
+- The loop detects an unadapted project (missing `steering/<active>/consensus.md`) and exits with instructions to run /adapt interactively.
 
 ### Git Sync
 - **Single-repo model:** the framework and all project folders live in one repo - the deployment clone of this template. The loop commits and pushes this repo as a whole; there is no separate per-project repo and no external artifact sync.

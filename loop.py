@@ -367,7 +367,7 @@ def main() -> None:
 
     # Unadapted project guard — runs before any mkdir so no stray directories are created
     if con.is_unadapted(consensus_path):
-        print(f"[agentteam] ERROR: Project '{active}' is unadapted or missing consensus.md.", file=sys.stderr)
+        print(f"[agentteam] ERROR: Project '{active}' is unadapted - {consensus_path.relative_to(REPO_ROOT)} does not exist.", file=sys.stderr)
         print("[agentteam] Run the /adapt skill interactively to set up this project, then rerun the loop.", file=sys.stderr)
         sys.exit(1)
 
