@@ -182,7 +182,14 @@ Replace the `<!-- DOMAIN-SPECIFIC -->` placeholders. Do **not** add a domain rol
 
 These load only into headless loop sessions via the `loop-plugin` plugin; agents apply them as `loop-plugin:<name>`. Never put domain skills in `.claude/skills/`. Leave the framework-provided `example-loop-skill` in place; delete only domain skills from a previous domain.
 
+The leading frontmatter block is **required**: Claude Code registers a plugin skill only when `SKILL.md` starts with `name` and `description`; without it the skill is silently skipped and agents never get it. `name` must equal the directory name. Write `description` as when to apply the skill and by whom (e.g. "Feed item template. Apply when the developer renders an edition and when QA checks one."), since that is what the session uses to pick it up.
+
 ```markdown
+---
+name: <name>
+description: <what this convention covers; which sub-agents apply it, and when>
+---
+
 # <name> - <Short Title>
 
 <one line: what this convention protects and why it must not drift>
@@ -210,7 +217,8 @@ Agent files, skill files, and `PROMPT.md` are **repo-global** - adapting a new d
 ## Final step
 
 1. **Delete `ADAPT_PROPOSAL.tmp.md`** - the proposal is now realized in the actual files.
-2. Tell the human:
+2. **Check frontmatter:** every `src/resources/loop-plugin/agents/*.md` and `src/resources/loop-plugin/skills/*/SKILL.md` must start with a `---` block whose `name` matches the file stem / directory name and whose `description` is non-empty. Run `.venv/bin/python -c "from pathlib import Path; from src.plugin_check import check_plugin; print(check_plugin(Path('src/resources/loop-plugin')) or 'ok')"` and fix anything it reports - `loop.py` refuses to start otherwise.
+3. Tell the human:
    - Steering files are at `steering/<name>/` (`consensus.md` + `human_directives.md`); deliverables accumulate in `projects/<name>/` and the process trail in `auto-outputs/<name>/` (both created by the loop on first run).
    - They can review/edit any generated file before running - especially the standing directives, the generated skills, and the squad in `config.yaml`.
    - Run `.venv/bin/python loop.py` to start the first cycle (`single_cycle: true` recommended for the first run).
