@@ -17,6 +17,8 @@ def url_for(query, since_epoch=None, min_points=MIN_POINTS):
 def fetch(http, url, name="Hacker News", min_points=MIN_POINTS):
     try:
         hits = json.loads(http.fetch(url))["hits"]
+        if not isinstance(hits, list):
+            raise TypeError("hits is not a list")
     except (ValueError, KeyError, TypeError) as e:
         raise FetchError(f"{url}: unexpected HN payload ({e})") from e
 

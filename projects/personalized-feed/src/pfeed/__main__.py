@@ -18,10 +18,52 @@ def check_live(http=None, out=print, today=None):
     return 0 if ok == len(result.reports) else 1
 
 
+def daily(args):
+    import argparse
+    from datetime import date
+    from pathlib import Path
+
+    from .pipeline import format_report, run_daily
+    p = argparse.ArgumentParser(prog="pfeed daily")
+    p.add_argument("--user", required=True)
+    p.add_argument("--date", type=date.fromisoformat, default=None)
+    p.add_argument("--out", help="edition directory (default: feeds/). With --out, the ledger defaults to OUT/ledger.md")
+    p.add_argument("--ledger")
+    p.add_argument("--window-days", type=int, default=14)
+    a = p.parse_args(args)
+    ledger = a.ledger or (str(Path(a.out) / "ledger.md") if a.out else None)
+    report = run_daily(a.user, a.date, Http(), out_dir=a.out, ledger_file=ledger, window_days=a.window_days)
+    print(format_report(report))
+    return 0 if report["path"] else 1
+
+
+def feedback_cmd(args):
+    import argparse
+    from pathlib import Path
+
+    from . import feedback
+    from .pipeline import DEFAULT_ROOT
+    from .rank import weights_path
+    p = argparse.ArgumentParser(prog="pfeed feedback")
+    p.add_argument("--user", required=True)
+    p.add_argument("--edition", required=True, help="path to feeds/<date>-NN.json (or .md)")
+    p.add_argument("--event", action="append", required=True)
+    p.add_argument("--simulated", action="store_true")
+    a = p.parse_args(args)
+    side = Path(a.edition).with_suffix(".json")
+    for flag in feedback.apply(weights_path(DEFAULT_ROOT, a.user), side, a.event, a.simulated):
+        print("interest flag for user-profiler:", flag)
+    return 0
+
+
 def main(argv):
     if argv[1:] == ["check-live"]:
         return check_live()
-    print("usage: python -m pfeed check-live", file=sys.stderr)
+    if argv[1:2] == ["daily"]:
+        return daily(argv[2:])
+    if argv[1:2] == ["feedback"]:
+        return feedback_cmd(argv[2:])
+    print("usage: python -m pfeed check-live | daily --user U [--date D] [--out DIR] | feedback --user U --edition F --event E", file=sys.stderr)
     return 2
 
 

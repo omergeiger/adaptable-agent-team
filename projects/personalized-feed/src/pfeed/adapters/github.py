@@ -17,6 +17,8 @@ def url_for(query):
 def fetch(http, url, name="GitHub search"):
     try:
         items = json.loads(http.fetch(url))["items"]
+        if not isinstance(items, list):
+            raise TypeError("items is not a list")
     except (ValueError, KeyError, TypeError) as e:
         raise FetchError(f"{url}: unexpected GitHub payload ({e})") from e
 

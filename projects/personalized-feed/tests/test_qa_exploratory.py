@@ -1,4 +1,4 @@
-"""QA exploratory-pass regressions (cycle 2). Defects are xfail(strict) so a fix flips them to a visible XPASS failure."""
+"""QA exploratory-pass regressions (cycle 2). QA-1 fixed in cycle 3."""
 import pytest
 
 from conftest import FakeHttp
@@ -8,25 +8,24 @@ from pfeed.ledger import Ledger, canonical_url, cluster_key
 from pfeed.models import make_candidate
 
 
-@pytest.mark.xfail(strict=True, reason="QA-1: null items/hits escapes as TypeError, breaking fail-soft (run_sources catches only FetchError)")
 @pytest.mark.parametrize("fetch,body", [
     (lambda h: github.fetch(h, url="https://x.test/"), b'{"items": null}'),
-    (lambda h: hn.fetch(h, url="https://x.test/"), b'{"hits": null}')])
+    (lambda h: hn.fetch(h, url="https://x.test/"), b'{"hits": null}'),
+    (lambda h: github.fetch(h, url="https://x.test/"), b'{"items": {"a": 1}}'),
+    (lambda h: hn.fetch(h, url="https://x.test/"), b'{"hits": "oops"}')])
 def test_null_collection_is_fetch_error(fetch, body):
     with pytest.raises(FetchError):
         fetch(FakeHttp(body))
 
 
 def test_null_payload_does_not_stop_other_sources_documented():
-    """Characterizes QA-1 end to end: today a null payload crashes the whole run."""
+    """QA-1 end to end: a null payload is recorded as a failed source, not a crash."""
     class H:
         def fetch(self, url):
             return b'{"items": null}'
     srcs = [Source("a", "https://a/", lambda http: github.fetch(http, url="https://a/"))]
-    try:
-        run_sources(H(), srcs)
-    except TypeError:
-        pytest.xfail("QA-1 still open")
+    result = run_sources(H(), srcs)
+    assert result.candidates == [] and not result.reports[0].ok
 
 
 @pytest.mark.parametrize("raw,expected", [

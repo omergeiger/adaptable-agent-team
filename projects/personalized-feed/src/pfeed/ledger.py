@@ -103,6 +103,9 @@ class Ledger:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():
             self.path.write_text(HEADER, encoding="utf-8")
+        elif "| date |" not in self.path.read_text(encoding="utf-8"):  # hand-written preamble, no table yet
+            with self.path.open("a", encoding="utf-8") as f:
+                f.write("\n" + HEADER)
         with self.path.open("a", encoding="utf-8") as f:
             for row in new_rows:
                 f.write("| " + " | ".join(_cell(c) for c in row) + " |\n")
