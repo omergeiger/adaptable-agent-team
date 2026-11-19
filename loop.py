@@ -19,8 +19,10 @@ import yaml
 
 from src import consensus as con
 from src import git_sync
+from src import plugin_check
 
 REPO_ROOT = Path(__file__).parent.resolve()
+PLUGIN_DIR = REPO_ROOT / "src" / "resources" / "loop-plugin"
 RATE_LIMIT_WAIT_SECONDS = 3600
 MAX_CONSECUTIVE_ERRORS = 5
 LOG_ROTATE_BYTES = 10 * 1024 * 1024  # 10 MB
@@ -215,7 +217,7 @@ def run_cycle(
     # Load loop-only skills as a plugin, scoped to this invocation. Interactive
     # Claude Code sessions never pass --plugin-dir, so these skills stay invisible
     # to them and are addressed namespaced as `loop-plugin:<skill-name>`.
-    cmd += ["--plugin-dir", str(REPO_ROOT / "src" / "resources" / "loop-plugin")]
+    cmd += ["--plugin-dir", str(PLUGIN_DIR)]
     if verbose:
         # The CLI requires --verbose for stream-json in print mode
         cmd += ["--output-format", "stream-json", "--verbose"]
@@ -366,6 +368,16 @@ def main() -> None:
     if con.is_unadapted(consensus_path):
         print(f"[agentteam] ERROR: Project '{active}' is unadapted or missing consensus.md.", file=sys.stderr)
         print("[agentteam] Run the /adapt skill interactively to set up this project, then rerun the loop.", file=sys.stderr)
+        sys.exit(1)
+
+    # Plugin preflight - Claude Code silently skips agent/skill files without
+    # name/description frontmatter, so fail loudly here instead.
+    plugin_problems = plugin_check.check_plugin(PLUGIN_DIR)
+    if plugin_problems:
+        print("[agentteam] ERROR: loop-plugin files would not be registered by Claude Code:", file=sys.stderr)
+        for problem in plugin_problems:
+            print(f"[agentteam]   {problem}", file=sys.stderr)
+        print("[agentteam] Add a leading '---' block with 'name' (matching the file/dir) and 'description'.", file=sys.stderr)
         sys.exit(1)
 
     steering_dir.mkdir(parents=True, exist_ok=True)
