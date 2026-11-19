@@ -170,11 +170,12 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 ## Runtime Guardrails (required)
 
 - **Deliverables** (the domain product the project is chartered to produce): write to `projects/{active}/`. Use domain-native filenames with no cycle or persona stamps; no framework references.
-- **By-products** (your synthesized account of this cycle's work): write one file per persona turn to `auto-outputs/{active}/docs/`. Name each file `cycle-{cycle_num:04d}-{cycle_time_file}-<persona>-<slug>.md`.
-- Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files in `steering/`.
+- **By-products** (the synthesized account of this cycle's work): you, the orchestrator, write one file per persona turn to `auto-outputs/{active}/docs/` - one for each sub-agent you delegated to (synthesized from its report) and one for your own turn if you did hands-on work. Sub-agents write only deliverables. Name each file `cycle-{cycle_num:04d}-{cycle_time_file}-<persona>-<slug>.md`.
+- **Consensus**: `steering/{active}/consensus.md` is the only steering file you may write, and only you (the orchestrator) write it - never a sub-agent.
+- Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or any other file in `steering/`.
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents.
-- Never invoke the /adapt skill - it is human-run only.
+- Never invoke the human-run skills in `.claude/skills/` (`/adapt`, `/retrospect`).
 
 ---
 
@@ -184,13 +185,13 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 
 ---
 
-## Human Directives (read-only — never modify this file)
+## Human Directives (read-only - never modify this file)
 
 {directives_content}
 
 ---
 
-## Current Consensus (pre-loaded — do not re-read from disk)
+## Current Consensus (pre-loaded - do not re-read from disk)
 
 {consensus_content}
 
@@ -214,9 +215,9 @@ def run_cycle(
     transcript_lines is populated only when verbose=True.
     """
     cmd = [claude_bin, "-p", prompt, "--permission-mode", "bypassPermissions"]
-    # Load loop-only skills as a plugin, scoped to this invocation. Interactive
-    # Claude Code sessions never pass --plugin-dir, so these skills stay invisible
-    # to them and are addressed namespaced as `loop-plugin:<skill-name>`.
+    # Load the loop-only role sub-agents and skills as a plugin, scoped to this
+    # invocation. Interactive Claude Code sessions never pass --plugin-dir, so they
+    # stay invisible there; both are addressed namespaced as `loop-plugin:<name>`.
     cmd += ["--plugin-dir", str(PLUGIN_DIR)]
     if verbose:
         # The CLI requires --verbose for stream-json in print mode
@@ -282,8 +283,40 @@ def extract_output_json(raw: str, verbose: bool) -> dict:
         return {}
 
 
-def is_rate_limited(raw: str, exit_code: int) -> bool:
-    lower = raw.lower()
+def _non_json_text(raw: str) -> str:
+    """Return the parts of the CLI output that are not JSON (stderr, plain error lines).
+
+    Output that is a single JSON document (json mode) yields "". Otherwise
+    (stream-json, or mixed output) every line that does not parse as JSON is kept.
+    """
+    try:
+        json.loads(raw)
+        return ""
+    except json.JSONDecodeError:
+        pass
+    kept = []
+    for line in raw.splitlines():
+        try:
+            json.loads(line)
+        except json.JSONDecodeError:
+            kept.append(line)
+    return "\n".join(kept)
+
+
+def is_rate_limited(raw: str, exit_code: int, output_obj: dict) -> bool:
+    """True if the CLI itself failed with a rate-limit/billing error.
+
+    Only CLI-level failures count (non-zero exit or an error result), and only
+    the error text is searched - never the agents' transcript, which may
+    legitimately mention words like "billing" or "quota".
+    """
+    is_error = bool(output_obj.get("is_error"))
+    if exit_code == 0 and not is_error:
+        return False
+    error_text = _non_json_text(raw)
+    if is_error:
+        error_text += "\n" + str(output_obj.get("result", ""))
+    lower = error_text.lower()
     return any(p in lower for p in RATE_LIMIT_PATTERNS)
 
 
@@ -364,9 +397,9 @@ def main() -> None:
     directives_path = steering_dir / "human_directives.md"
     state_file = logs_dir / "loop_state.json"
 
-    # Unadapted project guard — runs before any mkdir so no stray directories are created
+    # Unadapted project guard - runs before any mkdir so no stray directories are created
     if con.is_unadapted(consensus_path):
-        print(f"[agentteam] ERROR: Project '{active}' is unadapted or missing consensus.md.", file=sys.stderr)
+        print(f"[agentteam] ERROR: Project '{active}' is unadapted - {consensus_path.relative_to(REPO_ROOT)} does not exist.", file=sys.stderr)
         print("[agentteam] Run the /adapt skill interactively to set up this project, then rerun the loop.", file=sys.stderr)
         sys.exit(1)
 
@@ -524,7 +557,7 @@ def main() -> None:
                 save_state(state_file, cycle_count, "circuit_broken")
                 sys.exit(1)
 
-            if is_rate_limited(raw_output, exit_code):
+            if is_rate_limited(raw_output, exit_code, output_obj):
                 log.warning(f"Cycle #{cycle_count}: rate limit detected.")
                 save_state(state_file, cycle_count, "rate_limited")
                 if config.get("single_cycle", False):
@@ -587,7 +620,7 @@ def main() -> None:
         save_state(state_file, cycle_count, "idle")
 
         if config.get("single_cycle", False):
-            log.info(f"Cycle #{cycle_count}: DONE. Single-cycle mode — exiting.")
+            log.info(f"Cycle #{cycle_count}: DONE. Single-cycle mode - exiting.")
             if cycle_failed:
                 sys.exit(1)
             break

@@ -13,8 +13,6 @@ REQUIRED_SECTIONS = [
     "## Open Questions",
 ]
 
-SENTINEL = "<!-- AGENTTEAM_UNADAPTED -->"
-
 
 class ConsensusError(Exception):
     pass
@@ -36,10 +34,8 @@ def write(consensus_path: Path, content: str) -> None:
 
 
 def is_unadapted(consensus_path: Path) -> bool:
-    """Return True if consensus.md is missing or carries the unadapted sentinel."""
-    if not consensus_path.exists():
-        return True
-    return SENTINEL in consensus_path.read_text(encoding="utf-8")
+    """Return True if the project has no consensus.md - /adapt has not set it up."""
+    return not consensus_path.exists()
 
 
 def restore(consensus_path: Path, pre_content: str) -> bool:
