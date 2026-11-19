@@ -33,17 +33,26 @@ def _facts(c):
     return ", ".join(bits)
 
 
+def _cited(s):
+    """' (matched: a, b)' from the keywords that actually matched, so the reason is checkable."""
+    words = list(dict.fromkeys(m["keyword"] for m in s.matches))
+    return f" (matched: {', '.join(words[:3])})" if words else ""
+
+
 def why_line(s):
     c = s.candidate
     kind = {"repo": "Repo", "paper": "Paper with code", "discussion": "Discussion", "article": "Write-up",
             "tool": "Tool"}[c.item_type]
     facts = _facts(c)
     head = f"{kind} from {c.source}" + (f" ({facts})" if facts else "")
+    if s.exploration_kind == "broadening":
+        return f"Broadening pick: {head}, outside your listed interests - {HOOKS[c.item_type]}."
+    cited = _cited(s)
     if s.exploration:
-        return (f"Broadening pick: {head}, outside your usual top interests"
-                + (f" but touching {s.interest}" if s.interest else "") + f" - {HOOKS[c.item_type]}.")
-    tie = f"ties to your {s.interest} interest"
-    return f"{head}; {tie} - {HOOKS[c.item_type]}."
+        return f"Exploration pick: {head}; from your {s.interest} interest, outside your top interests{cited} - {HOOKS[c.item_type]}."
+    if not s.strong:  # no real content match: do not claim an interest
+        return f"{head}; a looser match to your interests - {HOOKS[c.item_type]}."
+    return f"{head}; ties to your {s.interest} interest{cited} - {HOOKS[c.item_type]}."
 
 
 def render_edition(selection, user_id, date):
@@ -53,7 +62,6 @@ def render_edition(selection, user_id, date):
     for s in items:
         if s.candidate.source_type not in types:
             types.append(s.candidate.source_type)
-    assert len(types) >= 3, f"edition must span >= 3 source types, got {types}"
     lines = [f"# Personalized Feed - {date}",
              f"**User:** {user_id} · **Items:** {len(items)} · **Source types:** {', '.join(types)}", ""]
     for n, s in enumerate(items, 1):
@@ -78,7 +86,7 @@ def sidecar(selection, user_id, date, edition, weights):
                        "canonical_url": s.candidate.canonical_url, "cluster_key": cluster_key(s.candidate),
                        "source_type": s.candidate.source_type, "item_type": s.candidate.item_type,
                        "signals": s.signals, "total": s.total, "interest": s.interest, "tier": s.tier, "matches": s.matches,
-                       "exploration": s.exploration} for n, s in enumerate(selection.items, 1)]}
+                       "exploration": s.exploration, "exploration_kind": s.exploration_kind} for n, s in enumerate(selection.items, 1)]}
 
 
 def write_edition(selection, user_id, date, weights, out_dir):

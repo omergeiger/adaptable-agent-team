@@ -25,6 +25,7 @@ class Scored:
     interest: str = ""     # matched profile interest ("" = none)
     tier: str = ""         # high | mid | low | ""
     exploration: bool = False
+    exploration_kind: str = ""  # "in-interest" (a real interest below the top 3) | "broadening" (outside all interests)
     strong: bool = False   # strong interest match (see match_interest)
     matches: list = field(default_factory=list)  # [{"keyword", "origin": title|summary}] for audit
 
@@ -123,8 +124,8 @@ def _interest_hits(it_name, key, c, text):
 def _match(c, profile):
     """Best single interest -> (name, tier, signal 0-5, strong, matches). Never sums rows; weight 0 is ineligible.
 
-    Strong = a non-weak keyword in the title, or >= STRONG_HITS distinct hits with at least one non-weak. A weak-only
-    or lone weak match is one tier lower. Confirmed low-weight interests have base 2 (rare, not never); inferred 1.
+    Strong = a non-weak keyword in the title, or >= STRONG_HITS distinct hits with at least one non-weak. A lone
+    non-strong match is one tier lower; a weak-only match scores 1. Confirmed low-weight interests have base 2 (rare, not never); inferred 1.
     HN/Lobsters items whose hits all come from the summary/body are capped at SUMMARY_ONLY_CAP (promotional text).
     """
     text, title = _text(c), c.title.lower()
@@ -141,7 +142,7 @@ def _match(c, profile):
         tier, base = ("high", 5) if w >= 4 else ("mid", 3) if w == 3 else ("low", low_base)
         strong_hits = [k for k in hits if k not in D.WEAK_KEYWORDS]
         strong = any(_kw_hit(k, title) for k in strong_hits) or (len(hits) >= D.STRONG_HITS and bool(strong_hits))
-        signal = base if strong else max(base - 1, 1)
+        signal = base if strong else max(base - 1, 1) if strong_hits else 1  # weak-only match is worth 1
         matches = [{"keyword": k, "origin": "title" if _kw_hit(k, title) else "summary"} for k in hits]
         if c.source_type in D.SUMMARY_CAP_SOURCE_TYPES and all(m["origin"] == "summary" for m in matches):
             if not strong_hits:
@@ -327,15 +328,18 @@ def _exploration_pick(scored, profile, floor, n, extra_cap):
 
 
 def _attempt(scored, profile, n, floor, extra_cap, min_match=D.MIN_INTEREST_MATCH_MAIN):
-    """One greedy pass at fixed constraints -> list of Scored, or None if n items with >=3 types are not reachable."""
+    """One greedy pass at fixed constraints -> list of Scored, or None if n items are not reachable.
+
+    It tries to reach >= MIN_SOURCE_TYPES by swapping in relevant items of a missing type, but never admits an item
+    below min_match to do so: a shortfall is reported by select(), not filled."""
     eligible = [s for s in scored if s.signals["hands-on"] >= floor and s.signals["interest-match"] >= min_match]
     chosen = []
     top = top_interests(profile)
     pick = _exploration_pick(eligible, profile, floor, n, extra_cap)
     for s in scored:
-        s.exploration = False
+        s.exploration, s.exploration_kind = False, ""
     if pick:
-        pick.exploration = True
+        pick.exploration, pick.exploration_kind = True, "in-interest"
         chosen.append(pick)
     for s in _order(eligible):
         if len(chosen) >= n:
@@ -357,8 +361,7 @@ def _attempt(scored, profile, n, floor, extra_cap, min_match=D.MIN_INTEREST_MATC
                 break
         if not swapped:
             break
-    ok = len(chosen) >= n and len(_types(chosen)) >= D.MIN_SOURCE_TYPES
-    return _order(chosen) if ok else None
+    return _order(chosen) if len(chosen) >= n else None  # type diversity is best-effort; see select()
 
 
 M = D.MIN_INTEREST_MATCH_MAIN
@@ -368,7 +371,6 @@ RELAXATIONS = [  # (hands-on floor, n, extra per-interest cap, min interest-matc
     (1, 4, 0, M, "relaxed: edition size lowered to 4"),
     (1, 3, 0, M, "relaxed: edition size lowered to 3"),
     (1, 3, 1, M, "relaxed: allowed a 2nd item for a capped interest"),
-    (1, 3, 1, 1, "relaxed: interest-match floor lowered to 1 (weak matches allowed in main slots)"),
 ]
 
 
@@ -436,11 +438,16 @@ def select(candidates, profile, weights, ledger, today=None):
             stats["rung"] = rung
             if note:
                 warnings.append(note)
+            types = sorted(_types(chosen))
+            stats["source_types"] = types
+            if len(types) < D.MIN_SOURCE_TYPES:
+                warnings.append(f"source-type shortfall: {len(types)} of {D.MIN_SOURCE_TYPES} types ({', '.join(types)}); "
+                                f"not filled with items below interest-match {D.MIN_INTEREST_MATCH_MAIN}")
             if not any(s.exploration for s in chosen):
-                warnings.append("no exploration (Broadening pick) candidate met the bar; shipped without one")
+                warnings.append("no exploration pick (in-interest, outside the top interests) met the bar; shipped without one")
             return Selection(chosen, warnings, stats)
         if note:
             warnings.append(note + " - still unsatisfiable")
     stats["rung"] = None
-    warnings.append("ALARM: cannot assemble >= 3 items across >= 3 source types; shipping nothing")
+    warnings.append(f"ALARM: fewer than {D.MIN_N} items with interest-match >= {D.MIN_INTEREST_MATCH_MAIN}; shipping nothing")
     return Selection([], warnings, stats)

@@ -1,0 +1,110 @@
+{
+  "user": "alex",
+  "date": "2026-11-19",
+  "edition": 2,
+  "weights": {
+    "interest-match": 0.2723232323232323,
+    "novelty": 0.23292929292929293,
+    "hands-on": 0.23292929292929293,
+    "thought-leadership": 0.11575757575757577,
+    "source-quality": 0.14606060606060609
+  },
+  "warnings": [
+    "relaxed: hands-on floor lowered to 1 - still unsatisfiable",
+    "relaxed: edition size lowered to 4 - still unsatisfiable",
+    "relaxed: edition size lowered to 3 - still unsatisfiable",
+    "relaxed: allowed a 2nd item for a capped interest",
+    "no exploration pick (in-interest, outside the top interests) met the bar; shipped without one"
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "boringmarketer/boring-marketing-skills",
+      "url": "https://github.com/boringmarketer/boring-marketing-skills",
+      "canonical_url": "https://github.com/boringmarketer/boring-marketing-skills",
+      "cluster_key": "gh:boringmarketer/boring-marketing-skills",
+      "source_type": "GitHub",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 4
+      },
+      "total": 4.3909,
+      "interest": "agent frameworks / orchestration / tool use",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "agent",
+          "origin": "summary"
+        },
+        {
+          "keyword": "agents",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false,
+      "exploration_kind": ""
+    },
+    {
+      "n": 2,
+      "title": "Show HN: Get your coding agent off ~2019 JavaScript, onto modern web primitives",
+      "url": "https://github.com/GoogleChrome/modern-web-guidance",
+      "canonical_url": "https://github.com/googlechrome/modern-web-guidance",
+      "cluster_key": "gh:googlechrome/modern-web-guidance",
+      "source_type": "HN",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 4
+      },
+      "total": 4.3909,
+      "interest": "agent frameworks / orchestration / tool use",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "agent",
+          "origin": "title"
+        }
+      ],
+      "exploration": false,
+      "exploration_kind": ""
+    },
+    {
+      "n": 3,
+      "title": "datasette-llm 0.1a11",
+      "url": "https://simonwillison.net/2026/Nov/14/datasette-llm/",
+      "canonical_url": "https://simonwillison.net/2026/Nov/14/datasette-llm",
+      "cluster_key": "https://simonwillison.net/2026/Nov/14/datasette-llm",
+      "source_type": "blog",
+      "item_type": "article",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 3,
+        "hands-on": 4,
+        "thought-leadership": 5,
+        "source-quality": 5
+      },
+      "total": 4.3012,
+      "interest": "running models locally / small models / quantization",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "llama.cpp",
+          "origin": "summary"
+        },
+        {
+          "keyword": "ollama",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false,
+      "exploration_kind": ""
+    }
+  ]
+}

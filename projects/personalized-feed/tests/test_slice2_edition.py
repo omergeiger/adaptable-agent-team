@@ -39,7 +39,7 @@ def test_markdown_matches_feed_item_format(tmp_path):
                   "**Relevance signals:** interest-match"):
         assert md.count(label) == n
     assert md.rstrip().endswith('to tune future feeds._')
-    assert "Broadening pick:" in md
+    assert "Exploration pick:" in md
 
 
 def test_renderer_refuses_bad_editions(tmp_path):
@@ -146,7 +146,7 @@ def test_weights_file_is_picked_up_by_load_weights(tmp_path):
     assert rank.load_weights(root, "alex") != DEFAULT_WEIGHTS
 
 
-def test_exploration_why_line_starts_with_broadening_pick(tmp_path):
+def test_exploration_why_line_starts_with_exploration_pick(tmp_path):
     from pfeed.render import why_line
     pick = next(s for s in selection(tmp_path).items if s.exploration)
-    assert why_line(pick).startswith("Broadening pick:")
+    assert why_line(pick).startswith("Exploration pick:")

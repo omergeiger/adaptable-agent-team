@@ -1,34 +1,34 @@
 ## Last Updated
-2026-11-19T02:58:43Z
+2026-11-19T03:13:43Z
 
 ## Current Phase
 Operate
 
 ## What We Did This Cycle
-- developer: shipped Slice 5 (keyword match provenance, summary-only cap of 3 on HN/Lobsters, weak pdf/extraction keywords, confirmed-low tier base 2, stricter exploration, Lobsters link sanity check/quarantine). Suite 196 passed.
-- qa-engineer: gate APPROVE. D-4, D-5 closed; D-6 partly open (weak-only title match still scores 2 on Lobsters). Live temp-dir trial: D2/D3/D7 ok, links 200.
-- critic: Verify-gate filter-bubble pass on the candidate: GO. Concerns: item 5 (ALIVE video paper) "why" falsely cites observability; items 1/2 over-credited on agents; item 4 broadening label is inside an existing interest.
-- Shipped edition 1: projects/personalized-feed/feeds/2026-11-19-01.md (5 items, sources blog/GitHub/arXiv, ledger updated).
-- Applied simulated reader feedback (D9, logged as simulated): thumbs up on items 1-4 (hands-on agent/local-model/broadening); item 5 neutral; no eval item for "more like this".
+- developer: shipped Slice 6 (why-lines cite only strong matches, items scoring <=2 dropped with source-type shortfall logged, in-interest "Exploration pick" vs true "Broadening pick" labels, weak-only match scores 1, looser Lobsters quarantine, 8-way parallel link check). Suite 212 passed.
+- qa-engineer: gate APPROVE. Live trial 80s (was 107s), quarantine 8 (was 11), 33/33 sources ok, D2/D3/D7 ok, links 200. Thin margin: exactly 3 items from 3 types.
+- Ran pipeline once: shipped edition 2, projects/personalized-feed/feeds/2026-11-19-02.md (3 items: GitHub, HN, blog; ledger updated). Relaxation rung 4 was needed.
+- critic: edition SHIP-WITH-NOTES, Slice 6 GO with conditions. Item 1 (boring-marketing-skills) is a false positive on the generic word "agent" and near the vendor-marketing exclude; item 2 marginal; item 3 good. 67% of items on agent frameworks, no exploration item.
+- Applied simulated reader feedback (D9, logged as simulated): thumbs up #2 and #3 (hands-on agent repo, local-model write-up); thumbs down #1 (vendor-marketing-like); no eval item so no "more like this"; no broadening item shipped so none rated.
 - Acknowledged directives: D1, D2, D3, D5, D6, D7, D8, D9, D10
 
 ## Key Decisions
-- Phase advanced Build -> Verify -> Operate: pipeline produced a valid feed, suite green (196), critic GO.
-- Shipped edition 1 as-is under the D9 conservative default (no fabricated or broken items; defects are labeling/over-credit, not correctness).
-- Simulated feedback reacts only to what reader-source.md section 3 specifies; item 5 got no reaction rather than an invented thumbs-down.
-- Slice 6 (from critic must-fix): "why" lines may cite only interests with real content match; drop items with interest-match <= 2 and log the source-type shortfall instead of filling it; separate true broadening from in-interest exploration; weak-only title match scores 1. Does not block shipping.
-- Lobsters quarantine over-triggers (legit pages, local SSL CA failures); loosen thresholds in Slice 6 and parallelize the link check (~107s runtime).
+- Shipped edition 2 with 3 items rather than failing the minimum; the pool was thin and no item was fabricated.
+- Slice 6 selection-rule change: critic GO, conditioned on Slice 7 below.
+- Slice 7 (from critic): a lone generic keyword (agent, llm, ai) scores as a weak match (<=2) unless a second distinct keyword or phrase hit backs it; confirm the exploration slot can still carry low-weight interests (rust, AI safety) on a hands-on test; soften the "hands-on floor lowered to 1" warning text.
+- Simulated thumbs-down on #1 is a reasonable reading of reader-source.md (vendor marketing) given the critic's flag; recorded as simulated.
+- Known limit: edition 2 why-lines for items 1 and 2 still overstate the tie to the orchestration interest (matched only "agent"); fixed forward by Slice 7, edition left as shipped.
 
 ## Next Action
-Operate cycle: run the pipeline once for edition 2 (date 2026-11-19 or next, NN=02) after a small Slice 6 (developer + qa-engineer) covering the critic must-fix and QA weak-only fix; then critic filter-bubble pass, ship edition 2 to feeds/, apply simulated feedback.
+Operate cycle: run Slice 7 (developer + qa-engineer: generic-keyword rule, exploration-slot check), then run the pipeline once for edition 3 (NN=03), critic filter-bubble pass, ship to feeds/, apply simulated feedback, and append `## Loop Signal: done` per D10.
 
 ## Team State
-- Pipeline maturity: profile: confirmed; source-catalog: draft; architecture: draft; ingestion: working; ledger: working; ranking: working (open: D-6 weak-only, why-line over-credit); renderer: working; feedback-loop: working (simulated feedback applied for edition 1); slack-delivery: out of scope (D4); tests: green (196 passed).
-- Feed editions shipped: 1 of 3 (D10)
-- Test suite: green, 196 passed
+- Pipeline maturity: profile: confirmed; source-catalog: draft; architecture: draft; ingestion: working; ledger: working; ranking: working (open: generic-keyword false positives, thin candidate pool); renderer: working; feedback-loop: working (simulated feedback applied for editions 1 and 2); slack-delivery: out of scope (D4); tests: green (212 passed).
+- Feed editions shipped: 2 of 3 (D10)
+- Test suite: green, 212 passed
 - Active user: alex; onboarded users: [alex]
-- Open defects: D-6 residual, over-quarantine, serial Lobsters fetch time, ranking-design.md tier line pending (ranking-engineer).
-- Open risks (critic): echo chamber on agents, simulated feedback self-confirmation (all-thumbs-up on 4 of 5), short thought-leadership list, shrinking candidate pool on later days.
+- Open defects: generic-keyword over-credit, ranking-design.md tier line pending (ranking-engineer), confusing relaxation warning text.
+- Open risks (critic): echo chamber on agents (67% in edition 2), thin margin of exactly 3 items from 3 source types, simulated feedback self-confirmation, shrinking candidate pool on later days.
 
 ## Open Questions
 - Reddit/r/LocalLLaMA access (for the record; default applied, not blocking).

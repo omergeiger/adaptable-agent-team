@@ -105,8 +105,8 @@ FATIGUE_NOVELTY = 3
 TOP_INTEREST_CAP_FRACTION = 0.6       # at most round(0.6*n) items (3 of 5) from the top-3 interests combined
 
 # --- Slice 4 (ranking-engineer cycle 6 eval) ---
-MIN_INTEREST_MATCH_MAIN = 2           # main slots need interest-match >= this (lowest relaxation rung may drop to 1, warned)
-EXPLORATION_MIN_INTEREST_MATCH = 2    # exploration pick needs a strong match (Scored.strong) AND at least this
+MIN_INTEREST_MATCH_MAIN = 3           # slice 6: items scoring <= 2 are dropped, never used to fill a slot or a source type
+EXPLORATION_MIN_INTEREST_MATCH = 3    # exploration pick needs a strong match (Scored.strong) AND at least this
 EXPLORATION_EXCLUDED_SOURCE_TYPES = ("Substack",)  # newsletter headlines are not tryable
 TAIL_REPO_STARS = 50                  # at most MAX_TAIL_REPOS delivered repos below this per edition
 MAX_TAIL_REPOS = 1

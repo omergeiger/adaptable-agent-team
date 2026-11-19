@@ -1,10 +1,10 @@
 {
   "weights": {
-    "interest-match": 0.2723232323232323,
-    "novelty": 0.23292929292929293,
-    "hands-on": 0.23292929292929293,
-    "thought-leadership": 0.11575757575757577,
-    "source-quality": 0.14606060606060609
+    "interest-match": 0.26937780583613913,
+    "novelty": 0.1830983445566779,
+    "hands-on": 0.23518167789001124,
+    "thought-leadership": 0.15256734006734005,
+    "source-quality": 0.1597748316498317
   },
   "log": [
     {
@@ -93,6 +93,72 @@
         "hands-on": 0.23292929292929293,
         "thought-leadership": 0.11575757575757577,
         "source-quality": 0.14606060606060609
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 2,
+      "event": "\ud83d\udc4d #2",
+      "item": 2,
+      "url": "https://github.com/GoogleChrome/modern-web-guidance",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.2723232323232323,
+        "novelty": 0.23292929292929293,
+        "hands-on": 0.23292929292929293,
+        "thought-leadership": 0.11575757575757577,
+        "source-quality": 0.14606060606060609
+      },
+      "after": {
+        "interest-match": 0.26860269360269357,
+        "novelty": 0.23577441077441078,
+        "hands-on": 0.23577441077441078,
+        "thought-leadership": 0.09646464646464648,
+        "source-quality": 0.16338383838383844
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 2,
+      "event": "\ud83d\udc4d #3",
+      "item": 3,
+      "url": "https://simonwillison.net/2026/Nov/14/datasette-llm/",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.26860269360269357,
+        "novelty": 0.23577441077441078,
+        "hands-on": 0.23577441077441078,
+        "thought-leadership": 0.09646464646464648,
+        "source-quality": 0.16338383838383844
+      },
+      "after": {
+        "interest-match": 0.2655022446689113,
+        "novelty": 0.19647867564534233,
+        "hands-on": 0.238145342312009,
+        "thought-leadership": 0.12205387205387205,
+        "source-quality": 0.17781986531986538
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 2,
+      "event": "\ud83d\udc4e #1",
+      "item": 1,
+      "url": "https://github.com/boringmarketer/boring-marketing-skills",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.2655022446689113,
+        "novelty": 0.19647867564534233,
+        "hands-on": 0.238145342312009,
+        "thought-leadership": 0.12205387205387205,
+        "source-quality": 0.17781986531986538
+      },
+      "after": {
+        "interest-match": 0.26937780583613913,
+        "novelty": 0.1830983445566779,
+        "hands-on": 0.23518167789001124,
+        "thought-leadership": 0.15256734006734005,
+        "source-quality": 0.1597748316498317
       }
     }
   ]

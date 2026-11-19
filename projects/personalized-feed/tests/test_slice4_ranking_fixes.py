@@ -133,9 +133,9 @@ def test_weak_keyword_in_title_alone_is_not_strong_but_second_hit_is():
     one = article("Retrieval notes", "https://blog.test/a")  # weak only
     two = article("Retrieval with rerank", "https://blog.test/b")  # two distinct hits
     strong = article("Structured extraction notes", "https://blog.test/c")  # one strong keyword in title
-    base = rank.match_interest(one, PROFILE)[2]
-    assert rank.match_interest(two, PROFILE)[2] == base + 1
-    assert rank.match_interest(strong, PROFILE)[2] == base + 1
+    assert rank.match_interest(one, PROFILE)[2] == 1  # slice 6: weak-only scores 1
+    assert rank.match_interest(two, PROFILE)[2] == 3
+    assert rank.match_interest(strong, PROFILE)[2] == 3
 
 
 def test_stems_still_prefix_match():
@@ -148,18 +148,16 @@ def test_match_one_item_never_fills_main_slot(tmp_path):
     filler = article("Why production matters", "https://blog.test/p", "production", source="Latent Space")
     sel = run(good_pool() + [filler], tmp_path)
     assert filler.url not in urls(sel)
-    assert all(s.signals["interest-match"] >= 2 for s in sel.items)
+    assert all(s.signals["interest-match"] >= 3 for s in sel.items)
 
 
-def test_floor_relaxes_to_1_only_with_a_warning(tmp_path):
+def test_weak_matches_are_never_admitted_even_on_the_last_rung(tmp_path):
     pool = [cand("o1/agentflow", "https://github.com/o1/agentflow", summary="agent framework with tool use", stars=900),
             article("Why production matters", "https://blog.test/p", "production", source="Latent Space"),
             cand("Prod hardening on HN", "https://news.ycombinator.com/item?id=9", "HN", "discussion",
                  "production notes", comments=120, points=200)]
     sel = run(pool, tmp_path)
-    assert sel.items, "last rung must still be able to ship 3 items"
-    assert any("interest-match floor lowered to 1" in w for w in sel.warnings)
-    assert sel.stats["rung"] == len(rank.RELAXATIONS) - 1
+    assert sel.items == [] and any("ALARM" in w for w in sel.warnings)  # slice 6: ship nothing rather than weak items
 
 
 # ---- 3. exploration quality ----

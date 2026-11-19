@@ -3,6 +3,7 @@
 Everything environmental (opener, sleep, clock) is injectable so tests never touch the network.
 """
 import socket
+import ssl
 import time
 import urllib.error
 import urllib.request
@@ -16,7 +17,15 @@ HOST_MIN_INTERVAL = {"export.arxiv.org": 3.0, "api.github.com": 6.0}
 
 
 class FetchError(Exception):
-    """A source could not be fetched or parsed. Callers record it and move on; nothing is fabricated."""
+    """A source could not be fetched or parsed. Callers record it and move on; nothing is fabricated.
+
+    kind: "" (generic), "ssl" (local certificate verification failed) or "blocked" (401/403/429 to our client);
+    the last two say nothing about the target page itself.
+    """
+
+    def __init__(self, message, kind=""):
+        super().__init__(message)
+        self.kind = kind
 
 
 class Http:
@@ -39,7 +48,7 @@ class Http:
                 request.add_header("If-None-Match", cached[0])
             if cached[1]:
                 request.add_header("If-Modified-Since", cached[1])
-        last_reason = "unknown error"
+        last_reason, kind = "unknown error", ""
         for attempt in (1, 2):
             self._be_polite(url)
             try:
@@ -51,15 +60,20 @@ class Http:
                 if e.code == 304 and cached:
                     return cached[2]
                 last_reason = f"HTTP {e.code}"
+                kind = "blocked" if e.code in (401, 403, 429) else ""
                 if not (e.code == 429 or e.code >= 500):
                     break  # 4xx other than 429: retrying will not help
             except (TimeoutError, socket.timeout):
                 last_reason = "timeout"
             except (urllib.error.URLError, OSError) as e:
-                last_reason = f"network error: {getattr(e, 'reason', e)}"
+                reason = getattr(e, "reason", e)
+                last_reason = f"network error: {reason}"
+                if isinstance(reason, ssl.SSLCertVerificationError):
+                    kind = "ssl"
+                    break  # a local trust-store problem: retrying will not help
             if attempt == 1:
                 self._sleep(self.backoff)
-        raise FetchError(f"{url}: {last_reason}")
+        raise FetchError(f"{url}: {last_reason}", kind)
 
     def _be_polite(self, url):
         host = urlsplit(url).hostname or ""
