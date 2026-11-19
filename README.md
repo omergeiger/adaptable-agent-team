@@ -1,17 +1,18 @@
-# AgentTeam
+# Adaptable Agent Team
 
-A generic, reusable multi-agent loop framework for Claude Code. Point it at a project, adapt it to your domain, and run a structured multi-agent loop that makes incremental progress on it - one headless Claude Code cycle at a time, coordinated through a shared consensus file.
+An open-source framework for multi-agent orchestration with Claude Code. Give it a goal and it puts together a team of agents with distinct roles who work on it together, one cycle at a time - each cycle a headless Claude Code session, with the agents handing off through a shared consensus file. It suits any task that benefits from several perspectives working in turn.
 
 What sets it apart:
 
 - **Any domain, not one fixed team.** The `/adapt` wizard turns the bare template into a team for your goal - a CV studio, a news-feed pipeline, a novel-writing room - generating the role sub-agents, the cycle prompt and the domain skills. Each domain lives on its own branch, so `main` stays a clean template.
+- **Full tracking.** Every cycle logs the prompt sent to the orchestrator, the CLI's output and the cycle's metadata, and each persona's turn is written up in its own document. With `verbosity` on, the full transcript is kept as well, including every hand-off to a sub-agent. `/retrospect` reads a finished run and writes prioritized improvement notes for the team and the framework.
+- **Control knobs.** Gated or continuous runs, `--cycles` caps, and per-run cadence, timeouts, model and git sync in `config.yaml`.
+- **Clear human/agent split.** Humans steer through `human_directives.md` with standing directives, one-off overrides and answers to the agents' open questions; agents own `consensus.md`. The loop validates the consensus after every cycle and rolls back to the last good state on failure, with a circuit breaker after repeated errors.
 - **Conventions that don't drift.** Domain rules (templates, rubrics, test gates) are packaged as skills loaded only into the headless loop sessions, so every cycle applies them the same way.
-- **Clear human/agent split.** Humans steer through `human_directives.md`; agents own `consensus.md`. The loop validates the consensus after every cycle and rolls back to the last good state on failure, with a circuit breaker after repeated errors.
-- **Built-in review.** `/retrospect` reads a finished run and writes prioritized improvement notes for both the team and the framework.
 
 ## Acknowledgments
 
-AgentTeam builds on [Autonomous Company](https://github.com/MaxMiksa/Autonomous-Company) (formerly Auto-Company; MIT License, Copyright (c) 2026 jinmingyang and Copyright (c) 2025-2026 Zheyuan (Max) Kong and contributors), which itself grew from the [nicepkg/auto-company](https://github.com/nicepkg/auto-company) macOS edition. Its core ideas come from that project, reimplemented from scratch as a domain-agnostic Python template.
+Adaptable Agent Team builds on [Autonomous Company](https://github.com/MaxMiksa/Autonomous-Company) (formerly Auto-Company; MIT License, Copyright (c) 2026 jinmingyang and Copyright (c) 2025-2026 Zheyuan (Max) Kong and contributors), which itself grew from the [nicepkg/auto-company](https://github.com/nicepkg/auto-company) macOS edition. It reimplements that project's core ideas from scratch as a domain-agnostic Python template, and adds the features under "What sets it apart": adaptability to any domain, full tracking, control knobs and a clear human/agent split.
 
 ## Examples
 
