@@ -46,6 +46,17 @@ class PluginCheckTest(unittest.TestCase):
         self._skill("rubric", "---\nname: rubric\ndescription: x\n\n# rubric\n")
         self.assertIn("missing YAML frontmatter", check_plugin(self.root)[0])
 
+    def test_invalid_yaml_reports_parse_error(self):
+        self._skill("rubric", "---\nname: rubric\ndescription: Scoring: how items rank\n---\n")
+        problems = check_plugin(self.root)
+        self.assertEqual(len(problems), 1)
+        self.assertIn("invalid YAML (line 3)", problems[0])
+        self.assertNotIn("missing", problems[0])
+
+    def test_non_mapping_frontmatter_fails(self):
+        self._skill("rubric", "---\n- just\n- a list\n---\n")
+        self.assertIn("not a key/value mapping", check_plugin(self.root)[0])
+
     def test_missing_description_fails(self):
         self._skill("rubric", "---\nname: rubric\n---\n")
         self.assertIn("'description'", check_plugin(self.root)[0])
