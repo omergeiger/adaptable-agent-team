@@ -46,7 +46,7 @@ Example data includes titles and excerpts of publicly available posts, kept for 
 ## Repo Structure
 
 ```
-AgentTeam/
+adaptable-agent-team/
 ├── README.md
 ├── CLAUDE.md                  # Directives for Claude Code sessions
 ├── LICENSE                    # MIT
