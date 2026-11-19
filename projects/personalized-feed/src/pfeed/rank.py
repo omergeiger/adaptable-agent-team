@@ -25,6 +25,8 @@ class Scored:
     interest: str = ""     # matched profile interest ("" = none)
     tier: str = ""         # high | mid | low | ""
     exploration: bool = False
+    strong: bool = False   # strong interest match (see match_interest)
+    matches: list = field(default_factory=list)  # [{"keyword", "origin": title|summary}] for audit
 
 
 @dataclass
@@ -118,10 +120,12 @@ def _interest_hits(it_name, key, c, text):
     return [k for k in D.INTEREST_KEYWORDS.get(key, []) if _kw_hit(k, text)]
 
 
-def match_interest(c, profile):
-    """Best single matching interest -> (name, tier, signal 0-5). Never sums rows; weight 0 is ineligible.
+def _match(c, profile):
+    """Best single interest -> (name, tier, signal 0-5, strong, matches). Never sums rows; weight 0 is ineligible.
 
-    Strong = >= STRONG_HITS distinct hits, or a non-weak keyword in the title. A lone weak keyword is one tier lower.
+    Strong = a non-weak keyword in the title, or >= STRONG_HITS distinct hits with at least one non-weak. A weak-only
+    or lone weak match is one tier lower. Confirmed low-weight interests have base 2 (rare, not never); inferred 1.
+    HN/Lobsters items whose hits all come from the summary/body are capped at SUMMARY_ONLY_CAP (promotional text).
     """
     text, title = _text(c), c.title.lower()
     best = None
@@ -133,12 +137,25 @@ def match_interest(c, profile):
         hits = _interest_hits(it.name, key, c, text)
         if not hits:
             continue
-        tier, base = ("high", 5) if w >= 4 else ("mid", 3) if w == 3 else ("low", 1)
-        strong = len(hits) >= D.STRONG_HITS or any(k not in D.WEAK_KEYWORDS and _kw_hit(k, title) for k in hits)
+        low_base = 2 if it.status == "confirmed" else 1
+        tier, base = ("high", 5) if w >= 4 else ("mid", 3) if w == 3 else ("low", low_base)
+        strong_hits = [k for k in hits if k not in D.WEAK_KEYWORDS]
+        strong = any(_kw_hit(k, title) for k in strong_hits) or (len(hits) >= D.STRONG_HITS and bool(strong_hits))
+        signal = base if strong else max(base - 1, 1)
+        matches = [{"keyword": k, "origin": "title" if _kw_hit(k, title) else "summary"} for k in hits]
+        if c.source_type in D.SUMMARY_CAP_SOURCE_TYPES and all(m["origin"] == "summary" for m in matches):
+            if not strong_hits:
+                continue  # weak words in a promotional body prove nothing: no match, no credit
+            signal = min(signal, D.SUMMARY_ONLY_CAP)
         rank_key = (base, len(hits), w)
         if best is None or rank_key > best[0]:
-            best = (rank_key, it.name, tier, base if strong else max(base - 1, 1))
-    return (best[1], best[2], best[3]) if best else ("", "", 0)
+            best = (rank_key, it.name, tier, signal, strong, matches)
+    return best[1:] if best else ("", "", 0, False, [])
+
+
+def match_interest(c, profile):
+    """(interest name, tier, signal 0-5); see _match for the rules."""
+    return _match(c, profile)[:3]
 
 
 def hands_on(c):
@@ -238,7 +255,7 @@ def fatigued_interests(ledger, profile):
 
 
 def score(c, profile, weights, recent, today=None, fatigued=frozenset()):
-    interest, tier, match = match_interest(c, profile)
+    interest, tier, match, strong, matches = _match(c, profile)
     dom = domain_key(c)
     novelty = 3 if dom and dom in recent else 5
     if interest in fatigued:
@@ -247,7 +264,7 @@ def score(c, profile, weights, recent, today=None, fatigued=frozenset()):
                "hands-on": hands_on(c), "thought-leadership": thought_leadership(c),
                "source-quality": source_quality(c, today)}
     total = round(sum(weights[k] * signals[k] for k in signals), 4)
-    return Scored(c, signals, total, interest, tier)
+    return Scored(c, signals, total, interest, tier, strong=strong, matches=matches)
 
 
 # ---------- selection ----------
@@ -290,7 +307,7 @@ def _types(chosen):
 def _exploration_eligible(s):
     """Tryable things only: repo/tool, paper with linked code, or a tryable article not from a newsletter headline."""
     c = s.candidate
-    if s.signals["interest-match"] < D.EXPLORATION_MIN_INTEREST_MATCH:
+    if not s.strong or s.signals["interest-match"] < D.EXPLORATION_MIN_INTEREST_MATCH:
         return False
     if c.item_type in ("repo", "tool"):
         return True

@@ -32,7 +32,7 @@ INTEREST_KEYWORDS = {
 STRONG_HITS = 2  # >= this many distinct keyword hits, or a STRONG keyword in the title, is a strong match
 # Weak keywords are generic: a single weak hit scores one tier lower and is never strong via the title alone.
 WEAK_KEYWORDS = {"production", "document", "form", "schema", "trace", "retrieval", "benchmark", "monitoring",
-                 "incident", "ticket"}
+                 "incident", "ticket", "pdf", "extraction"}
 # Keywords matched as a prefix (stems). Everything else is a whole word with an optional plural "s".
 STEM_KEYWORDS = {"quantiz", "orchestrat"}
 # An interest whose words are ambiguous alone needs one of these terms in the text (repos/tools are exempt).
@@ -106,10 +106,14 @@ TOP_INTEREST_CAP_FRACTION = 0.6       # at most round(0.6*n) items (3 of 5) from
 
 # --- Slice 4 (ranking-engineer cycle 6 eval) ---
 MIN_INTEREST_MATCH_MAIN = 2           # main slots need interest-match >= this (lowest relaxation rung may drop to 1, warned)
-EXPLORATION_MIN_INTEREST_MATCH = 3    # exploration pick needs a real match, not one generic word
+EXPLORATION_MIN_INTEREST_MATCH = 2    # exploration pick needs a strong match (Scored.strong) AND at least this
 EXPLORATION_EXCLUDED_SOURCE_TYPES = ("Substack",)  # newsletter headlines are not tryable
 TAIL_REPO_STARS = 50                  # at most MAX_TAIL_REPOS delivered repos below this per edition
 MAX_TAIL_REPOS = 1
 # Same repo name under different owners = one cluster (clone defect), only for distinctive names.
 CLONE_MIN_NAME_LEN = 8
 CLONE_GENERIC_NAMES = {"agent", "agents", "examples", "demo", "starter", "playground", "tutorial"}
+
+# --- Slice 5 (ranking-engineer cycle 7 eval, MF1) ---
+SUMMARY_CAP_SOURCE_TYPES = ("HN", "Lobsters")  # long promotional bodies: summary-only hits are capped
+SUMMARY_ONLY_CAP = 3

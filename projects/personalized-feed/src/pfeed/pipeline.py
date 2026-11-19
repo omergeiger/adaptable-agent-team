@@ -38,6 +38,7 @@ def format_report(r):
     lines = [f"sources ok: {ok}/{len(r['sources'])}; fetched {r['fetched']}; stale dropped {r['stale_dropped']}; "
              f"stats {r['selection'].stats}"]
     lines += [f"  FAIL {s.id}: {s.error}" for s in r["sources"] if not s.ok]
+    lines += [f"  QUARANTINED {s.id}: {q}" for s in r["sources"] for q in s.quarantined]
     lines += [f"WARNING: {w}" for w in r["selection"].warnings]
     rung = r["selection"].stats.get("rung")
     lines.append(f"relaxation rung used: {rung if rung is not None else 'none (nothing shipped)'}")

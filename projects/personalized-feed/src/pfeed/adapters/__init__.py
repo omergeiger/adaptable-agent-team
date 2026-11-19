@@ -36,6 +36,7 @@ class Source:
     id: str
     url: str
     fetch: Callable  # fetch(http) -> list[Candidate]
+    quarantine: list = field(default_factory=list)  # items dropped by a source-level sanity check
 
 
 @dataclass
@@ -45,6 +46,7 @@ class SourceReport:
     ok: bool
     count: int = 0
     error: str = ""
+    quarantined: list = field(default_factory=list)
 
 
 @dataclass
@@ -68,7 +70,8 @@ def build_sources(today=None):
         out.append(Source(f"S3:{q}", url, partial(hn.fetch, url=url, name=f"HN: {q}")))
     for sid, url in [("S5:all", "https://lobste.rs/rss"), ("S5:ai", "https://lobste.rs/t/ai.rss"),
                      ("S5:ml", "https://lobste.rs/t/ml.rss")]:
-        out.append(Source(sid, url, partial(lobsters.fetch, url=url)))
+        held = []
+        out.append(Source(sid, url, partial(lobsters.fetch_checked, url=url, quarantine=held), held))
     out.append(Source("S7", arxiv.URL, partial(arxiv.fetch, url=arxiv.URL)))
     out.append(Source("S7c", hfpapers.URL, partial(hfpapers.fetch, url=hfpapers.URL)))
     for sid, name, url, stype in FEEDS:
@@ -83,7 +86,7 @@ def run_sources(http, sources):
         try:
             items = src.fetch(http)
             result.candidates.extend(items)
-            result.reports.append(SourceReport(src.id, src.url, True, len(items)))
+            result.reports.append(SourceReport(src.id, src.url, True, len(items), quarantined=list(src.quarantine)))
         except FetchError as e:
             result.reports.append(SourceReport(src.id, src.url, False, 0, str(e)))
     return result

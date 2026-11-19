@@ -1,34 +1,34 @@
 ## Last Updated
-2026-11-19T02:47:33Z
+2026-11-19T02:58:43Z
 
 ## Current Phase
-Build
+Operate
 
 ## What We Did This Cycle
-- developer: shipped Slice 4: same-name clone clustering with D7 handling, strong/weak keyword split (main slots need interest-match >= 2), stricter exploration pick (interest-match >= 3, repo/tool/paper/tryable only), MIN_REPO_STARS 25 with at most one <50-star repo per edition, NOTABLE_REPO_STARS back to 5000, widened ai-art exclude. Suite 180 passed. Weights unchanged.
-- qa-engineer: gate APPROVE (suite 182 passed after QA tests). QA D-1, D-2, D-3 closed. Live 3-day trial: D2/D3/D7 ok, 11 links all HTTP 200, real feeds/ and ledger untouched. Open: D-5 (low-weight interests cannot reach main slots), D-4 (Lobsters PDF item links to an unrelated page), D-6 (topic matching over-credits, e.g. Recalc credited to evals).
-- ranking-engineer: eval note "approve with conditions". Must-fix before edition 1: interest-match false positives (keyword match logging with title/summary origin, cap interest-match at 3 for summary-only HN/Lobsters hits, treat "pdf"/"extraction" as weak without a second distinct keyword). Should-fix: confirmed low-weight interests (AI safety, rust tooling) get a tier base of 2 (inferred stay 1) and exploration needs interest-match >= 2 with a strong match.
-- critic not consulted this cycle (3-sub-agent cap); the filter-bubble pass is due on the edition 1 candidate.
-- No feed edition shipped this cycle (the Recalc false positive is a must-fix).
-- Acknowledged directives: D1, D2, D3, D5, D6, D7, D8, D9
+- developer: shipped Slice 5 (keyword match provenance, summary-only cap of 3 on HN/Lobsters, weak pdf/extraction keywords, confirmed-low tier base 2, stricter exploration, Lobsters link sanity check/quarantine). Suite 196 passed.
+- qa-engineer: gate APPROVE. D-4, D-5 closed; D-6 partly open (weak-only title match still scores 2 on Lobsters). Live temp-dir trial: D2/D3/D7 ok, links 200.
+- critic: Verify-gate filter-bubble pass on the candidate: GO. Concerns: item 5 (ALIVE video paper) "why" falsely cites observability; items 1/2 over-credited on agents; item 4 broadening label is inside an existing interest.
+- Shipped edition 1: projects/personalized-feed/feeds/2026-11-19-01.md (5 items, sources blog/GitHub/arXiv, ledger updated).
+- Applied simulated reader feedback (D9, logged as simulated): thumbs up on items 1-4 (hands-on agent/local-model/broadening); item 5 neutral; no eval item for "more like this".
+- Acknowledged directives: D1, D2, D3, D5, D6, D7, D8, D9, D10
 
 ## Key Decisions
-- Slice 4 accepted as green and gated.
-- Slice 5 scope: ranking-engineer must-fix (keyword logging, summary-only cap, weak pdf/extraction) plus the should-fix confirmed-low tier base, plus a link sanity check for Lobsters items (QA D-4: drop or quarantine when the page does not look technical or the title does not match).
-- Conservative default (D9): ship edition 1 right after Slice 5 passes QA, without waiting for further polish; small 3-item editions are acceptable under D3.
-- ranking-engineer syncs docs/ranking-design.md with the tier change (their doc).
-- Real feeds/ and ledger stay untouched until the first Operate edition; trials use temp dirs.
+- Phase advanced Build -> Verify -> Operate: pipeline produced a valid feed, suite green (196), critic GO.
+- Shipped edition 1 as-is under the D9 conservative default (no fabricated or broken items; defects are labeling/over-credit, not correctness).
+- Simulated feedback reacts only to what reader-source.md section 3 specifies; item 5 got no reaction rather than an invented thumbs-down.
+- Slice 6 (from critic must-fix): "why" lines may cite only interests with real content match; drop items with interest-match <= 2 and log the source-type shortfall instead of filling it; separate true broadening from in-interest exploration; weak-only title match scores 1. Does not block shipping.
+- Lobsters quarantine over-triggers (legit pages, local SSL CA failures); loosen thresholds in Slice 6 and parallelize the link check (~107s runtime).
 
 ## Next Action
-Slice 5 (developer, then qa-engineer, then critic filter-bubble pass on the candidate edition): implement the ranking-engineer must-fix and should-fix items plus the Lobsters link sanity check with regression tests (Recalc, Lobsters PDF item, confirmed-low interest), then advance to Verify, ship edition 1 into projects/personalized-feed/feeds/ and apply simulated reader feedback (D9) from reader-source.md section 3.
+Operate cycle: run the pipeline once for edition 2 (date 2026-11-19 or next, NN=02) after a small Slice 6 (developer + qa-engineer) covering the critic must-fix and QA weak-only fix; then critic filter-bubble pass, ship edition 2 to feeds/, apply simulated feedback.
 
 ## Team State
-- Pipeline maturity: profile: confirmed; source-catalog: draft; architecture: draft; ingestion: working; ledger: working; ranking: working (Slice 4, open D-5/D-6); renderer: working; feedback-loop: working (simulated feedback not yet applied); slack-delivery: out of scope (D4); tests: green (182 passed).
-- Feed editions shipped: 0 of 3 (D10)
-- Test suite: green, 182 passed
+- Pipeline maturity: profile: confirmed; source-catalog: draft; architecture: draft; ingestion: working; ledger: working; ranking: working (open: D-6 weak-only, why-line over-credit); renderer: working; feedback-loop: working (simulated feedback applied for edition 1); slack-delivery: out of scope (D4); tests: green (196 passed).
+- Feed editions shipped: 1 of 3 (D10)
+- Test suite: green, 196 passed
 - Active user: alex; onboarded users: [alex]
-- Open defects: QA D-4 (Lobsters link mismatch), D-5 (confirmed low-weight interests unreachable), D-6 (topic over-crediting); ranking-engineer must-fix on false positives blocks edition 1.
-- Open risks (critic): echo chamber on agents, simulated feedback self-confirmation, thought-leadership list is only six names. Also: GitHub search 403s without a token reduce the candidate pool; editions on later days shrink to 3 items.
+- Open defects: D-6 residual, over-quarantine, serial Lobsters fetch time, ranking-design.md tier line pending (ranking-engineer).
+- Open risks (critic): echo chamber on agents, simulated feedback self-confirmation (all-thumbs-up on 4 of 5), short thought-leadership list, shrinking candidate pool on later days.
 
 ## Open Questions
 - Reddit/r/LocalLLaMA access (for the record; default applied, not blocking).

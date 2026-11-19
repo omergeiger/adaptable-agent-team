@@ -1,0 +1,99 @@
+{
+  "weights": {
+    "interest-match": 0.2723232323232323,
+    "novelty": 0.23292929292929293,
+    "hands-on": 0.23292929292929293,
+    "thought-leadership": 0.11575757575757577,
+    "source-quality": 0.14606060606060609
+  },
+  "log": [
+    {
+      "date": "2026-11-19",
+      "edition": 1,
+      "event": "\ud83d\udc4d 2",
+      "item": 2,
+      "url": "https://github.com/erkamyaman/rust-anything",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.35,
+        "novelty": 0.2,
+        "hands-on": 0.2,
+        "thought-leadership": 0.15,
+        "source-quality": 0.1
+      },
+      "after": {
+        "interest-match": 0.3333333333333333,
+        "novelty": 0.20833333333333334,
+        "hands-on": 0.20833333333333334,
+        "thought-leadership": 0.125,
+        "source-quality": 0.12500000000000003
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 1,
+      "event": "\ud83d\udc4d 3",
+      "item": 3,
+      "url": "https://github.com/manuelgscom/inside-llm",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.3333333333333333,
+        "novelty": 0.20833333333333334,
+        "hands-on": 0.20833333333333334,
+        "thought-leadership": 0.125,
+        "source-quality": 0.12500000000000003
+      },
+      "after": {
+        "interest-match": 0.31944444444444436,
+        "novelty": 0.21527777777777776,
+        "hands-on": 0.21527777777777776,
+        "thought-leadership": 0.10416666666666666,
+        "source-quality": 0.14583333333333334
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 1,
+      "event": "\ud83d\udc4d 4",
+      "item": 4,
+      "url": "https://github.com/STARKTANG108/antigravity-token-monitor",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.31944444444444436,
+        "novelty": 0.21527777777777776,
+        "hands-on": 0.21527777777777776,
+        "thought-leadership": 0.10416666666666666,
+        "source-quality": 0.14583333333333334
+      },
+      "after": {
+        "interest-match": 0.2904040404040404,
+        "novelty": 0.2411616161616162,
+        "hands-on": 0.2411616161616162,
+        "thought-leadership": 0.0946969696969697,
+        "source-quality": 0.1325757575757576
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 1,
+      "event": "\ud83d\udc4d 1",
+      "item": 1,
+      "url": "https://simonwillison.net/2026/Nov/11/aws-emulator/",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.2904040404040404,
+        "novelty": 0.2411616161616162,
+        "hands-on": 0.2411616161616162,
+        "thought-leadership": 0.0946969696969697,
+        "source-quality": 0.1325757575757576
+      },
+      "after": {
+        "interest-match": 0.2723232323232323,
+        "novelty": 0.23292929292929293,
+        "hands-on": 0.23292929292929293,
+        "thought-leadership": 0.11575757575757577,
+        "source-quality": 0.14606060606060609
+      }
+    }
+  ]
+}

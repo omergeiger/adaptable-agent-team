@@ -77,7 +77,7 @@ def sidecar(selection, user_id, date, edition, weights):
             "items": [{"n": n, "title": s.candidate.title, "url": s.candidate.url,
                        "canonical_url": s.candidate.canonical_url, "cluster_key": cluster_key(s.candidate),
                        "source_type": s.candidate.source_type, "item_type": s.candidate.item_type,
-                       "signals": s.signals, "total": s.total, "interest": s.interest, "tier": s.tier,
+                       "signals": s.signals, "total": s.total, "interest": s.interest, "tier": s.tier, "matches": s.matches,
                        "exploration": s.exploration} for n, s in enumerate(selection.items, 1)]}
 
 

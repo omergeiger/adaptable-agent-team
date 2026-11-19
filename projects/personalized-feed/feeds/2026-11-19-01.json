@@ -1,0 +1,165 @@
+{
+  "user": "alex",
+  "date": "2026-11-19",
+  "edition": 1,
+  "weights": {
+    "interest-match": 0.35,
+    "novelty": 0.2,
+    "hands-on": 0.2,
+    "thought-leadership": 0.15,
+    "source-quality": 0.1
+  },
+  "warnings": [],
+  "items": [
+    {
+      "n": 1,
+      "title": "aws-emulator",
+      "url": "https://simonwillison.net/2026/Nov/11/aws-emulator/",
+      "canonical_url": "https://simonwillison.net/2026/Nov/11/aws-emulator",
+      "cluster_key": "https://simonwillison.net/2026/Nov/11/aws-emulator",
+      "source_type": "blog",
+      "item_type": "article",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 4,
+        "thought-leadership": 5,
+        "source-quality": 5
+      },
+      "total": 4.8,
+      "interest": "agent frameworks / orchestration / tool use",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "agent",
+          "origin": "summary"
+        },
+        {
+          "keyword": "agents",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false
+    },
+    {
+      "n": 2,
+      "title": "erkamyaman/rust-anything",
+      "url": "https://github.com/erkamyaman/rust-anything",
+      "canonical_url": "https://github.com/erkamyaman/rust-anything",
+      "cluster_key": "gh:erkamyaman/rust-anything",
+      "source_type": "GitHub",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 5
+      },
+      "total": 4.4,
+      "interest": "agent frameworks / orchestration / tool use",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "agent",
+          "origin": "summary"
+        },
+        {
+          "keyword": "mcp",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false
+    },
+    {
+      "n": 3,
+      "title": "manuelgscom/inside-llm",
+      "url": "https://github.com/manuelgscom/inside-llm",
+      "canonical_url": "https://github.com/manuelgscom/inside-llm",
+      "cluster_key": "gh:manuelgscom/inside-llm",
+      "source_type": "GitHub",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 4
+      },
+      "total": 4.3,
+      "interest": "running models locally / small models / quantization",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "llama.cpp",
+          "origin": "summary"
+        },
+        {
+          "keyword": "gguf",
+          "origin": "summary"
+        },
+        {
+          "keyword": "quantiz",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false
+    },
+    {
+      "n": 4,
+      "title": "STARKTANG108/antigravity-token-monitor",
+      "url": "https://github.com/STARKTANG108/antigravity-token-monitor",
+      "canonical_url": "https://github.com/starktang108/antigravity-token-monitor",
+      "cluster_key": "gh:starktang108/antigravity-token-monitor",
+      "source_type": "GitHub",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 3,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 2
+      },
+      "total": 3.4,
+      "interest": "observability / tracing for LLM pipelines",
+      "tier": "mid",
+      "matches": [
+        {
+          "keyword": "observability",
+          "origin": "summary"
+        },
+        {
+          "keyword": "telemetry",
+          "origin": "summary"
+        }
+      ],
+      "exploration": true
+    },
+    {
+      "n": 5,
+      "title": "ALIVE: Making Streaming Video Models Interactive",
+      "url": "https://arxiv.org/abs/2611.21366",
+      "canonical_url": "https://arxiv.org/abs/2611.21366",
+      "cluster_key": "gh:lijinzhao30/alive",
+      "source_type": "arXiv",
+      "item_type": "paper",
+      "signals": {
+        "interest-match": 2,
+        "novelty": 5,
+        "hands-on": 4,
+        "thought-leadership": 1,
+        "source-quality": 4
+      },
+      "total": 3.05,
+      "interest": "observability / tracing for LLM pipelines",
+      "tier": "mid",
+      "matches": [
+        {
+          "keyword": "monitoring",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false
+    }
+  ]
+}
