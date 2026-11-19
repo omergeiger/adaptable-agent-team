@@ -45,6 +45,10 @@ Example data includes titles and excerpts of publicly available posts, kept for 
    `--cycles` only takes effect with `single_cycle: false`; in gated mode the loop always exits after one cycle.
    The loop detects an unadapted project (no `steering/<active>/consensus.md`) and exits, directing you to run `/adapt` first.
 
+## Try It
+
+[TRY_IT.md](TRY_IT.md) walks through the whole flow on a small team - two agents who publish a daily AI tooling digest - with the exact `/adapt` request to use, what to expect at each step, ready-to-paste prompts that check the generated files, and one- and three-cycle runs of the loop.
+
 ## Repo Structure
 
 ```
@@ -52,6 +56,7 @@ adaptable-agent-team/
 ├── README.md
 ├── CLAUDE.md                  # Directives for Claude Code sessions
 ├── LICENSE                    # MIT
+├── TRY_IT.md                  # Hands-on walkthrough: /adapt a daily digest team and run it
 ├── loop.py                    # Main loop entrypoint
 ├── config.yaml                # Top-level config (active project, toggles)
 ├── requirements.txt
