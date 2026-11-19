@@ -12,3 +12,6 @@ Dedup ledger (D7). One line per delivered item: `<edition> | <canonical URL> | <
 | 2026-11-19 | 02 | https://github.com/boringmarketer/boring-marketing-skills | gh:boringmarketer/boring-marketing-skills | boringmarketer/boring-marketing-skills |
 | 2026-11-19 | 02 | https://github.com/googlechrome/modern-web-guidance | gh:googlechrome/modern-web-guidance | Show HN: Get your coding agent off ~2019 JavaScript, onto modern web primitives |
 | 2026-11-19 | 02 | https://simonwillison.net/2026/Nov/14/datasette-llm | https://simonwillison.net/2026/Nov/14/datasette-llm | datasette-llm 0.1a11 |
+| 2026-11-19 | 03 | https://github.com/morajabi/poo | gh:morajabi/poo | morajabi/poo |
+| 2026-11-19 | 03 | https://github.com/rivet-dev/rivet | gh:rivet-dev/rivet | Launch HN: Rivet (YC W23) – Scale and Orchestrate Agents on S3 |
+| 2026-11-19 | 03 | https://latent.space/p/ainews-the-no-ai-slop-manifesto | https://latent.space/p/ainews-the-no-ai-slop-manifesto | [AINews] The No AI Slop Manifesto |

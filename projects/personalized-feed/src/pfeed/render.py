@@ -6,6 +6,7 @@ import json
 import re
 from pathlib import Path
 
+from . import rank_data as D
 from .ledger import cluster_key
 
 FOOTER = '---\n_Feedback: reply 👍/👎 per item, or "more like #2 / less like #4" to tune future feeds._\n'
@@ -35,7 +36,8 @@ def _facts(c):
 
 def _cited(s):
     """' (matched: a, b)' from the keywords that actually matched, so the reason is checkable."""
-    words = list(dict.fromkeys(m["keyword"] for m in s.matches))
+    words = list(dict.fromkeys(m["keyword"] for m in s.matches
+                               if m["keyword"] not in D.WEAK_KEYWORDS | D.GENERIC_KEYWORDS))  # never cite weak matches
     return f" (matched: {', '.join(words[:3])})" if words else ""
 
 

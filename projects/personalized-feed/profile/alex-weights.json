@@ -1,10 +1,10 @@
 {
   "weights": {
-    "interest-match": 0.26937780583613913,
-    "novelty": 0.1830983445566779,
-    "hands-on": 0.23518167789001124,
-    "thought-leadership": 0.15256734006734005,
-    "source-quality": 0.1597748316498317
+    "interest-match": 0.2811393168805608,
+    "novelty": 0.20298763093901978,
+    "hands-on": 0.25016456330616965,
+    "thought-leadership": 0.1381950544088225,
+    "source-quality": 0.12751343446542723
   },
   "log": [
     {
@@ -159,6 +159,72 @@
         "hands-on": 0.23518167789001124,
         "thought-leadership": 0.15256734006734005,
         "source-quality": 0.1597748316498317
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 3,
+      "event": "\ud83d\udc4d 1",
+      "item": 1,
+      "url": "https://github.com/morajabi/poo",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.26937780583613913,
+        "novelty": 0.1830983445566779,
+        "hands-on": 0.23518167789001124,
+        "thought-leadership": 0.15256734006734005,
+        "source-quality": 0.1597748316498317
+      },
+      "after": {
+        "interest-match": 0.26614817153011594,
+        "novelty": 0.19424862046389824,
+        "hands-on": 0.23765139824167605,
+        "thought-leadership": 0.1271394500561167,
+        "source-quality": 0.1748123597081931
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 3,
+      "event": "\ud83d\udc4d 2",
+      "item": 2,
+      "url": "https://github.com/rivet-dev/rivet",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.26614817153011594,
+        "novelty": 0.19424862046389824,
+        "hands-on": 0.23765139824167605,
+        "thought-leadership": 0.1271394500561167,
+        "source-quality": 0.1748123597081931
+      },
+      "after": {
+        "interest-match": 0.2749114535044487,
+        "novelty": 0.21239010475121586,
+        "hands-on": 0.25013165064493575,
+        "thought-leadership": 0.11055604352705801,
+        "source-quality": 0.15201074757234181
+      }
+    },
+    {
+      "date": "2026-11-19",
+      "edition": 3,
+      "event": "\ud83d\udc4e 3",
+      "item": 3,
+      "url": "https://latent.space/p/ainews-the-no-ai-slop-manifesto/",
+      "tag": "simulated",
+      "before": {
+        "interest-match": 0.2749114535044487,
+        "novelty": 0.21239010475121586,
+        "hands-on": 0.25013165064493575,
+        "thought-leadership": 0.11055604352705801,
+        "source-quality": 0.15201074757234181
+      },
+      "after": {
+        "interest-match": 0.2811393168805608,
+        "novelty": 0.20298763093901978,
+        "hands-on": 0.25016456330616965,
+        "thought-leadership": 0.1381950544088225,
+        "source-quality": 0.12751343446542723
       }
     }
   ]

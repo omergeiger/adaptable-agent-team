@@ -1,0 +1,122 @@
+{
+  "user": "alex",
+  "date": "2026-11-19",
+  "edition": 3,
+  "weights": {
+    "interest-match": 0.26937780583613913,
+    "novelty": 0.1830983445566779,
+    "hands-on": 0.23518167789001124,
+    "thought-leadership": 0.15256734006734005,
+    "source-quality": 0.1597748316498317
+  },
+  "warnings": [
+    "relaxed: hands-on floor lowered to 1 (some items are less tryable than usual) - still unsatisfiable",
+    "relaxed: edition size lowered to 4 - still unsatisfiable",
+    "relaxed: edition size lowered to 3 - still unsatisfiable",
+    "relaxed: allowed a 2nd item for a capped interest",
+    "no exploration pick (in-interest, outside the top interests) met the bar; shipped without one"
+  ],
+  "items": [
+    {
+      "n": 1,
+      "title": "morajabi/poo",
+      "url": "https://github.com/morajabi/poo",
+      "canonical_url": "https://github.com/morajabi/poo",
+      "cluster_key": "gh:morajabi/poo",
+      "source_type": "GitHub",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 4
+      },
+      "total": 4.23,
+      "interest": "agent frameworks / orchestration / tool use",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "agent",
+          "origin": "summary"
+        },
+        {
+          "keyword": "agents",
+          "origin": "summary"
+        },
+        {
+          "keyword": "mcp",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false,
+      "exploration_kind": ""
+    },
+    {
+      "n": 2,
+      "title": "Launch HN: Rivet (YC W23) – Scale and Orchestrate Agents on S3",
+      "url": "https://github.com/rivet-dev/rivet",
+      "canonical_url": "https://github.com/rivet-dev/rivet",
+      "cluster_key": "gh:rivet-dev/rivet",
+      "source_type": "HN",
+      "item_type": "repo",
+      "signals": {
+        "interest-match": 5,
+        "novelty": 5,
+        "hands-on": 5,
+        "thought-leadership": 1,
+        "source-quality": 3
+      },
+      "total": 4.0702,
+      "interest": "agent frameworks / orchestration / tool use",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "agent",
+          "origin": "title"
+        },
+        {
+          "keyword": "agents",
+          "origin": "title"
+        },
+        {
+          "keyword": "agentic",
+          "origin": "summary"
+        },
+        {
+          "keyword": "orchestrat",
+          "origin": "title"
+        }
+      ],
+      "exploration": false,
+      "exploration_kind": ""
+    },
+    {
+      "n": 3,
+      "title": "[AINews] The No AI Slop Manifesto",
+      "url": "https://latent.space/p/ainews-the-no-ai-slop-manifesto/",
+      "canonical_url": "https://latent.space/p/ainews-the-no-ai-slop-manifesto",
+      "cluster_key": "https://latent.space/p/ainews-the-no-ai-slop-manifesto",
+      "source_type": "Substack",
+      "item_type": "article",
+      "signals": {
+        "interest-match": 4,
+        "novelty": 5,
+        "hands-on": 4,
+        "thought-leadership": 1,
+        "source-quality": 4
+      },
+      "total": 3.7254,
+      "interest": "running models locally / small models / quantization",
+      "tier": "high",
+      "matches": [
+        {
+          "keyword": "llama.cpp",
+          "origin": "summary"
+        }
+      ],
+      "exploration": false,
+      "exploration_kind": ""
+    }
+  ]
+}

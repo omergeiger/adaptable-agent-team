@@ -33,6 +33,10 @@ STRONG_HITS = 2  # >= this many distinct keyword hits, or a STRONG keyword in th
 # Weak keywords are generic: a single weak hit scores one tier lower and is never strong via the title alone.
 WEAK_KEYWORDS = {"production", "document", "form", "schema", "trace", "retrieval", "benchmark", "monitoring",
                  "incident", "ticket", "pdf", "extraction"}
+# Slice 7: generic words that name a whole field. Hits made only of these (agent/agents/agentic are one word family)
+# are a lone generic match: score <= LONE_GENERIC_CAP, never strong. A second distinct non-generic hit backs it up.
+GENERIC_KEYWORDS = {"agent", "agents", "agentic", "llm", "ai"}
+LONE_GENERIC_CAP = 2
 # Keywords matched as a prefix (stems). Everything else is a whole word with an optional plural "s".
 STEM_KEYWORDS = {"quantiz", "orchestrat"}
 # An interest whose words are ambiguous alone needs one of these terms in the text (repos/tools are exempt).
@@ -106,7 +110,7 @@ TOP_INTEREST_CAP_FRACTION = 0.6       # at most round(0.6*n) items (3 of 5) from
 
 # --- Slice 4 (ranking-engineer cycle 6 eval) ---
 MIN_INTEREST_MATCH_MAIN = 3           # slice 6: items scoring <= 2 are dropped, never used to fill a slot or a source type
-EXPLORATION_MIN_INTEREST_MATCH = 3    # exploration pick needs a strong match (Scored.strong) AND at least this
+EXPLORATION_MIN_INTEREST_MATCH = 2    # exploration pick needs a strong match (Scored.strong) AND at least this
 EXPLORATION_EXCLUDED_SOURCE_TYPES = ("Substack",)  # newsletter headlines are not tryable
 TAIL_REPO_STARS = 50                  # at most MAX_TAIL_REPOS delivered repos below this per edition
 MAX_TAIL_REPOS = 1

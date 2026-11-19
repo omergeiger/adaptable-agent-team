@@ -143,12 +143,14 @@ def _match(c, profile):
         strong_hits = [k for k in hits if k not in D.WEAK_KEYWORDS]
         strong = any(_kw_hit(k, title) for k in strong_hits) or (len(hits) >= D.STRONG_HITS and bool(strong_hits))
         signal = base if strong else max(base - 1, 1) if strong_hits else 1  # weak-only match is worth 1
+        if all(k in D.GENERIC_KEYWORDS for k in hits):  # lone generic word: weak match, never strong
+            signal, strong = min(signal, D.LONE_GENERIC_CAP), False
         matches = [{"keyword": k, "origin": "title" if _kw_hit(k, title) else "summary"} for k in hits]
         if c.source_type in D.SUMMARY_CAP_SOURCE_TYPES and all(m["origin"] == "summary" for m in matches):
             if not strong_hits:
                 continue  # weak words in a promotional body prove nothing: no match, no credit
             signal = min(signal, D.SUMMARY_ONLY_CAP)
-        rank_key = (base, len(hits), w)
+        rank_key = (signal, base, len(hits), w)  # what it scores first: a lone generic hit must not beat a strong match
         if best is None or rank_key > best[0]:
             best = (rank_key, it.name, tier, signal, strong, matches)
     return best[1:] if best else ("", "", 0, False, [])
@@ -335,7 +337,7 @@ def _attempt(scored, profile, n, floor, extra_cap, min_match=D.MIN_INTEREST_MATC
     eligible = [s for s in scored if s.signals["hands-on"] >= floor and s.signals["interest-match"] >= min_match]
     chosen = []
     top = top_interests(profile)
-    pick = _exploration_pick(eligible, profile, floor, n, extra_cap)
+    pick = _exploration_pick([s for s in scored if s.signals["hands-on"] >= floor], profile, floor, n, extra_cap)
     for s in scored:
         s.exploration, s.exploration_kind = False, ""
     if pick:
@@ -367,7 +369,7 @@ def _attempt(scored, profile, n, floor, extra_cap, min_match=D.MIN_INTEREST_MATC
 M = D.MIN_INTEREST_MATCH_MAIN
 RELAXATIONS = [  # (hands-on floor, n, extra per-interest cap, min interest-match, warning)
     (D.DEFAULT_HANDS_ON_FLOOR, D.TARGET_N, 0, M, ""),
-    (1, D.TARGET_N, 0, M, "relaxed: hands-on floor lowered to 1"),
+    (1, D.TARGET_N, 0, M, "relaxed: hands-on floor lowered to 1 (some items are less tryable than usual)"),
     (1, 4, 0, M, "relaxed: edition size lowered to 4"),
     (1, 3, 0, M, "relaxed: edition size lowered to 3"),
     (1, 3, 1, M, "relaxed: allowed a 2nd item for a capped interest"),
