@@ -185,13 +185,13 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 
 ---
 
-## Human Directives (read-only — never modify this file)
+## Human Directives (read-only - never modify this file)
 
 {directives_content}
 
 ---
 
-## Current Consensus (pre-loaded — do not re-read from disk)
+## Current Consensus (pre-loaded - do not re-read from disk)
 
 {consensus_content}
 
@@ -215,9 +215,9 @@ def run_cycle(
     transcript_lines is populated only when verbose=True.
     """
     cmd = [claude_bin, "-p", prompt, "--permission-mode", "bypassPermissions"]
-    # Load loop-only skills as a plugin, scoped to this invocation. Interactive
-    # Claude Code sessions never pass --plugin-dir, so these skills stay invisible
-    # to them and are addressed namespaced as `loop-plugin:<skill-name>`.
+    # Load the loop-only role sub-agents and skills as a plugin, scoped to this
+    # invocation. Interactive Claude Code sessions never pass --plugin-dir, so they
+    # stay invisible there; both are addressed namespaced as `loop-plugin:<name>`.
     cmd += ["--plugin-dir", str(PLUGIN_DIR)]
     if verbose:
         # The CLI requires --verbose for stream-json in print mode
@@ -397,7 +397,7 @@ def main() -> None:
     directives_path = steering_dir / "human_directives.md"
     state_file = logs_dir / "loop_state.json"
 
-    # Unadapted project guard — runs before any mkdir so no stray directories are created
+    # Unadapted project guard - runs before any mkdir so no stray directories are created
     if con.is_unadapted(consensus_path):
         print(f"[agentteam] ERROR: Project '{active}' is unadapted - {consensus_path.relative_to(REPO_ROOT)} does not exist.", file=sys.stderr)
         print("[agentteam] Run the /adapt skill interactively to set up this project, then rerun the loop.", file=sys.stderr)
@@ -620,7 +620,7 @@ def main() -> None:
         save_state(state_file, cycle_count, "idle")
 
         if config.get("single_cycle", False):
-            log.info(f"Cycle #{cycle_count}: DONE. Single-cycle mode — exiting.")
+            log.info(f"Cycle #{cycle_count}: DONE. Single-cycle mode - exiting.")
             if cycle_failed:
                 sys.exit(1)
             break

@@ -51,7 +51,7 @@ The two output files are **NOT added to source control** - the human decides whe
 
 For each, ask "what worked, what hurt, and what is the concrete fix":
 
-- **Deliverable quality** - do the products in `projects/<project>/` meet the domain bar? Gaps, fabrication risks, format/ATS issues, missed requirements.
+- **Deliverable quality** - do the products in `projects/<project>/` meet the domain bar? Gaps, fabrication risks, format or structure issues, missed requirements.
 - **Agents** - did each sub-agent earn its place? Overlap, never-invoked agents, weak/ambiguous instructions, missing guardrails.
 - **Domain skills** - were the rubrics / templates / checklists actually applied, and did they change outcomes?
 - **PROMPT domain rules** - delegation order, phase-advance semantics, escalation rules - did they match what the run actually needed?
@@ -66,7 +66,7 @@ For each, ask "what worked, what hurt, and what is the concrete fix":
 
 ### 5. Write two files (do NOT commit)
 
-Use a file-safe UTC timestamp `YYYY-MM-DDTHH-MM` (colons -> hyphens), matching existing retrospectives.
+Use a file-safe UTC timestamp `YYYY-MM-DDTHH-MM` (colons -> hyphens).
 
 - `.dev-docs/retrospective-team-<project>-<timestamp>.md`
 - `.dev-docs/retrospective-framework-<timestamp>.md`
@@ -76,7 +76,7 @@ Each file contains:
 - (Framework file) a short timeline table for context.
 - **Findings grouped by priority**, each as: **title** -> *evidence* (artifact + figures) -> **fix** (concrete change). Keep them scannable.
 
-Do **not** `git add` or `git commit` either file. Do **not** modify `.gitignore`. After writing, tell the human the two paths and that they are untracked in `.dev-docs/` until the human decides to keep them. Offer to fold chosen findings into `todos.md` (team) or a framework-branch plan (framework) if the human wants.
+Do **not** `git add` or `git commit` either file. Do **not** modify `.gitignore`. After writing, tell the human the two paths and that they are untracked in `.dev-docs/` until the human decides to keep them. Offer to apply chosen findings if the human wants - team-level ones on the instantiation's branch, framework-level ones on `main`.
 
 ### 6. Report
 
