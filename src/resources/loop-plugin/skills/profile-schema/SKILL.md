@@ -1,3 +1,8 @@
+---
+name: profile-schema
+description: User interest profile and onboarding schema, multi-user (D5). Apply when the user-profiler creates or refines a profile or runs onboarding, and when the ranking-engineer reads interest weights and excludes.
+---
+
 # profile-schema - User Interest Profile & Onboarding
 
 **Audience: agent-applied (loop-plugin:profile-schema).** Keeps the user-interest model and the onboarding/preference-capture flow consistent and multi-user (D5) - never hardcoded to one user.

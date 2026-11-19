@@ -1,3 +1,8 @@
+---
+name: test-gate
+description: Test suite discipline: how to run the suite and what counts as green. Apply when the qa-engineer verifies a slice, when the tech-lead decides whether red tests block feature work, and when the developer changes dependencies.
+---
+
 # test-gate - Test Suite Discipline
 
 **Audience: agent-applied (loop-plugin:test-gate).** Defines how the suite is run and what "green" means, so a slice is never declared done on unverified or broken tests.

@@ -1,3 +1,8 @@
+---
+name: relevance-rubric
+description: Relevance scoring signals and feedback re-weighting rules. Apply when the ranking-engineer specs or judges ranking, when the developer implements scoring and feedback, and when the user-profiler consumes thumbs-down interest flags.
+---
+
 # relevance-rubric - Ranking & Feedback Re-weighting
 
 **Audience: agent-applied (loop-plugin:relevance-rubric).** Keeps how items are scored and how human feedback adjusts that scoring stable and explainable across cycles.

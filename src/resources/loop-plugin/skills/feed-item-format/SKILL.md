@@ -1,3 +1,8 @@
+---
+name: feed-item-format
+description: Template for every feed edition and its items (3-5 items, 3+ source types, real link and a why-line each). Apply when the developer renders an edition and when the qa-engineer checks one.
+---
+
 # feed-item-format - Daily Feed & Item Template
 
 **Audience: agent-applied (loop-plugin:feed-item-format).** Protects the shape of every feed item and the daily digest so output stays consistent across cycles, users, and the Slack vs markdown channels.
