@@ -105,7 +105,7 @@ Two operating modes, selected by `single_cycle` in `config.yaml`:
   ```
 
 ### 3. Steer the team between cycles
-Edit `steering/<active>/human_directives.md` - the human's only write channel (agents read it, never write it). Add a `## Cycle Overrides` entry for a one-off instruction that supersedes the consensus `## Next Action` (remove it once satisfied), a numbered `## Standing Directives` rule (D1, D2, ...) for a persistent constraint, or an entry under `## Answers` to resolve a question the agents raised in consensus `## Open Questions`. In continuous mode with `git_sync` on, the pre-cycle commit captures edits made between cycles. See [Human Directives File](#human-directives-file).
+Edit `steering/<active>/human_directives.md` - the human's only write channel (agents read it, never write it). Add a numbered `## Cycle Overrides` entry (O1, O2, ...) for a one-off instruction that supersedes the consensus `## Next Action` (remove it once satisfied), a numbered `## Standing Directives` rule (D1, D2, ...) for a persistent constraint, or an entry under `## Answers` to resolve a question the agents raised in consensus `## Open Questions`. In continuous mode with `git_sync` on, the pre-cycle commit captures edits made between cycles. See [Human Directives File](#human-directives-file).
 
 ### 4. Review progress
 - **`steering/<active>/consensus.md`** - current state at a glance: phase, what the last cycle did, the next action, and open questions.
@@ -158,7 +158,7 @@ Each project's workspace spans three top-level directories, separated by purpose
 
 **`projects/<name>/` - deliverables only (git-tracked).** The domain-native product: code, reports, slides, digests - whatever the project is chartered to produce. Domain-native filenames, no cycle or persona stamps, no consensus/loop references. Updated in place as the canonical version. A human (or stakeholder) should be able to read this folder with no knowledge of the framework.
 
-Deliverable vs by-product rule: deliverable = the artifact the project is chartered to produce (mutable, domain-native, stands alone if the process history is deleted); by-product = the agent's synthesized account of producing it (immutable, cycle-stamped, meaningful only as a trail). Each persona writes one by-product per turn to `auto-outputs/<name>/docs/`; writes/updates deliverables in `projects/<name>/`.
+Deliverable vs by-product rule: deliverable = the artifact the project is chartered to produce (mutable, domain-native, stands alone if the process history is deleted); by-product = the agent's synthesized account of producing it (immutable, cycle-stamped, meaningful only as a trail). Agents write/update deliverables in `projects/<name>/`. The orchestrator writes one by-product per persona turn to `auto-outputs/<name>/docs/`, synthesized from each sub-agent's report (sub-agents write only deliverables).
 
 ### Loop Behavior
 `loop.py` runs iterations. Each iteration makes **one** headless Claude Code CLI call (the orchestrator session); worker agents are subagents the orchestrator delegates to *within* that session via the Task tool. The loop never invokes workers directly.
@@ -184,7 +184,7 @@ Each iteration:
 - `verbosity` flag in config.yaml: when verbose, the loop uses `--output-format stream-json` and persists the full transcript - including the orchestrator's Task-tool delegations to workers, which captures the per-agent prompts. The direction is maximum visibility into the loop from logs alone.
 
 ### Runtime Guardrails (enforced via prompt + loop)
-- The cycle prompt instructs agents: write deliverables to `projects/<active>/`, write per-cycle by-product docs to `auto-outputs/<active>/docs/`, never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files, never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents).
+- The cycle prompt instructs agents: write deliverables to `projects/<active>/`, write per-cycle by-product docs to `auto-outputs/<active>/docs/` (orchestrator only), never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files other than `consensus.md` (which only the orchestrator writes), never run git push (the loop owns git sync), never write human_directives.md (human-owned, read-only to agents), never invoke the human-run skills (`/adapt`, `/retrospect`).
 - The CLI runs from the repo root, so these restrictions are prompt-level, backed by the loop's restore of consensus from the pre-cycle in-memory snapshot.
 
 ### Consensus.md Relay Baton
@@ -194,9 +194,9 @@ Each iteration:
 
 ### Human Directives File
 - `steering/<name>/human_directives.md` is the human's steering channel. Agents read it every cycle but never write it.
-- Sections: `## Standing Directives` (persistent rules, numbered D1, D2, ... for unambiguous reference), `## Cycle Overrides` (one-off instructions that supersede consensus `## Next Action`; the human removes them once satisfied), `## Answers` (responses to consensus.md's `## Open Questions`).
+- Sections: `## Standing Directives` (persistent rules, numbered D1, D2, ... for unambiguous reference), `## Cycle Overrides` (one-off instructions that supersede consensus `## Next Action`, numbered O1, O2, ...; the human removes them once satisfied), `## Answers` (responses to consensus.md's `## Open Questions`).
 - Precedence: Cycle Overrides > Standing Directives > consensus `## Next Action`.
-- The loop injects the file's content into the cycle prompt, marked read-only. Agents acknowledge directive IDs they acted on in consensus.md's `## What We Did This Cycle`.
+- The loop injects the file's content into the cycle prompt, marked read-only. Agents acknowledge the directive and override IDs (D1, O1, ...) they acted on in consensus.md's `## What We Did This Cycle`.
 - In gated mode (`single_cycle: true`): run a cycle, edit human_directives.md, re-run.
 
 ### Dynamic Squad Assembly
@@ -207,7 +207,7 @@ Each iteration:
 ### Skill Library
 - Reusable capabilities, defined as callable units rather than baked into agent prompts.
 - Skills live in one of two homes depending on audience:
-  - **`.claude/skills/`** - human-run setup skills (the only one shipped is `/adapt`). Discovered by **both** interactive sessions and headless loop sessions (they share the repo cwd), so loop agents are explicitly forbidden from invoking them in `PROMPT.md`. Invoked interactively as `/<name>`.
+  - **`.claude/skills/`** - human-run setup skills (the only one shipped is `/adapt`). Discovered by **both** interactive sessions and headless loop sessions (they share the repo cwd), so loop agents are explicitly forbidden from invoking them by the runtime guardrails `loop.py` appends to the cycle prompt. Invoked interactively as `/<name>`.
   - **`src/resources/loop-plugin/skills/`** - agent-applied skills, loaded **only** into headless loop sessions via the `loop-plugin` plugin (`loop.py` passes `claude -p --plugin-dir`). Invisible to interactive sessions; addressed namespaced as `loop-plugin:<name>`. This is the home for framework loop skills **and** the domain-convention skills `/adapt` generates.
 
 ### Adapt Skill (human-facing, pre-launch)

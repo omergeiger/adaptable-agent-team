@@ -5,7 +5,7 @@ description: Human-run retrospective for a team instantiation run. Iterates the 
 
 # /retrospect - AgentTeam Run Retrospective
 
-**Run this skill interactively after (or during) a team instantiation's loop run.** It is HUMAN-RUN only - never invoked by the loop or by agents. It lives in `.claude/skills/`, the human-run home alongside `/adapt`; PROMPT.md forbids loop agents from invoking anything here.
+**Run this skill interactively after (or during) a team instantiation's loop run.** It is HUMAN-RUN only - never invoked by the loop or by agents. It lives in `.claude/skills/`, the human-run home alongside `/adapt`; the runtime guardrails `loop.py` appends to the cycle prompt forbid loop agents from invoking it.
 
 It reads everything a run produced - steering, per-cycle by-products, logs, deliverables, and the instantiation's generated config (agents, skills, tailored prompt) - and writes **two separate, prioritized improvement docs** to `.dev-docs/`:
 

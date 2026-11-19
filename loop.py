@@ -170,11 +170,12 @@ def build_prompt(cycle_num: int, config: dict, consensus_content: str, directive
 ## Runtime Guardrails (required)
 
 - **Deliverables** (the domain product the project is chartered to produce): write to `projects/{active}/`. Use domain-native filenames with no cycle or persona stamps; no framework references.
-- **By-products** (your synthesized account of this cycle's work): write one file per persona turn to `auto-outputs/{active}/docs/`. Name each file `cycle-{cycle_num:04d}-{cycle_time_file}-<persona>-<slug>.md`.
-- Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or steering files in `steering/`.
+- **By-products** (the synthesized account of this cycle's work): you, the orchestrator, write one file per persona turn to `auto-outputs/{active}/docs/` - one for each sub-agent you delegated to (synthesized from its report) and one for your own turn if you did hands-on work. Sub-agents write only deliverables. Name each file `cycle-{cycle_num:04d}-{cycle_time_file}-<persona>-<slug>.md`.
+- **Consensus**: `steering/{active}/consensus.md` is the only steering file you may write, and only you (the orchestrator) write it - never a sub-agent.
+- Never modify framework files (`loop.py`, `config.yaml`, `src/`, `.claude/`) or any other file in `steering/`.
 - Never run `git push` - the loop owns git sync.
 - Never write `human_directives.md` - it is human-owned and read-only to agents.
-- Never invoke the /adapt skill - it is human-run only.
+- Never invoke the human-run skills in `.claude/skills/` (`/adapt`, `/retrospect`).
 
 ---
 

@@ -12,7 +12,7 @@ The current consensus and human directives are pre-loaded at the end of this pro
 
 Determine the priority action for this cycle using this precedence:
 
-1. **Cycle Overrides** in human_directives.md — these supersede everything. Execute them and acknowledge the override IDs in `## What We Did This Cycle`.
+1. **Cycle Overrides** in human_directives.md — these supersede everything. Execute them and acknowledge the override IDs (O1, O2, ...) in `## What We Did This Cycle`.
 2. **Standing Directives** (D1, D2, ...) — persistent rules that apply every cycle.
 3. **`## Next Action`** in consensus.md — the default course.
 
@@ -43,7 +43,7 @@ Before this cycle ends, you **must** update `steering/<active_project>/consensus
 
 ## What We Did This Cycle
 - <what was done this cycle>
-- Acknowledged directives: <D1, D2, ...> or "none"
+- Acknowledged directives: <D1, O1, ...> or "none"
 
 ## Key Decisions
 - <decision and brief rationale>
