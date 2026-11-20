@@ -1,15 +1,15 @@
 # Pristine template defaults. `active_project` and `squad` are set by /adapt;
 # until then the loop detects an unadapted project and exits, directing you to
 # run /adapt. Do not point `active_project` at a real project before adapting.
-active_project: example
+active_project: ai-tooling-digest
 
 loop_interval_seconds: 30
-single_cycle: true
+single_cycle: false
 git_sync: false
 
 # Worker role slugs, populated by /adapt (one src/resources/loop-plugin/agents/<role>.md per entry).
 # The orchestrator is never listed here - the headless cycle session is the orchestrator.
-squad: []
+squad: [editor, researcher]
 
 model: claude-sonnet-5-5
 
