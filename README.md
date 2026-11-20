@@ -16,10 +16,11 @@ Adaptable Agent Team builds on [Autonomous Company](https://github.com/MaxMiksa/
 
 ## Examples
 
-Two complete adapted runs live on their own branches, so `main` stays a clean template. Compare a branch against `main` to see exactly what `/adapt` generated and what the team produced:
+Three complete adapted runs live on their own branches, so `main` stays a clean template. Compare a branch against `main` to see exactly what `/adapt` generated and what the team produced:
 
 - [`example/personalized-feed`](../../tree/example/personalized-feed) - a team that builds a personalized news-feed pipeline (ingest, rank, render, feedback) in Python, with tests.
 - [`example/cv-designer`](../../tree/example/cv-designer) - a team that turns a (fictional) candidate's raw material into a CV with several HTML layouts, a PDF and an ATS report.
+- [`example/ai-tooling-digest`](../../tree/example/ai-tooling-digest) - the result of following [TRY_IT.md](TRY_IT.md): a two-agent team that publishes a daily digest of AI tooling news. Its digests are AI-generated summaries of public changelogs from a 2026-11-19 test run; they may contain errors and are not affiliated with the products mentioned.
 
 Example data includes titles and excerpts of publicly available posts, kept for illustration; open an issue to request removal.
 

@@ -7,6 +7,8 @@ You will:
 2. check what it generated,
 3. run the loop for one or three cycles and check the digests it produces.
 
+To see the end result before you start, browse the [`example/ai-tooling-digest`](../../tree/example/ai-tooling-digest) branch: one run of this walkthrough, with its three digests (AI-generated, may contain errors - see the note on that branch).
+
 Steps 1-2 take a few minutes. Running cycles uses Claude usage: each cycle does web searches and calls two sub-agents, and takes a few minutes.
 
 ---
